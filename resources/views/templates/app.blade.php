@@ -46,10 +46,9 @@
         <nav id="navmenu" class="navmenu">
           <ul>
             <li><a href="{{url('/')}}">Início</a></li>
-            <li><a href="#about">Sobre</a></li>
-            <li><a href="#services">Blog</a></li>
-            <li><a href="#portfolio">Empregos</a></li>
-            <li><a href="#team">Contactos</a></li>
+            <li><a href="{{url('/sobre')}}">Sobre</a></li>
+            <li><a href="{{url('/blog')}}">Blog</a></li>
+            <li><a href="{{url('/vagas')}}">Empregos</a></li>
           </ul>
           <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
         </nav>

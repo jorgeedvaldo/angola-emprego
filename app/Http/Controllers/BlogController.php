@@ -12,7 +12,7 @@ class BlogController extends Controller
     {
         $posts = Post::orderByRaw('id DESC')->paginate(30);
         $categories = Category::orderBy('name')->get();
-        return view('posts', compact('posts', 'categories'));
+        return view('blog', compact('posts', 'categories'));
     }
 
     public function getBySlug($slug)

@@ -11,8 +11,8 @@ class JobController extends Controller
     public function index()
     {
         $jobs = Job::orderByRaw('id DESC')->paginate(30);
-        $categories = Category::orderBy('name')->get();
-        return view('jobs', compact('jobs', 'categories'));
+        //$categories = Category::orderBy('name')->get();
+        return view('jobs', compact('jobs'));
     }
 
     public function getBySlug($slug)

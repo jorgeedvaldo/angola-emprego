@@ -9,8 +9,8 @@
   <meta name="robots" content="follow, index, max-snippet:-1, max-video-preview:-1, max-image-preview:large"/>
 
   <!-- Favicons -->
-  <link href="{{ asset('assets/img/favicon.png') }}" rel="icon">
-  <link href="{{ asset('assets/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
+  <link rel="icon" href="{{ asset('assets/img/favicon.png') }}">
+  <link rel="apple-touch-icon" href="{{ asset('assets/img/apple-touch-icon.png') }}">
 
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com" rel="preconnect">
@@ -32,15 +32,14 @@
 
 <body class="index-page">
 
-  <header id="header" class="header sticky-top">
+  <header id="header" class="header sticky-topp">
 
     <div class="branding d-flex align-items-cente">
 
       <div class="container position-relative d-flex align-items-center justify-content-between">
         <a href="{{url('/')}}" class="logo d-flex align-items-center">
           <!-- Uncomment the line below if you also wish to use an image logo -->
-          <!-- <img src="assets/img/logo.png" alt=""> -->
-          <h1 class="sitename">AngolaEmprego</h1>
+          <img width="150" src="assets/img/logo.svg" alt=""/>
         </a>
 
         <nav id="navmenu" class="navmenu">

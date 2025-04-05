@@ -30,7 +30,7 @@ class PostResource extends Resource
                         Forms\Components\TextInput::make('title')->required(),
                         Forms\Components\RichEditor::make('description')->required(),
                         Forms\Components\FileUpload::make('image')
-                        ->directory('images/articles')
+                        ->directory('images/posts')
                         ->image(),
                     ])
             ]);

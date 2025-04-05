@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AboutController;
+use App\Http\Controllers\BlogController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\JobController;
 
@@ -19,6 +20,9 @@ use App\Http\Controllers\JobController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/sobre', [AboutController::class, 'index'])->name('sobre');
+
+Route::get('/blog', [BlogController::class, 'index']);
+Route::get('/{slug}', [BlogController::class, 'getBySlug']);
 
 Route::get('/vagas', [JobController::class, 'index']);
 Route::get('/vagas/{slug}', [JobController::class, 'getBySlug']);

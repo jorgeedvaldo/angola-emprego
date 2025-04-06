@@ -4,6 +4,7 @@
 @section('canonical_link', url('/'.$post->slug))
 @section('created_at', $post->created_at)
 @section('updated_at', $post->updated_at)
+@section('url', asset('storage/' . $post->image))
 
 @section('head-scripts')
 

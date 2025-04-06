@@ -61,6 +61,7 @@
                   </div>
               </div>
             @endforeach
+            <a href="{{url('/vagas')}}" class="btn btn-outline-primary btn-lg">Ver mais Vagas</a>
           </div>
 
         </div>
@@ -105,7 +106,7 @@
                 </article>
               </div><!-- End post list item -->
               @endforeach
-
+              <a href="{{url('/blog')}}" class="btn btn-outline-primary btn-lg">Visitar o Blog</a>
             </div>
           </div>
 

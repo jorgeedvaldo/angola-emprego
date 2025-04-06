@@ -40,7 +40,7 @@
           </div>
 
           <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
-            <img src="{{asset('storage/')}}" alt="" class="img-fluid services-img">
+            <img src="{{asset('assets/img/about.jpg')}}" alt="" class="img-fluid services-img">
 
           </div>
 

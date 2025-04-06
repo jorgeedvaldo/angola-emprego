@@ -39,7 +39,7 @@
       <div class="container position-relative d-flex align-items-center justify-content-between">
         <a href="{{url('/')}}" class="logo d-flex align-items-center">
           <!-- Uncomment the line below if you also wish to use an image logo -->
-          <img width="150" src="assets/img/logo.svg" alt=""/>
+          <img width="150" src="{{asset('assets/img/logo.svg')}}" alt=""/>
         </a>
 
         <nav id="navmenu" class="navmenu">

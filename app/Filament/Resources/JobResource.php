@@ -34,7 +34,7 @@ class JobResource extends Resource
                     Forms\Components\FileUpload::make('image')
                         ->directory('images/jobs')
                         ->image()
-                        ->default('images/jobs/default.jpg'),
+                        ->default('images/jobs/default.png'),
                     Forms\Components\MultiSelect::make('categories')
                         ->relationship('categories','name'),
                 ])

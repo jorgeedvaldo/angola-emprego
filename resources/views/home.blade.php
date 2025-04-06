@@ -84,17 +84,16 @@
                 <article>
 
                   <div class="post-img">
-                    <img src="assets/img/blog/blog-1.jpg" alt="" class="img-fluid">
+                    <img src="{{asset('storage/thumb/' . $post->image)}}" alt="" class="img-fluid">
                   </div>
 
                   <p class="post-category">Politics</p>
 
-                  <h3 class="title">
+                  <h4 class="title">
                     <a href="{{ url('/' . $post->slug) }}">{{ $post->title }}</a>
-                  </h3>
+                  </h4>
 
                   <div class="d-flex align-items-center">
-                    <img src="assets/img/blog/blog-author.jpg" alt="" class="img-fluid post-author-img flex-shrink-0">
                     <div class="post-meta">
                       <p class="post-author">Yuri Kiluanji</p>
                       <p class="post-date">

@@ -32,11 +32,11 @@
                 <div class="col-lg-4">
                   <article>
 
-                    <div class="post-img">
+                    <div class="post-img mb-3">
                       <img src="{{asset('storage/thumb/' . $post->image)}}" alt="" class="img-fluid">
                     </div>
 
-                    <p class="post-category">Politics</p>
+                    <!-- Category here <p class="post-category">Politics</p>-->
 
                     <h4 class="title">
                       <a href="{{ url('/' . $post->slug) }}">{{ $post->title }}</a>

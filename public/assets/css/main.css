@@ -18,7 +18,7 @@
 }
 
 /* Global Colors - The following color variables are used throughout the website. Updating them here will change the color scheme of the entire website */
-:root { 
+:root {
   --background-color: #ffffff; /* Background color for the entire website, including individual sections */
   --default-color: #444444; /* Default color used for the majority of the text content across the entire website */
   --heading-color: #222222; /* Color for headings, subheadings and title throughout the website */
@@ -1957,4 +1957,43 @@ section,
 --------------------------------------------------------------*/
 .starter-section {
   /* Add your styles here */
+}
+
+
+
+
+/* Estilos para os elementos da vaga */
+.vaga-meta {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.compartilhar-botoes .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+.vaga-info i {
+    font-size: 0.9rem;
+}
+
+@media (max-width: 576px) {
+    .compartilhar-botoes {
+        margin-bottom: 10px;
+    }
+
+    .vaga-info {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+}
+.btn-facebook {
+    color: #1877F2;
+    border-color: #1877F2;
+}
+.btn-facebook:hover {
+    background-color: #1877F2;
+    color: white;
 }

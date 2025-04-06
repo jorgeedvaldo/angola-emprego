@@ -2,6 +2,7 @@
 @section('title', 'Blog')
 @section('description', 'Angola Emprego é o maior portal de emprego em Angola, comprometido em ajudar milhares de angolanos a encontrar as melhores oportunidades de trabalho diariamente')
 @section('canonical_link', url('/blog'))
+@section('url', asset('storage/' . $post->image))
 
 @section('head-scripts')
 

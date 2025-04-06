@@ -4,6 +4,7 @@
 @section('canonical_link', url('/vagas/'.$job->slug))
 @section('created_at', $job->created_at)
 @section('updated_at', $job->updated_at)
+@section('url', asset('storage/' . $job->image))
 
 @section('head-scripts')
 <script type="application/ld+json">

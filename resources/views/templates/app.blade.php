@@ -27,6 +27,24 @@
   <!-- Main CSS File -->
   <link href="{{ asset('assets/css/main.css') }}" rel="stylesheet">
 
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="@yield('title') - {{env('APP_NAME')}}" />
+  <meta property="og:url" content="@yield('canonical_link')" />
+  <meta property="og:description" content="@yield('description')" />
+  <meta property="article:published_time" content="@yield('created_at')" />
+  <meta property="article:modified_time" content="@yield('updated_at')" />
+  <meta property="og:site_name" content="Angola Emprego" />
+  <meta property="og:image" content="@yield('url')" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="700" />
+  <meta property="og:image:alt" content />
+  <meta property="og:locale" content="pt_PT" />
+  <meta name="author" content="Edivaldo" />
+  <meta name="twitter:text:title" content="@yield('title') - {{env('APP_NAME')}}" />
+  <meta name="twitter:image" content="@yield('url')" />
+  <meta name="twitter:card" content="summary_large_image" />
+
   @yield('head-scripts')
 </head>
 

@@ -6,7 +6,58 @@
 @section('updated_at', $job->updated_at)
 
 @section('head-scripts')
+<script type="application/ld+json">
+    {
+  "@context":"http:\/\/schema.org\/",
+  "@type":"JobPosting",
+  "datePosted":"{{ date_format(new DateTime($job['created_at']), DATE_ATOM) }}",
+  "title":"{{$job['title']}}",
+  "description":"{{$job['description']}}",
+  "employmentType":["FULL_TIME"],
+  "hiringOrganization":{
+          "@type":"Organization",
+          "name":"{{$job['company']}}",
+          "logo":"{{asset('storage/' . $job['image'])}}"
+          },
+  "identifier":{
+          "@type":"PropertyValue",
+          "name":"{{$job['company']}}",
+          "value":"https:\/\/angolaemprego.com\/#identifier"
+          },
+  "jobLocation":[
 
+    {
+      "@type":"Place",
+      "address":"{{$job['province']}}"
+    },
+
+    {
+        "@type":"Place",
+        "address":
+                {
+                    "@type":"PostalAddress",
+                    "streetAddress":"Luanda",
+                    "addressLocality":"Luanda",
+                    "addressRegion":"Luanda",
+                    "postalCode":"Luanda",
+                    "addressCountry":"Luanda"
+                }
+    },
+    {
+        "@type":"Place",
+        "address":
+                {
+                    "@type":"PostalAddress",
+                    "streetAddress":"Angola",
+                    "addressLocality":"Angola",
+                    "addressRegion":"Angola",
+                    "postalCode":"Angola",
+                    "addressCountry":"Angola"
+                }
+    }
+]
+}
+</script>
 @endsection
 
 @section('content')

@@ -10,7 +10,7 @@ class BlogController extends Controller
 {
     public function index()
     {
-        $posts = Post::orderByRaw('id DESC')->paginate(10);
+        $posts = Post::orderByRaw('id DESC')->paginate(30);
         $categories = Category::orderBy('name')->get();
         return view('blog', compact('posts', 'categories'));
     }

@@ -55,6 +55,7 @@
                 </div><!-- End post list item -->
                 @endforeach
 
+                {{ $posts->links() }}
               </div>
 
           </div>

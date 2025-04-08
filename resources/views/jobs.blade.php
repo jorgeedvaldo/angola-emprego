@@ -41,7 +41,7 @@
                               {!! \Illuminate\Support\Str::limit(strip_tags($job->description), 207, $end='...') !!}
                             </p>
                             <ul class="list-unstyled">
-                                <li><strong>Local:</strong> {{ $job->location }}</li>
+                                <li><strong>Local: </strong> {{ $job->location }}</li>
                             </ul>
                             <a href="{{ url('/vagas/' . $job->slug) }}" class="btn btn-primary">Ver Detalhes</a>
                         </div>

@@ -23,7 +23,7 @@ class BlogController extends Controller
 
             $categories = Category::orderBy('name')->get();
 
-            $LastPosts = Post::where('slug', '<>', $slug)->orderByRaw('id DESC')->get();
+            $LastPosts = Post::where('slug', '<>', $slug)->orderByRaw('id DESC')->paginate(8);;
 
             return view('post', compact('post', 'categories', 'LastPosts'));
         }

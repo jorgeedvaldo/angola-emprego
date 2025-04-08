@@ -23,7 +23,7 @@ class JobController extends Controller
 
             $categories = Category::orderBy('name')->get();
 
-            $LastJobs = Job::where('slug', '<>', $slug)->orderByRaw('id DESC')->get();
+            $LastJobs = Job::where('slug', '<>', $slug)->orderByRaw('id DESC')->paginate(8);
 
             return view('job-detail', compact('job', 'categories', 'LastJobs'));
         }

@@ -100,7 +100,7 @@
     <div class="container footer-top">
       <div class="row gy-4">
         <div class="col-lg-6 col-md-12 footer-about">
-          <a href="index.html" class="d-flex align-items-center">
+          <a href="{{url('/')}}" class="d-flex align-items-center">
             <span class="sitename">AngolaEmprego</span>
           </a>
           <div class="footer-contact pt-3">

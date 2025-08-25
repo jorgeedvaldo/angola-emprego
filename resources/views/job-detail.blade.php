@@ -115,6 +115,34 @@
                 </div>
             </div>
             <!-- Fim das adições -->
+
+            <!-- AD 1 -->
+		<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2118765549976668"
+     crossorigin="anonymous"></script>
+		<!-- AnuncioVizualizacao2 -->
+		<ins class="adsbygoogle"
+			 style="display:block"
+			 data-ad-client="ca-pub-2118765549976668"
+			 data-ad-slot="5838441610"
+			 data-ad-format="auto"
+			 data-full-width-responsive="true"></ins>
+		<script>
+			 (adsbygoogle = window.adsbygoogle || []).push({});
+		</script>
+		<!-- AD 2 -->
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2118765549976668" crossorigin="anonymous"></script>
+        <ins class="adsbygoogle"
+            style="display:block; text-align:center;"
+            data-ad-layout="in-article"
+            data-ad-format="fluid"
+            data-ad-client="ca-pub-2118765549976668"
+            data-ad-slot="7583808877">
+        </ins>
+        <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+
+            <!-- Descricao -->
             {!!$job->description!!}
           </div>
 

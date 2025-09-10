@@ -10,7 +10,8 @@ class JobController extends Controller
 {
     public function store(Request $request)
     {
-        return Job::create($request->all());
+        $job = Job::create($request->all());
+        return response()->json($job);
     }
 
     public function getById($id)

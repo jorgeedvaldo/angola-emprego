@@ -16,8 +16,6 @@ O Angola Emprego tem como missão:
 - **Publicação de Vagas**: Empresas podem adicionar vagas de forma simples.
 - **Design Responsivo**: Interface adaptável a desktops e dispositivos móveis.
 
-*(Ajuste esta seção conforme as funcionalidades reais do projeto.)*
-
 ## Tecnologias Utilizadas
 
 - **Backend**: PHP com Laravel

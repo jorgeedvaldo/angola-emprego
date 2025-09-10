@@ -12,4 +12,17 @@ class JobController extends Controller
     {
         return Job::create($request->all());
     }
+
+    public function getById($id)
+    {
+        $data = Job::with('categories')->where('id', $id)->get();
+        $license = 'This API was developed by Edivaldo Jorge (https://github.com/jorgeedvaldo)';
+        $message = 'Operation performed successfully.';
+        return response()->json(
+            [
+                'message' => $message,
+                'data' => $data,
+                'license' => $license
+            ]);
+    }
 }

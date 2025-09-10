@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Route;
 */
 Route::post('/job/create', [JobController::class, 'store']);
 
+Route::get('/jobs/{id}', [JobController::class, 'getById']);
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });

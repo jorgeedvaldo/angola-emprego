@@ -11,6 +11,7 @@ use Filament\Resources\Table;
 use Filament\Tables;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\BadgeColumn;
@@ -38,10 +39,11 @@ class SubscriberResource extends Resource
                     ->tel()
                     ->maxLength(20),
 
-                TextInput::make('cv_link')
-                    ->url()
-                    ->label('CV Link')
-                    ->maxLength(500)
+                FileUpload::make('cv_path')
+                    ->label('CV File')
+                    ->directory('cv') // pasta em storage/app/public/cv
+                    ->acceptedFileTypes(['application/pdf', 'image/*'])
+                    ->maxSize(5120) // até 5MB
                     ->nullable(),
 
                 DatePicker::make('start_date')
@@ -75,7 +77,7 @@ class SubscriberResource extends Resource
                 TextColumn::make('name')->sortable()->searchable(),
                 TextColumn::make('email')->sortable()->searchable(),
                 TextColumn::make('phone'),
-                TextColumn::make('cv_link')->label('CV')->url(fn($record) => $record->cv_link, true)->limit(20),
+                TextColumn::make('cv_path')->label('CV')->url(fn($record) => $record->cv_url, true)->formatStateUsing(fn($state) => $state ? 'Download CV' : '-')->openUrlInNewTab(),
                 TextColumn::make('start_date')->date(),
                 TextColumn::make('end_date')->date(),
                 BadgeColumn::make('status')

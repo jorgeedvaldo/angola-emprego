@@ -28,4 +28,9 @@ class Subscriber extends Model
     {
         return $this->belongsToMany('App\Models\Category', 'category_subscribers');
     }
+
+    public function getCvUrlAttribute()
+    {
+        return $this->cv_path ? asset('storage/' . $this->cv_path) : null;
+    }
 }

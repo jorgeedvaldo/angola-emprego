@@ -104,7 +104,7 @@
                 <div class="col-lg-2 col-md-6">
                     <label for="filter-province" class="form-label mb-1">Província</label>
                     <select class="form-select" id="filter-province">
-                        <option value="all" selected>Todas as Províncias</option>
+                        <option value="all">Todas as Províncias</option>
                         <option value="Bengo">Bengo</option>
                         <option value="Benguela">Benguela</option>
                         <option value="Bié">Bié</option>
@@ -115,7 +115,7 @@
                         <option value="Cunene">Cunene</option>
                         <option value="Huambo">Huambo</option>
                         <option value="Huíla">Huíla</option>
-                        <option value="Luanda">Luanda</option>
+                        <option value="Luanda" selected>Luanda</option>
                         <option value="Lunda Norte">Lunda Norte</option>
                         <option value="Lunda Sul">Lunda Sul</option>
                         <option value="Malanje">Malanje</option>

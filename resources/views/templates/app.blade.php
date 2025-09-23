@@ -79,6 +79,7 @@
             <li><a href="{{url('/sobre')}}">Sobre</a></li>
             <li><a href="{{url('/blog')}}">Blog</a></li>
             <li><a href="{{url('/vagas')}}">Empregos</a></li>
+            <li><a href="{{url('/atm-com-dinheiro')}}">ATMs Com Dinheiro</a></li>
           </ul>
           <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
         </nav>

@@ -4,6 +4,92 @@
 @section('canonical_link', url('/atm-com-dinheiro'))
 
 @section('content')
+<style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f7f9;
+            color: #333;
+        }
+        .navbar-brand {
+            font-weight: bold;
+        }
+        .filters-container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        .atm-card {
+            background-color: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            height: 100%; /* Garante que todos os cartões na linha tenham a mesma altura */
+            display: flex;
+            flex-direction: column;
+        }
+        .atm-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .atm-card h5 {
+            margin-top: 0;
+            font-size: 1.1em;
+            color: #1a202c;
+            margin-bottom: 10px;
+        }
+        .atm-card p {
+            margin-bottom: 5px;
+            font-size: 0.9em;
+            color: #4a5568;
+        }
+        .atm-card .address {
+            font-style: italic;
+            font-size: 0.85em;
+            color: #6c757d;
+        }
+        .atm-card .status-badge {
+            margin-top: auto; /* Empurra o badge para o final do cartão */
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: bold;
+            color: #fff;
+            text-transform: uppercase;
+        }
+
+        /* Cores dos badges baseadas no status */
+        .status-badge-com-dinheiro { background-color: #28a745; } /* Verde */
+        .status-badge-sem-dinheiro { background-color: #ffc107; color: #343a40; } /* Amarelo */
+        .status-badge-indisponivel { background-color: #dc3545; } /* Vermelho */
+        .status-badge-operacional { background-color: #007bff; } /* Azul - para status gerais como "com comprovativo", "sem comprovativo" */
+
+        #loader, #error-message {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.1em;
+        }
+        #error-message {
+            color: #dc3545;
+        }
+        .info-message {
+            color: #6c757d;
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
+        }
+        .form-select, .form-control {
+            border-radius: 0.375rem; /* Bootstrap default */
+        }
+        .btn-clear-filters {
+            font-size: 0.9em;
+            padding: 0.375rem 0.75rem;
+        }
+    </style>
 <!-- Filtros e Barra de Pesquisa -->
         <div class="filters-container">
             <div class="row g-3 align-items-end">

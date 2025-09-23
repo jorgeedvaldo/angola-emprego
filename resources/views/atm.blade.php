@@ -90,7 +90,8 @@
             padding: 0.375rem 0.75rem;
         }
     </style>
-<!-- Filtros e Barra de Pesquisa -->
+<div class="container">
+        <!-- Filtros e Barra de Pesquisa -->
         <div class="filters-container">
             <div class="row g-3 align-items-end">
                 <div class="col-lg-4 col-md-12">
@@ -173,6 +174,8 @@
         <div id="no-results-message" class="info-message" style="display:none;">
             <p>Nenhum ATM encontrado com os filtros aplicados.</p>
         </div>
+
+    </div>
         <!-- Bootstrap JS Bundle com Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXcWb5U9QvYfKxX2AnUjN5g8w4/nI8zVpB2T+yJd2i0NlEwK/L7V2sS" crossorigin="anonymous"></script>
 

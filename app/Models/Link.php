@@ -11,6 +11,6 @@ class Link extends Model
 
     use HasFactory;
     protected $fillable = [
-        'url', 'country_id', 'published'
+        'url', 'country_id', 'published '
     ];
 }

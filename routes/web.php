@@ -24,9 +24,8 @@ Route::get('/sobre', [AboutController::class, 'index'])->name('sobre');
 Route::get('/vagas', [JobController::class, 'index'])->name('vagas');
 Route::get('/blog', [BlogController::class, 'index']);
 Route::get('/atm-com-dinheiro', [ToolsController::class, 'index']);
+Route::get('/sitemap.xml', [HomeController::class, 'siteMapGenerator'])->name('sitemap');
+Route::get('/feed', [HomeController::class, 'feedGenerator'])->name('feed');
 
 Route::get('/{slug}', [BlogController::class, 'getBySlug']);
 Route::get('/vagas/{slug}', [JobController::class, 'getBySlug']);
-
-Route::get('/sitemap.xml', [HomeController::class, 'siteMapGenerator'])->name('sitemap');
-Route::get('/feed', [HomeController::class, 'feedGenerator'])->name('feed');

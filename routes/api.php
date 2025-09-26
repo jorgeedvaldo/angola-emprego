@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\JobController;
+use App\Http\Controllers\Api\PostController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 Route::post('/job/create', [JobController::class, 'store']);
+Route::post('/post/create', [PostController::class, 'store']);
 
 Route::get('/jobs/{id}', [JobController::class, 'getById']);
 

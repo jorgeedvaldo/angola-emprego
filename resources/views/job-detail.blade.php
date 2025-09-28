@@ -176,7 +176,7 @@
                 <div class="col-md-6 mb-3">
                 <div class="d-flex align-items-center">
                     <div class="me-3" style="width: 50px; height: 50px; background-color: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-target text-white"></i>
+                    <i class="fas fa-bullseye text-white"></i>
                     </div>
                     <div>
                     <h5 class="text-white mb-1">Precisão</h5>

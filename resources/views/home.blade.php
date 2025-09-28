@@ -62,7 +62,7 @@
           <div class="col-md-4">
             <div class="text-center">
               <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                <i class="fas fa-target text-primary" style="font-size: 2rem;"></i>
+                <i class="fas fa-bullseye text-primary" style="font-size: 2rem;"></i>
               </div>
               <h5 class="fw-bold text-dark">Precisão Máxima</h5>
               <p class="text-muted small">Candidaturas direcionadas baseadas na sua experiência e objetivos</p>

@@ -145,107 +145,51 @@
             <!-- Descricao -->
             {!!$job->description!!}
 
-            <section class="py-5" style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);">
-  <div class="container">
-    <div class="row align-items-center">
-      <div class="col-lg-8 col-md-7">
-        <div class="text-white">
-          <h2 class="fw-bold mb-3" style="font-size: 2.2rem;">
-            <i class="fas fa-robot me-3" style="color: #60a5fa;"></i>
-            Candidaturas Automáticas
-          </h2>
-          <p class="lead mb-4" style="font-size: 1.1rem; line-height: 1.6;">
-            Deixe que nós façamos as candidaturas por você! Com base no seu CV, aplicamos
-            automaticamente às vagas que combinam com o seu perfil.
-          </p>
-          <div class="d-flex align-items-center">
-            <div class="me-4">
-              <i class="fas fa-check-circle text-success me-2"></i>
-              <span>Candidaturas 24/7</span>
-            </div>
-            <div class="me-4">
-              <i class="fas fa-check-circle text-success me-2"></i>
-              <span>Match Inteligente</span>
-            </div>
-            <div>
-              <i class="fas fa-check-circle text-success me-2"></i>
-              <span>Sem Esforço Manual</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-4 col-md-5 text-center">
-        <div class="mt-4 mt-md-0">
-          <a href="#planos" class="btn btn-light btn-lg px-4 py-3 fw-bold"
-             style="border-radius: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: all 0.3s ease;">
-            <i class="fas fa-eye me-2"></i>
-            Ver Planos
-          </a>
-          <div class="mt-3">
-            <small class="text-white-50">
-              <i class="fas fa-users me-1"></i>
-              Mais de 1000+ profissionais já usam
-            </small>
-          </div>
-        </div>
-      </div>
+            <div class="card shadow-sm border-0 mb-4">
+  <div class="card-body p-4" style="background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); color: white;">
+    <div class="text-center mb-4">
+      <i class="fas fa-robot fa-3x mb-3" style="opacity: 0.9;"></i>
+      <h3 class="fw-bold mb-3">Candidaturas Automáticas</h3>
+      <p class="lead mb-4">
+        Deixe que nós façamos as candidaturas por você! Com base no seu CV, aplicamos automaticamente às vagas que combinam com o seu perfil.
+      </p>
+      <a href="#planos" class="btn btn-light btn-lg px-4 py-2 fw-bold" style="color: #007bff; border-radius: 25px; transition: all 0.3s ease;">
+        <i class="fas fa-eye me-2"></i>Ver Planos
+      </a>
     </div>
+  </div>
+</div>
 
-     Seção de benefícios adicionais
-    <div class="row mt-5">
-      <div class="col-12">
-        <div class="row text-center text-white">
-          <div class="col-md-4 mb-3">
-            <div class="p-3">
-              <i class="fas fa-clock fa-2x mb-3" style="color: #60a5fa;"></i>
-              <h5>Economia de Tempo</h5>
-              <p class="small">Poupe horas de candidaturas manuais</p>
-            </div>
-          </div>
-          <div class="col-md-4 mb-3">
-            <div class="p-3">
-              <i class="fas fa-target fa-2x mb-3" style="color: #60a5fa;"></i>
-              <h5>Precisão no Match</h5>
-              <p class="small">IA analisa seu perfil e encontra vagas ideais</p>
-            </div>
-          </div>
-          <div class="col-md-4 mb-3">
-            <div class="p-3">
-              <i class="fas fa-chart-line fa-2x mb-3" style="color: #60a5fa;"></i>
-              <h5>Mais Oportunidades</h5>
-              <p class="small">Nunca perca uma vaga que combine com você</p>
-            </div>
-          </div>
-        </div>
+<div class="row g-3 mb-4">
+  <div class="col-md-6">
+    <div class="card h-100 border-0 shadow-sm">
+      <div class="card-body text-center p-3">
+        <i class="fas fa-clock text-primary fa-2x mb-2"></i>
+        <h6 class="fw-bold">Economia de Tempo</h6>
+        <small class="text-muted">Candidature-se a múltiplas vagas automaticamente</small>
       </div>
     </div>
   </div>
-</section>
+  <div class="col-md-6">
+    <div class="card h-100 border-0 shadow-sm">
+      <div class="card-body text-center p-3">
+        <i class="fas fa-target text-success fa-2x mb-2"></i>
+        <h6 class="fw-bold">Vagas Relevantes</h6>
+        <small class="text-muted">Algoritmo inteligente seleciona as melhores oportunidades</small>
+      </div>
+    </div>
+  </div>
+</div>
 
 <style>
 .btn-light:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.3) !important;
+  box-shadow: 0 4px 12px rgba(0,123,255,0.3);
 }
 
-@media (max-width: 768px) {
-  .lead {
-    font-size: 1rem !important;
-  }
-
-  h2 {
-    font-size: 1.8rem !important;
-  }
-
-  .d-flex.align-items-center {
-    flex-direction: column;
-    align-items: flex-start !important;
-  }
-
-  .d-flex.align-items-center > div {
-    margin-bottom: 0.5rem;
-    margin-right: 0 !important;
-  }
+.card:hover {
+  transform: translateY(-2px);
+  transition: transform 0.3s ease;
 }
 </style>
           </div>

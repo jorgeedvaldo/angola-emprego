@@ -45,7 +45,7 @@
                 <i class="fas fa-robot text-primary" style="font-size: 2rem;"></i>
               </div>
               <h5 class="fw-bold text-dark">Automação Inteligente</h5>
-              <p class="text-muted small">Sistema avançado que analisa seu perfil e encontra as melhores oportunidades.</p>
+              <p class="text-muted small">Sistema avançado que analisa seu perfil e encontra as melhores oportunidades</p>
             </div>
           </div>
 

@@ -145,7 +145,7 @@
             <!-- Descricao -->
             {!!$job->description!!}
 
-            <section class="py-5" style="background-color: #4a90e2; border-radius: 15px;">
+            <section class="py-5 px-4" style="background-color: #4a90e2; border-radius: 15px;">
             <div class="text-center mb-4">
                 <div class="d-inline-flex align-items-center justify-content-center mb-3"
                     style="width: 80px; height: 80px; background-color: rgba(255,255,255,0.2); border-radius: 50%;">

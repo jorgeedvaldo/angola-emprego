@@ -10,7 +10,7 @@ class SubscriberController extends Controller
 {
     public function index()
     {
-        $subscribers = Subscriber::with('categories')->all();
+        $subscribers = Subscriber::with('categories')->get();
         return response()->json($subscribers);
     }
 }

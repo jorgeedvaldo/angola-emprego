@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+Route::get('/subscribers', [SubscriberController::class, 'index']);
 Route::post('/job/create', [JobController::class, 'store']);
 Route::post('/post/create', [PostController::class, 'store']);
 

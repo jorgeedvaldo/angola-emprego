@@ -9,15 +9,39 @@
 
 @section('content')
     <!-- Hero Section -->
-    <section id="hero" class="hero section light-background">
+    <section id="hero" class="hero section d-flex align-items-center" style="min-height: 60vh; background: linear-gradient(135deg, #f3f2f1 0%, #ffffff 100%);">
 
         <div class="container">
-            <div class="row gy-4">
-            <div class="col-lg-6 order-2 order-lg-1 d-flex flex-column justify-content-center" data-aos="zoom-out">
-                <h1>Bem-vindo ao <span>AngolaEmprego</span></h1>
-                <p>O Maior portal de emprego em Angola</p>
-                <div class="d-flex">
-                <a href="{{url('/vagas')}}" class="btn-get-started">Ver Oportunidades</a>
+            <div class="row justify-content-center text-center">
+            <div class="col-lg-8" data-aos="zoom-out">
+                <h1 class="display-4 fw-bold text-dark mb-4">Encontre o emprego ideal para si</h1>
+                <p class="lead text-muted mb-5">Milhares de oportunidades de emprego e formação em Angola à sua espera.</p>
+                
+                <div class="bg-white p-4 rounded-3 shadow-sm border">
+                    <form action="{{ url('/vagas') }}" method="GET" class="row g-3">
+                        <div class="col-md-5">
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                                <input type="text" name="q" class="form-control border-start-0 ps-0" placeholder="Cargo, empresa ou competências">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                             <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0"><i class="bi bi-geo-alt text-muted"></i></span>
+                                <input type="text" name="location" class="form-control border-start-0 ps-0" placeholder="Cidade ou Província">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-primary w-100 fw-bold">Pesquisar Vagas</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="mt-4 text-muted small">
+                    <span class="me-2">Tendências:</span>
+                    <a href="#" class="text-decoration-none text-muted me-2 bg-light px-2 py-1 rounded border">Tecnologia</a>
+                    <a href="#" class="text-decoration-none text-muted me-2 bg-light px-2 py-1 rounded border">Vendas</a>
+                    <a href="#" class="text-decoration-none text-muted me-2 bg-light px-2 py-1 rounded border">Construção</a>
                 </div>
             </div>
             </div>
@@ -25,145 +49,97 @@
 
     </section><!-- /Hero Section -->
 
-    <section class="py-5 px-5" style="background-color: #f8f9fa;">
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-lg-10">
-        <div class="text-center mb-5">
-          <h2 class="display-5 fw-bold text-dark mb-3">
-            Candidaturas <span style="color: #007bff;">Automáticas</span>
-          </h2>
-          <p class="lead text-muted">
-            Deixe que nós façamos as candidaturas por você! Com base no seu CV, aplicamos automaticamente às vagas que combinam com o seu perfil.
-          </p>
-        </div>
-
-        <div class="row g-4 mb-5">
+    <!-- Features Section -->
+    <section class="py-5" style="background-color: #fff;">
+      <div class="container">
+        <div class="row g-4 justify-content-center">
           <div class="col-md-4">
-            <div class="text-center">
-              <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                <i class="fas fa-robot text-primary" style="font-size: 2rem;"></i>
-              </div>
-              <h5 class="fw-bold text-dark">Automação Inteligente</h5>
-              <p class="text-muted small">Sistema avançado que analisa seu perfil e encontra as melhores oportunidades</p>
+            <div class="p-4 border rounded-3 h-100 bg-light-hover transition-all">
+                <i class="bi bi-file-earmark-person text-primary fs-2 mb-3"></i>
+                <h5 class="fw-bold text-dark">Melhore o seu CV</h5>
+                <p class="text-muted small">Receba dicas para tornar o seu currículo mais atraente para os recrutadores.</p>
             </div>
           </div>
-
           <div class="col-md-4">
-            <div class="text-center">
-              <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                <i class="fas fa-clock text-primary" style="font-size: 2rem;"></i>
-              </div>
-              <h5 class="fw-bold text-dark">Economia de Tempo</h5>
-              <p class="text-muted small">Não perca mais tempo procurando vagas. Focamos nas que realmente importam</p>
+            <div class="p-4 border rounded-3 h-100 bg-light-hover transition-all">
+                <i class="bi bi-bell text-primary fs-2 mb-3"></i>
+                <h5 class="fw-bold text-dark">Alertas de Vagas</h5>
+                <p class="text-muted small">Seja notificado assim que novas vagas compatíveis com seu perfil forem publicadas.</p>
             </div>
           </div>
-
           <div class="col-md-4">
-            <div class="text-center">
-              <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                <i class="fas fa-bullseye text-primary" style="font-size: 2rem;"></i>
-              </div>
-              <h5 class="fw-bold text-dark">Precisão Máxima</h5>
-              <p class="text-muted small">Candidaturas direcionadas baseadas na sua experiência e objetivos</p>
+             <div class="p-4 border rounded-3 h-100 bg-light-hover transition-all">
+                <i class="bi bi-mortarboard text-primary fs-2 mb-3"></i>
+                <h5 class="fw-bold text-dark">Desenvolvimento</h5>
+                <p class="text-muted small">Aceda aos nossos cursos gratuitos e desenvolva novas competências.</p>
+                <a href="{{ route('courses.index') }}" class="small fw-bold text-primary text-decoration-none">Ver Cursos <i class="bi bi-arrow-right"></i></a>
             </div>
           </div>
-        </div>
-
-        <div class="text-center">
-          <a href="https://pay.kuenha.com/856ed35c-7b33-4e98-9352-954d22bc56a2" class="btn btn-primary btn-lg px-5 py-3 rounded-pill shadow-sm">
-            <i class="fas fa-eye me-2"></i>Ver Planos
-          </a>
         </div>
       </div>
-    </div>
-  </div>
-</section>
+    </section>
 
     <!-- Job Section -->
-    <section id="about" class="about section light-background">
+    <section id="about" class="about section bg-light py-5">
 
         <!-- Section Title -->
-        <div class="container section-title" data-aos="fade-up">
-          <h2>Empregos</h2>
-          <p><span>Encontre mais oportunidades de</span> <span class="description-title">emprego</span></p>
+        <div class="container section-title mb-5 text-center" data-aos="fade-up">
+          <h2 class="fw-bold text-dark">Destaques</h2>
+          <p class="text-muted">As vagas mais recentes em Angola</p>
         </div><!-- End Section Title -->
 
         <div class="container">
 
-          <div class="row gy-3">
+          <div class="row gy-4">
 
             @foreach($jobs as $job)
-              <!-- Primeiro Card -->
-              <div class="col-md-6 mb-4">
-                  <div class="card h-100">
-                      <div class="card-header bg-primary text-white">
-                          <h5 class="card-title mb-0">{{ $job->title }}</h5>
+              <div class="col-md-6 col-lg-4 d-flex align-items-stretch" data-aos="fade-up">
+                  <a href="{{ url('/vagas/' . $job->slug) }}" class="text-decoration-none w-100">
+                      <div class="card h-100 border-0 shadow-sm shadow-hover transition-all p-3" style="border-radius: 12px;">
+                          <div class="card-body">
+                              <div class="d-flex justify-content-between align-items-start mb-3">
+                                  <h5 class="card-title fw-bold text-dark mb-0">{{ $job->title }}</h5>
+                                  @if($loop->iteration <= 3)
+                                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill small">Novo</span>
+                                  @endif
+                              </div>
+                              <h6 class="card-subtitle mb-3 text-muted small"><i class="bi bi-building me-1"></i> {{ $job->company }}</h6>
+                              <div class="mb-3">
+                                  <span class="badge bg-light text-dark border me-1"><i class="bi bi-geo-alt me-1"></i> {{ $job->location }}</span>
+                                  <span class="badge bg-light text-dark border"><i class="bi bi-clock me-1"></i> Integral</span>
+                              </div>
+                              <p class="card-text text-muted small description-truncate">
+                                {!! \Illuminate\Support\Str::limit(strip_tags($job->description), 100, $end='...') !!}
+                              </p>
+                          </div>
+                          <div class="card-footer bg-white border-0 pt-0 text-muted small">
+                              Publicado em {{ date_format(new DateTime($job->created_at), 'd-m-Y') }}
+                          </div>
                       </div>
-                      <div class="card-body">
-                          <h6 class="card-subtitle mb-2 text-muted">{{ $job->company }}</h6>
-                          <p class="card-text">
-                            {!! \Illuminate\Support\Str::limit(strip_tags($job->description), 207, $end='...') !!}
-                          </p>
-                          <ul class="list-unstyled">
-                              <li><strong>Local:</strong> {{ $job->location }}</li>
-                          </ul>
-                          <a href="{{ url('/vagas/' . $job->slug) }}" class="btn btn-primary">Ver Detalhes</a>
-                      </div>
-                      <div class="card-footer text-muted">
-                          Publicado em {{ date_format(new DateTime($job->created_at), 'd-m-Y') }}
-                      </div>
-                  </div>
+                  </a>
               </div>
             @endforeach
-            <a href="{{url('/vagas')}}" class="btn btn-outline-primary btn-lg">Ver mais Vagas</a>
+            
+            <div class="col-12 text-center mt-5">
+                 <a href="{{url('/vagas')}}" class="btn btn-primary btn-lg fw-bold px-5 rounded-pill">Ver Todas as Vagas</a>
+            </div>
+            
           </div>
 
         </div>
 
       </section><!-- /Job Section -->
 
-      <!-- /Blog Posts Section -->
-      <section id="blog-posts" class="blog-posts section">
-
-          <!-- Section Title -->
-          <div class="container section-title" data-aos="fade-up">
-              <h2>Blog</h2>
-              <p><span>Últimas novidades do nosso</span> <span class="description-title">Blog</span></p>
-          </div><!-- End Section Title -->
-
-          <div class="container">
-            <div class="row gy-4">
-
-              @foreach($posts as $post)
-              <div class="col-lg-4">
-                <article>
-
-                  <div class="post-img mb-3">
-                    <img src="{{asset('storage/thumb/' . $post->image)}}" alt="" class="img-fluid">
-                  </div>
-
-                  <!-- Category here <p class="post-category">Politics</p>-->
-
-                  <h4 class="title">
-                    <a href="{{ url('/' . $post->slug) }}">{{ $post->title }}</a>
-                  </h4>
-
-                  <div class="d-flex align-items-center">
-                    <div class="post-meta">
-                      <p class="post-author">Yuri Kiluanji</p>
-                      <p class="post-date">
-                        <time datetime="2022-01-01">{{ date_format(new DateTime($post->created_at), 'd-m-Y') }}</time>
-                      </p>
-                    </div>
-                  </div>
-
-                </article>
-              </div><!-- End post list item -->
-              @endforeach
-              <a href="{{url('/blog')}}" class="btn btn-outline-primary btn-lg">Visitar o Blog</a>
-            </div>
-          </div>
-
-        </section><!-- /Blog Posts Section -->
+      <style>
+        .bg-light-hover:hover {
+            background-color: #f8f9fa;
+        }
+        .shadow-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 1rem 3rem rgba(0,0,0,.1)!important;
+        }
+        .transition-all {
+            transition: all 0.3s ease;
+        }
+      </style>
 @endsection('content')

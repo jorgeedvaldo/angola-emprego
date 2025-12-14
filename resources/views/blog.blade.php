@@ -8,57 +8,80 @@
 @endsection
 
 @section('content')
-    <!-- Page Title -->
-    <div class="page-title" data-aos="fade">
-      <div class="container d-lg-flex justify-content-between align-items-center">
-        <h1 class="mb-2 mb-lg-0">O Nosso Blog</h1>
-        <nav class="breadcrumbs">
-          <ol>
-            <li><a href="{{url('/')}}">Início</a></li>
-            <li class="current">Blog</li>
-          </ol>
-        </nav>
+    <!-- Page Header -->
+    <div class="bg-light py-5">
+      <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                 <h1 class="fw-bold mb-2 text-dark">Blog e Notícias</h1>
+                 <p class="text-muted mb-0">Dicas de carreira, notícias e atualizações do mercado.</p>
+            </div>
+            <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                 <nav aria-label="breadcrumb">
+                  <ol class="breadcrumb justify-content-lg-end mb-0">
+                    <li class="breadcrumb-item"><a href="{{url('/')}}">Início</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Blog</li>
+                  </ol>
+                </nav>
+            </div>
+        </div>
       </div>
-    </div><!-- End Page Title -->
+    </div>
 
-    <!-- Service Details Section -->
-    <section id="service-details" class="service-details section">
+    <!-- Blog Section -->
+    <section class="section py-5">
 
         <div class="container">
 
             <div class="row gy-4">
 
                 @foreach($posts as $post)
-                <div class="col-lg-4">
-                  <article>
+                <div class="col-md-6 col-lg-4 d-flex align-items-stretch">
+                  <article class="card h-100 border-0 shadow-sm shadow-hover transition-all w-100" style="border-radius: 12px; overflow: hidden;">
+                    <a href="{{ url('/' . $post->slug) }}" class="text-decoration-none text-dark">
+                        <div class="post-img overflow-hidden position-relative" style="height: 200px;">
+                           <img src="{{asset('storage/thumb/' . $post->image)}}" alt="{{ $post->title }}" class="img-fluid w-100 h-100" style="object-fit: cover; transition: transform 0.5s ease;">
+                           <div class="overlay-hover position-absolute top-0 start-0 w-100 h-100 bg-dark opacity-0"></div>
+                        </div>
 
-                    <div class="post-img mb-3">
-                      <img src="{{asset('storage/thumb/' . $post->image)}}" alt="" class="img-fluid">
-                    </div>
+                         <div class="card-body p-4">
+                            <div class="post-meta mb-2 small text-muted">
+                                <span class="me-3"><i class="bi bi-calendar me-1"></i> {{ date_format(new DateTime($post->created_at), 'd/m/Y') }}</span>
+                            </div>
 
-                    <!-- Category here <p class="post-category">Politics</p>-->
-
-                    <h4 class="title">
-                      <a href="{{ url('/' . $post->slug) }}">{{ $post->title }}</a>
-                    </h4>
-
-                    <div class="d-flex align-items-center">
-                      <div class="post-meta">
-                        <p class="post-author">Yuri Kiluanji</p>
-                        <p class="post-date">
-                          <time datetime="2022-01-01">{{ date_format(new DateTime($post->created_at), 'd-m-Y') }}</time>
-                        </p>
-                      </div>
-                    </div>
-
+                            <h5 class="card-title fw-bold mb-3">{{ $post->title }}</h5>
+                            
+                            <p class="card-text text-muted small">
+                                {!! \Illuminate\Support\Str::limit(strip_tags($post->description), 100) !!}
+                            </p>
+                        </div>
+                        <div class="card-footer bg-white border-0 px-4 pb-4 pt-0">
+                            <span class="text-primary fw-bold small">Ler mais <i class="bi bi-arrow-right ms-1"></i></span>
+                        </div>
+                    </a>
                   </article>
-                </div><!-- End post list item -->
+                </div>
                 @endforeach
-
-                {{ $posts->links() }}
-              </div>
+                
+                <div class="col-12 mt-5 text-center">
+                    {{ $posts->links() }}
+                </div>
+            </div>
 
           </div>
 
-    </section><!-- /Service Details Section -->
+    </section>
+    
+    <style>
+        .shadow-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 1rem 3rem rgba(0,0,0,.1)!important;
+        }
+        .transition-all {
+            transition: all 0.3s ease;
+        }
+        .post-img:hover img {
+            transform: scale(1.1);
+        }
+    </style>
 @endsection('content')

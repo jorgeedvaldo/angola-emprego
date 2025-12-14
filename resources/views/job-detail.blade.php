@@ -62,174 +62,163 @@
 @endsection
 
 @section('content')
-    <!-- Page Title -->
-    <div class="page-title" data-aos="fade">
-      <div class="container d-lg-flex justify-content-between align-items-center">
-        <h1 class="mb-2 mb-lg-0">Detalhes da Vaga</h1>
-        <nav class="breadcrumbs">
-          <ol>
-            <li><a href="{{url('/')}}">Início</a></li>
-            <li><a href="{{url('/vagas')}}">Vagas</a></li>
-            <li class="current">{{$job->title}}</li>
+    <!-- Page Header -->
+    <div class="bg-light py-5">
+      <div class="container">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb mb-4">
+            <li class="breadcrumb-item"><a href="{{url('/')}}">Início</a></li>
+            <li class="breadcrumb-item"><a href="{{url('/vagas')}}">Vagas</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{$job->title}}</li>
           </ol>
         </nav>
+        
+        <div class="bg-white p-4 p-lg-5 rounded-3 shadow-sm border">
+            <div class="row align-items-center">
+                <div class="col-lg-2 mb-3 mb-lg-0 text-center">
+                     <img src="{{asset('storage/' . $job->image)}}" alt="{{ $job->company }}" class="img-fluid rounded shadow-sm" style="max-height: 100px; object-fit: contain;">
+                </div>
+                <div class="col-lg-7">
+                    <h1 class="fw-bold text-dark mb-2">{{$job->title}}</h1>
+                    <div class="d-flex flex-wrap gap-3 text-muted mb-3">
+                         <span><i class="bi bi-building me-1"></i> {{$job->company}}</span>
+                         <span><i class="bi bi-geo-alt me-1"></i> {{$job->location ?? 'Angola'}}</span>
+                         <span><i class="bi bi-clock me-1"></i> {{ date_format(new DateTime($job['created_at']), 'd/m/Y') }}</span>
+                    </div>
+                </div>
+                <div class="col-lg-3 text-lg-end">
+                    <div class="d-grid gap-2">
+                        <a href="#apply-section" class="btn btn-primary fw-bold py-2 px-4 rounded-pill">Candidatar-se</a>
+                        <button class="btn btn-outline-secondary btn-sm rounded-pill" onclick="window.print()"><i class="bi bi-printer me-1"></i> Imprimir</button>
+                    </div>
+                </div>
+            </div>
+        </div>
       </div>
-    </div><!-- End Page Title -->
+    </div>
 
-    <!-- Service Details Section -->
-    <section id="service-details" class="service-details section">
+    <!-- Job Details Section -->
+    <section class="section py-5">
 
       <div class="container">
 
-        <div class="row gy-4">
+        <div class="row gy-5">
 
-          <div class="col-lg-8" data-aos="fade-up" data-aos-delay="200">
-            <img src="{{asset('storage/' . $job->image)}}" alt="" class="img-fluid services-img">
-            <h3>{{$job->title}}</h3>
-            <!-- Adição dos novos elementos -->
-            <div class="vaga-meta mb-4">
-                <!-- Botões de compartilhamento -->
-                <div class="compartilhar-botoes mb-2">
-                    <a class="btn btn-sm btn-outline-primary me-2" href="https://www.facebook.com/sharer/sharer.php?u={{ url('/vagas/'. $job->slug) }}&quote={{ $job->title }}%0A.%0ASe%20você%20deseja%20saber%20mais%20sobre%20esta%20oportunidade,%20por%20favor,%20clique%20no%20link:%20{{ url('/empregos/'. $job->slug) }}%0A."
-                    target="_blank">
-                        <i class="bi bi-facebook"></i> Facebook
-                    </a>
-                    <a class="btn btn-sm btn-outline-primary me-2" href="https://www.linkedin.com/sharing/share-offsite/?url={{ url('/vagas/'. $job->slug) }}&text={{ $job->title }}%0A.%0ASe%20você%20deseja%20saber%20mais%20sobre%20esta%20oportunidade,%20por%20favor,%20clique%20no%20link:%20{{ url('/empregos/'. $job->slug) }}%0A."
-                    target="_blank">
-                        <i class="bi bi-linkedin"></i> LinkedIn
-                    </a>
-                    <a class="btn btn-sm btn-outline-success me-2" href="https://api.whatsapp.com/send?text={{ $job->title }}%0A.%0ASe%20você%20deseja%20saber%20mais%20sobre%20esta%20oportunidade,%20por%20favor,%20clique%20no%20link:%20{{ url('/vagas/'. $job->slug) }}%0A."
-                    target="_blank">
-                        <i class="bi bi-whatsapp"></i> WhatsApp
-                    </a>
-                    <a class="btn btn-sm btn-outline-danger" href="mailto:?subject={{ $job->title }}&body=Confira esta oportunidade:%0A%0A{{ $job->title }}%0A%0APara mais detalhes, acesse: {{ url('/vagas/'. $job->slug) }}"
-                    target="_blank">
-                        <i class="bi bi-envelope"></i> Email
-                    </a>
-                </div>
-
-                <!-- Informações da vaga -->
-                <div class="vaga-info text-muted small">
-                    <span class="me-3"><i class="bi bi-calendar me-1"></i> Publicada em: {{ date_format(new DateTime($job->created_at), 'd-m-Y') }}</span>
-                    <span><i class="bi bi-building me-1"></i> Empresa: {{$job->company}}</span>
+          <div class="col-lg-8">
+            
+            <div class="bg-white p-4 rounded-3 shadow-sm border mb-4">
+                <h4 class="fw-bold mb-4 border-bottom pb-2">Descrição da Vaga</h4>
+                <div class="job-description text-dark" style="font-size: 1.05rem; line-height: 1.7;">
+                    {!!$job->description!!}
                 </div>
             </div>
-            <!-- Fim das adições -->
+
+            <!-- Botões de compartilhamento -->
+            <div class="bg-light p-3 rounded-3 mb-4 border">
+                <span class="fw-bold me-3">Partilhar:</span>
+                <a class="btn btn-sm btn-outline-primary me-1" href="https://www.facebook.com/sharer/sharer.php?u={{ url('/vagas/'. $job->slug) }}" target="_blank"><i class="bi bi-facebook"></i></a>
+                <a class="btn btn-sm btn-outline-primary me-1" href="https://www.linkedin.com/sharing/share-offsite/?url={{ url('/vagas/'. $job->slug) }}" target="_blank"><i class="bi bi-linkedin"></i></a>
+                <a class="btn btn-sm btn-outline-success me-1" href="https://api.whatsapp.com/send?text={{ $job->title }} {{ url('/vagas/'. $job->slug) }}" target="_blank"><i class="bi bi-whatsapp"></i></a>
+            </div>
 
             <!-- AD 1 -->
-		<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2118765549976668"
-     crossorigin="anonymous"></script>
-		<!-- AnuncioVizualizacao2 -->
-		<ins class="adsbygoogle"
-			 style="display:block"
-			 data-ad-client="ca-pub-2118765549976668"
-			 data-ad-slot="5838441610"
-			 data-ad-format="auto"
-			 data-full-width-responsive="true"></ins>
-		<script>
-			 (adsbygoogle = window.adsbygoogle || []).push({});
-		</script>
-		<!-- AD 2 -->
-        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2118765549976668" crossorigin="anonymous"></script>
-        <ins class="adsbygoogle"
-            style="display:block; text-align:center;"
-            data-ad-layout="in-article"
-            data-ad-format="fluid"
-            data-ad-client="ca-pub-2118765549976668"
-            data-ad-slot="7583808877">
-        </ins>
-        <script>
-            (adsbygoogle = window.adsbygoogle || []).push({});
-        </script>
-
-            <!-- Descricao -->
-            {!!$job->description!!}
-
-            <section class="py-5 px-4" style="background-color: #4a90e2; border-radius: 15px;">
-            <div class="text-center mb-4">
-                <div class="d-inline-flex align-items-center justify-content-center mb-3"
-                    style="width: 80px; height: 80px; background-color: rgba(255,255,255,0.2); border-radius: 50%;">
-                <i class="fas fa-magic fa-2x text-white"></i>
+            <div class="my-4 text-center">
+                <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2118765549976668" crossorigin="anonymous"></script>
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="ca-pub-2118765549976668"
+                     data-ad-slot="5838441610"
+                     data-ad-format="auto"
+                     data-full-width-responsive="true"></ins>
+                <script>
+                     (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+            </div>
+            
+            <div id="apply-section" class="py-5 px-4 mb-4 text-center text-white rounded-3 shadow-lg position-relative overflow-hidden" style="background: linear-gradient(135deg, #2557a7 0%, #1e468a 100%);">
+                <div class="position-relative z-1">
+                    <div class="mb-3">
+                        <i class="bi bi-lightning-charge-fill fs-1 text-warning"></i>
+                    </div>
+                    <h2 class="fw-bold mb-3">Candidaturas Automáticas</h2>
+                    <p class="mb-4 fs-5 opacity-75">Deixe que nós façamos as candidaturas por você! Com base no seu CV, aplicamos automaticamente às vagas que combinam com o seu perfil.</p>
+                    <a href="https://pay.kuenha.com/856ed35c-7b33-4e98-9352-954d22bc56a2" class="btn btn-warning btn-lg fw-bold rounded-pill px-5 text-dark shadow-sm hover-scale">
+                        <i class="bi bi-eye me-2"></i>Ver Planos
+                    </a>
                 </div>
-                <h2 class="text-white fw-bold mb-3">Candidaturas Automáticas</h2>
-                <p class="text-white fs-5 mb-4 opacity-90">
-                Deixe que nós façamos as candidaturas por você! Com base no seu CV, aplicamos automaticamente às vagas que combinam com o seu perfil.
-                </p>
-                <a href="https://pay.kuenha.com/856ed35c-7b33-4e98-9352-954d22bc56a2" class="btn btn-light btn-lg px-4 py-2 fw-bold" style="border-radius: 25px; color: #4a90e2;">
-                <i class="fas fa-eye me-2"></i>Ver Planos
-                </a>
             </div>
 
-            <div class="row mt-5">
-                <div class="col-md-6 mb-3">
-                <div class="d-flex align-items-center">
-                    <div class="me-3" style="width: 50px; height: 50px; background-color: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-clock text-white"></i>
-                    </div>
-                    <div>
-                    <h5 class="text-white mb-1">Economia de Tempo</h5>
-                    <p class="text-white mb-0 opacity-90">Candidature-se a múltiplas vagas automaticamente</p>
-                    </div>
-                </div>
-                </div>
+            <!-- AD 2 -->
+             <div class="my-4 text-center">
+                 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2118765549976668" crossorigin="anonymous"></script>
+                <ins class="adsbygoogle"
+                    style="display:block; text-align:center;"
+                    data-ad-layout="in-article"
+                    data-ad-format="fluid"
+                    data-ad-client="ca-pub-2118765549976668"
+                    data-ad-slot="7583808877">
+                </ins>
+                <script>
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+             </div>
 
-                <div class="col-md-6 mb-3">
-                <div class="d-flex align-items-center">
-                    <div class="me-3" style="width: 50px; height: 50px; background-color: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-bullseye text-white"></i>
-                    </div>
-                    <div>
-                    <h5 class="text-white mb-1">Precisão</h5>
-                    <p class="text-white mb-0 opacity-90">Vagas selecionadas com base no seu perfil</p>
-                    </div>
-                </div>
-                </div>
-
-                <div class="col-md-6 mb-3">
-                <div class="d-flex align-items-center">
-                    <div class="me-3" style="width: 50px; height: 50px; background-color: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-chart-line text-white"></i>
-                    </div>
-                    <div>
-                    <h5 class="text-white mb-1">Mais Oportunidades</h5>
-                    <p class="text-white mb-0 opacity-90">Aumente suas chances de ser contratado</p>
-                    </div>
-                </div>
-                </div>
-
-                <div class="col-md-6 mb-3">
-                <div class="d-flex align-items-center">
-                    <div class="me-3" style="width: 50px; height: 50px; background-color: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-bell text-white"></i>
-                    </div>
-                    <div>
-                    <h5 class="text-white mb-1">Notificações</h5>
-                    <p class="text-white mb-0 opacity-90">Receba atualizações sobre suas candidaturas</p>
-                    </div>
-                </div>
-                </div>
-            </div>
-            </section>
           </div>
 
-          <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
-            <h4>Categorias</h4>
-            @foreach($categories as $item)
-              <a href="{{ url('/categories/' . $item['id']) }}"><span class="badge text-bg-dark">{{ $item->name }}</span></a>
-            @endforeach
+          <div class="col-lg-4">
+            <div class="sticky-top" style="top: 100px;">
+                <div class="card shadow-sm border-0 mb-4 rounded-3">
+                    <div class="card-header bg-white py-3 border-bottom-0">
+                        <h5 class="fw-bold m-0 text-dark">Categorias</h5>
+                    </div>
+                    <div class="card-body">
+                         <div class="d-flex flex-wrap gap-2">
+                            @foreach($categories as $item)
+                              <a href="{{ url('/categories/' . $item['id']) }}" class="badge bg-light text-dark border p-2 text-decoration-none">{{ $item->name }}</a>
+                            @endforeach
+                         </div>
+                    </div>
+                </div>
 
-            <h4 class="mt-5">Vagas Recentes</h4>
-            <div class="services-list">
-              @foreach($LastJobs as $item)
-                <a href="{{ url('/vagas/' . $item->slug) }}">{{ $item->title }}</a>
-              @endforeach
-              </div>
-
+                <div class="card shadow-sm border-0 rounded-3">
+                     <div class="card-header bg-white py-3 border-bottom-0">
+                        <h5 class="fw-bold m-0 text-dark">Vagas Recentes</h5>
+                    </div>
+                    <div class="list-group list-group-flush">
+                      @foreach($LastJobs as $item)
+                        <a href="{{ url('/vagas/' . $item->slug) }}" class="list-group-item list-group-item-action d-flex align-items-center py-3 border-0 border-bottom">
+                            <i class="bi bi-briefcase text-primary me-3 bg-light p-2 rounded-circle"></i>
+                            <div>
+                                <h6 class="mb-0 fw-bold text-dark text-truncate" style="max-width: 200px;">{{ $item->title }}</h6>
+                                <small class="text-muted">{{ $item->company }}</small>
+                            </div>
+                        </a>
+                      @endforeach
+                      </div>
+                </div>
+            </div>
           </div>
 
         </div>
 
       </div>
 
-    </section><!-- /Service Details Section -->
+    </section>
+    
+    <style>
+        .hover-scale:hover {
+            transform: scale(1.05);
+            transition: transform 0.2s ease;
+        }
+        .job-description h1, .job-description h2, .job-description h3 {
+            font-weight: 700;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+        }
+        .job-description ul {
+            padding-left: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+    </style>
 @endsection('content')

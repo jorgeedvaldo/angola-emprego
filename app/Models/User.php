@@ -21,7 +21,21 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'sex',
+        'birth_date',
+        'mobile',
+        'is_admin',
     ];
+
+    public function courses()
+    {
+        return $this->belongsToMany(Course::class, 'course_user')->withTimestamps()->withPivot('completed_at');
+    }
+
+    public function lessons()
+    {
+        return $this->belongsToMany(Lesson::class, 'lesson_user')->withTimestamps()->withPivot('completed_at');
+    }
 
     /**
      * The attributes that should be hidden for serialization.

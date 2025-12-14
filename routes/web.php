@@ -27,5 +27,22 @@ Route::get('/atm-com-dinheiro', [ToolsController::class, 'index']);
 Route::get('/sitemap.xml', [HomeController::class, 'siteMapGenerator'])->name('sitemap');
 Route::get('/feed', [HomeController::class, 'feedGenerator'])->name('feed');
 
-Route::get('/{slug}', [BlogController::class, 'getBySlug']);
+
 Route::get('/vagas/{slug}', [JobController::class, 'getBySlug']);
+
+Route::get('/login', [App\Http\Controllers\AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [App\Http\Controllers\AuthController::class, 'login']);
+Route::get('/register', [App\Http\Controllers\AuthController::class, 'showRegisterForm'])->name('register');
+Route::post('/register', [App\Http\Controllers\AuthController::class, 'register']);
+Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout'])->name('logout');
+Route::group(['middleware' => 'auth'], function () {
+    Route::get('/cursos/{slug}/certificado', [App\Http\Controllers\CourseController::class, 'certificate'])->name('courses.certificate');
+    Route::get('/cursos/{slug}/{lessonSlug}', [App\Http\Controllers\CourseController::class, 'attend'])->name('courses.attend');
+    Route::post('/cursos/{slug}/{lessonSlug}/complete', [App\Http\Controllers\CourseController::class, 'completeLesson'])->name('courses.complete');
+});
+
+Route::get('/cursos', [App\Http\Controllers\CourseController::class, 'index'])->name('courses.index');
+Route::get('/cursos/{slug}', [App\Http\Controllers\CourseController::class, 'show'])->name('courses.show');
+
+
+Route::get('/{slug}', [BlogController::class, 'getBySlug']);

@@ -11,80 +11,103 @@
 @endsection
 
 @section('content')
-    <!-- Page Title -->
-    <div class="page-title" data-aos="fade">
-      <div class="container d-lg-flex justify-content-between align-items-center">
-        <h1 class="mb-2 mb-lg-0">Detalhes do Artigo</h1>
-        <nav class="breadcrumbs">
-          <ol>
-            <li><a href="{{url('/')}}">Início</a></li>
-            <li><a href="{{url('/blog')}}">Blog</a></li>
-            <li class="current">{{$post->title}}</li>
+    <!-- Page Header -->
+    <div class="bg-light py-5">
+      <div class="container">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb mb-4">
+             <li class="breadcrumb-item"><a href="{{url('/')}}">Início</a></li>
+             <li class="breadcrumb-item"><a href="{{url('/blog')}}">Blog</a></li>
+             <li class="breadcrumb-item active" aria-current="page">{{ \Illuminate\Support\Str::limit($post->title, 50) }}</li>
           </ol>
         </nav>
+        
+        <div class="row justify-content-center">
+            <div class="col-lg-10 text-center">
+                <h1 class="display-5 fw-bold text-dark mb-4">{{$post->title}}</h1>
+                <div class="d-flex justify-content-center align-items-center gap-3 text-muted">
+                     <span><i class="bi bi-person-fill me-1"></i> Yuri Kiluanji</span>
+                     <span><i class="bi bi-calendar-event me-1"></i> {{ date_format(new DateTime($post->created_at), 'd/m/Y') }}</span>
+                </div>
+            </div>
+        </div>
       </div>
-    </div><!-- End Page Title -->
+    </div>
 
-    <!-- Service Details Section -->
-    <section id="service-details" class="service-details section">
+    <!-- Article Section -->
+    <section class="section py-5">
 
       <div class="container">
 
-        <div class="row gy-4">
+        <div class="row g-5 justify-content-center">
 
-          <div class="col-lg-8" data-aos="fade-up" data-aos-delay="200">
-            <img src="{{asset('storage/' . $post->image)}}" alt="" class="img-fluid services-img">
-            <h3>{{$post->title}}</h3>
-            <!-- Adição dos novos elementos -->
-            <div class="vaga-meta mb-4">
+          <div class="col-lg-8">
+            <div class="mb-4 rounded-3 overflow-hidden shadow-sm">
+                 <img src="{{asset('storage/' . $post->image)}}" alt="" class="img-fluid w-100">
+            </div>
+
+            <div class="bg-white p-lg-5 p-4 rounded-3 text-dark shadow-sm border mb-4 article-content">
                 <!-- Botões de compartilhamento -->
-                <div class="compartilhar-botoes mb-2">
-                    <a class="btn btn-sm btn-outline-primary me-2" href="https://www.facebook.com/sharer/sharer.php?u={{ url('/'. $post->slug) }}&quote={{ $post->title }}%0A.%0ASe%20você%20deseja%20saber%20mais%20sobre%20esta%20matéria,%20por%20favor,%20clique%20no%20link:%20{{ url('/empregos/'. $post->slug) }}%0A."
-                    target="_blank">
-                        <i class="bi bi-facebook"></i> Facebook
-                    </a>
-                    <a class="btn btn-sm btn-outline-primary me-2" href="https://www.linkedin.com/sharing/share-offsite/?url={{ url('/'. $post->slug) }}&text={{ $post->title }}%0A.%0ASe%20você%20deseja%20saber%20mais%20sobre%20esta%20matéria,%20por%20favor,%20clique%20no%20link:%20{{ url('/empregos/'. $post->slug) }}%0A."
-                    target="_blank">
-                        <i class="bi bi-linkedin"></i> LinkedIn
-                    </a>
-                    <a class="btn btn-sm btn-outline-success me-2" href="https://api.whatsapp.com/send?text={{ $post->title }}%0A.%0ASe%20você%20deseja%20saber%20mais%20sobre%20esta%20matéria,%20por%20favor,%20clique%20no%20link:%20{{ url('/'. $post->slug) }}%0A."
-                    target="_blank">
-                        <i class="bi bi-whatsapp"></i> WhatsApp
-                    </a>
-                    <a class="btn btn-sm btn-outline-danger" href="mailto:?subject={{ $post->title }}&body=Confira esta matéria:%0A%0A{{ $post->title }}%0A%0APara mais detalhes, acesse: {{ url('/'. $post->slug) }}"
-                    target="_blank">
-                        <i class="bi bi-envelope"></i> Email
-                    </a>
+                <div class="d-flex gap-2 mb-4">
+                    <a class="btn btn-outline-primary btn-sm rounded-pill px-3" href="https://www.facebook.com/sharer/sharer.php?u={{ url('/'. $post->slug) }}" target="_blank"><i class="bi bi-facebook me-1"></i> Partilhar</a>
+                    <a class="btn btn-outline-success btn-sm rounded-pill px-3" href="https://api.whatsapp.com/send?text={{ $post->title }} {{ url('/'. $post->slug) }}" target="_blank"><i class="bi bi-whatsapp me-1"></i> WhatsApp</a>
                 </div>
 
-                <!-- Informações do artigo -->
-                <div class="vaga-info text-muted small">
-                    <span class="me-3"><i class="bi bi-calendar me-1"></i> Publicada em: {{ date_format(new DateTime($post->created_at), 'd-m-Y') }}</span>
-                    <span><i class="bi bi-person-badge me-1"></i> Autor: Yuri Kiluanji</span>
+                <div class="lead mb-4">
+                     {!!$post->description!!}
                 </div>
             </div>
-            <!-- Fim das adições -->
-            {!!$post->description!!}
+
           </div>
 
-          <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
-            <h4>Categorias</h4>
-            @foreach($categories as $item)
-              <a href="{{ url('/categories/' . $item['id']) }}"><span class="badge text-bg-dark">{{ $item->name }}</span></a>
-            @endforeach
+          <div class="col-lg-4">
+            <div class="sticky-top" style="top: 100px;">
+                 <div class="card shadow-sm border-0 mb-4 rounded-3">
+                    <div class="card-header bg-white py-3 border-bottom-0">
+                        <h5 class="fw-bold m-0 text-dark">Categorias</h5>
+                    </div>
+                    <div class="card-body">
+                         <div class="d-flex flex-wrap gap-2">
+                            @foreach($categories as $item)
+                              <a href="{{ url('/categories/' . $item['id']) }}" class="badge bg-light text-dark border p-2 text-decoration-none">{{ $item->name }}</a>
+                            @endforeach
+                         </div>
+                    </div>
+                </div>
 
-            <h4 class="mt-5">Artigos Recentes</h4>
-            <div class="services-list">
-              @foreach($LastPosts as $item)
-                <a href="{{ url('/' . $item->slug) }}">{{ $item->title }}</a>
-              @endforeach
-              </div>
-
+                <div class="card shadow-sm border-0 rounded-3">
+                     <div class="card-header bg-white py-3 border-bottom-0">
+                        <h5 class="fw-bold m-0 text-dark">Artigos Recentes</h5>
+                    </div>
+                    <div class="list-group list-group-flush">
+                      @foreach($LastPosts as $item)
+                        <a href="{{ url('/' . $item->slug) }}" class="list-group-item list-group-item-action py-3 border-0 border-bottom">
+                            <h6 class="mb-1 fw-bold text-dark">{{ $item->title }}</h6>
+                            <small class="text-muted">{{ date_format(new DateTime($item->created_at), 'd/m/Y') }}</small>
+                        </a>
+                      @endforeach
+                      </div>
+                </div>
+            </div>
           </div>
 
         </div>
 
       </div>
 
-    </section><!-- /Service Details Section -->
+    </section>
+    
+    <style>
+        .article-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .article-content h2, .article-content h3 {
+            font-weight: 700;
+            margin-top: 2rem;
+            color: #2d2d2d;
+        }
+    </style>
 @endsection('content')

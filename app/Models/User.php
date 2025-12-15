@@ -32,6 +32,7 @@ class User extends Authenticatable implements FilamentUser
         'birth_date',
         'mobile',
         'is_admin',
+        'cv_path',
     ];
 
     public function courses()
@@ -43,6 +44,17 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->belongsToMany(Lesson::class, 'lesson_user')->withTimestamps()->withPivot('completed_at');
     }
+
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class, 'category_user')->withTimestamps();
+    }
+
+    public function getCvUrlAttribute()
+    {
+        return $this->cv_path ? asset('storage/' . $this->cv_path) : null;
+    }
+
 
     /**
      * The attributes that should be hidden for serialization.

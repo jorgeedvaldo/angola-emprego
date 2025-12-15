@@ -17,4 +17,9 @@ class Category extends Model
     {
         return $this->belongsToMany('App\Models\Job', 'category_jobs');
     }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'category_user');
+    }
 }

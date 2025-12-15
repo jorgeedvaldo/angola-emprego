@@ -59,8 +59,18 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $e)
     {
-        if ($this->isHttpException($e) && $e->getStatusCode() == 403) {
-            return response()->view('errors.404', [], 404);
+        if ($this->isHttpException($e)) {
+            if ($e->getStatusCode() == 403) {
+                return response()->view('errors.404', [], 404);
+            }
+            if ($e->getStatusCode() == 500) {
+                 return response()->view('errors.404', [], 404);
+            }
+        }
+        
+        // Catch-all for non-http exceptions treated as 500 server errors
+        if ($e instanceof \Error || $e instanceof \ErrorException) {
+             return response()->view('errors.404', [], 404);
         }
 
         return parent::render($request, $e);

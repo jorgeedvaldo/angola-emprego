@@ -7,6 +7,8 @@ use App\Http\Controllers\BlogController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\ToolsController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CourseController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,19 +32,29 @@ Route::get('/feed', [HomeController::class, 'feedGenerator'])->name('feed');
 
 Route::get('/vagas/{slug}', [JobController::class, 'getBySlug']);
 
-Route::get('/login', [App\Http\Controllers\AuthController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [App\Http\Controllers\AuthController::class, 'login']);
-Route::get('/register', [App\Http\Controllers\AuthController::class, 'showRegisterForm'])->name('register');
-Route::post('/register', [App\Http\Controllers\AuthController::class, 'register']);
-Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout'])->name('logout');
-Route::group(['middleware' => 'auth'], function () {
-    Route::get('/cursos/{slug}/certificado', [App\Http\Controllers\CourseController::class, 'certificate'])->name('courses.certificate');
-    Route::get('/cursos/{slug}/{lessonSlug}', [App\Http\Controllers\CourseController::class, 'attend'])->name('courses.attend');
-    Route::post('/cursos/{slug}/{lessonSlug}/complete', [App\Http\Controllers\CourseController::class, 'completeLesson'])->name('courses.complete');
+Route::middleware(['guest'])->group(function () {
+    Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
+    Route::post('/register', [AuthController::class, 'register']);
 });
 
-Route::get('/cursos', [App\Http\Controllers\CourseController::class, 'index'])->name('courses.index');
-Route::get('/cursos/{slug}', [App\Http\Controllers\CourseController::class, 'show'])->name('courses.show');
+Route::middleware(['auth'])->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    
+    // Profile & Recommendations
+    Route::get('/perfil', [App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');
+    Route::put('/perfil', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+    Route::get('/vagas-sugeridas', [App\Http\Controllers\ProfileController::class, 'potentialJobs'])->name('jobs.potential');
+
+    // Course routes that require authentication
+    Route::get('/cursos/{slug}/certificado', [CourseController::class, 'certificate'])->name('courses.certificate');
+    Route::get('/cursos/{slug}/{lessonSlug}', [CourseController::class, 'attend'])->name('courses.attend');
+    Route::post('/cursos/{slug}/{lessonSlug}/complete', [CourseController::class, 'completeLesson'])->name('courses.complete');
+});
+
+Route::get('/cursos', [CourseController::class, 'index'])->name('courses.index');
+Route::get('/cursos/{slug}', [CourseController::class, 'show'])->name('courses.show');
 
 
 Route::get('/{slug}', [BlogController::class, 'getBySlug']);

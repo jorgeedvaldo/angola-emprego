@@ -148,8 +148,10 @@
                 <li class="ms-lg-3"><a href="{{route('login')}}" class="text-primary fw-bold">Entrar</a></li>
                 <li><a href="{{route('register')}}" class="btn-get-started ms-2">Criar perfil</a></li>
             @else
+                <li><a href="{{route('jobs.potential')}}" class="text-primary">Vagas Sugeridas</a></li>
                 <li class="dropdown"><a href="#"><span>{{ Auth::user()->name }}</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
                     <ul>
+                    <li><a href="{{route('profile.show')}}">Meu Perfil</a></li>
                     <li><a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Sair</a></li>
                     </ul>
                 </li>
@@ -200,8 +202,13 @@
         <div class="col-lg-2 col-6 footer-links">
           <h4>Candidatos</h4>
           <ul class="list-unstyled">
-            <li><a href="{{route('register')}}" class="text-decoration-none text-muted">Criar Conta</a></li>
-            <li><a href="{{route('login')}}" class="text-decoration-none text-muted">Entrar</a></li>
+            @guest
+                <li><a href="{{route('register')}}" class="text-decoration-none text-muted">Criar Conta</a></li>
+                <li><a href="{{route('login')}}" class="text-decoration-none text-muted">Entrar</a></li>
+            @else
+                <li><a href="{{route('profile.show')}}" class="text-decoration-none text-muted">Meu Perfil</a></li>
+                <li><a href="{{route('jobs.potential')}}" class="text-decoration-none text-muted">Vagas Sugeridas</a></li>
+            @endguest
           </ul>
         </div>
 

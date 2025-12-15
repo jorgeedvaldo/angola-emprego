@@ -216,9 +216,9 @@
           <h4>Siga-nos</h4>
           <p>Fique por dentro das novidades</p>
           <div class="social-links d-flex mt-2">
-            <a href="#" class="d-flex align-items-center justify-content-center bg-white text-primary border rounded-circle" style="width: 40px; height: 40px;"><i class="bi bi-linkedin"></i></a>
-            <a href="#" class="d-flex align-items-center justify-content-center bg-white text-primary border rounded-circle ms-2" style="width: 40px; height: 40px;"><i class="bi bi-facebook"></i></a>
-            <a href="#" class="d-flex align-items-center justify-content-center bg-white text-primary border rounded-circle ms-2" style="width: 40px; height: 40px;"><i class="bi bi-instagram"></i></a>
+            <a href="https://www.linkedin.com/company/angola-emprego/" target="_blank" class="d-flex align-items-center justify-content-center bg-white text-primary border rounded-circle" style="width: 40px; height: 40px;"><i class="bi bi-linkedin"></i></a>
+            <a href="https://www.facebook.com/61563942219094" target="_blank" class="d-flex align-items-center justify-content-center bg-white text-primary border rounded-circle ms-2" style="width: 40px; height: 40px;"><i class="bi bi-facebook"></i></a>
+            <!-- <a href="#" class="d-flex align-items-center justify-content-center bg-white text-primary border rounded-circle ms-2" style="width: 40px; height: 40px;"><i class="bi bi-instagram"></i></a> -->
           </div>
         </div>
 

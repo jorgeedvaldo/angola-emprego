@@ -97,6 +97,8 @@
 
     </section>
     
+    @include('partials.social-cta')
+    
     <style>
         .article-content img {
             max-width: 100%;

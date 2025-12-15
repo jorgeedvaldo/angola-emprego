@@ -205,6 +205,8 @@
 
     </section>
     
+    @include('partials.social-cta')
+    
     <style>
         .hover-scale:hover {
             transform: scale(1.05);

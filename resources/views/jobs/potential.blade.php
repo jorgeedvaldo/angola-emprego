@@ -21,7 +21,7 @@
                     <div class="card h-100 border-0 shadow-sm hover-shadow transition-all" style="border-radius: 12px;">
                         <a href="{{ url('/vagas/' . $job->slug) }}" class="text-decoration-none text-dark">
                             <div class="position-relative">
-                                <img src="{{ $job->image }}" class="card-img-top object-fit-cover" alt="{{ $job->title }}" style="height: 180px; border-top-left-radius: 12px; border-top-right-radius: 12px;">
+                                <img src="{{ url('/storage/' . $job->image) }}" class="card-img-top object-fit-cover" alt="{{ $job->title }}" style="height: 180px; border-top-left-radius: 12px; border-top-right-radius: 12px;">
                                 <span class="position-absolute top-0 end-0 m-3 badge bg-light text-dark shadow-sm">
                                     {{ $job->type ?? 'Tempo Inteiro' }}
                                 </span>

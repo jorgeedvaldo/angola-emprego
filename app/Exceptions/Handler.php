@@ -63,13 +63,13 @@ class Handler extends ExceptionHandler
             if ($e->getStatusCode() == 403) {
                 return response()->view('errors.404', [], 404);
             }
-            if ($e->getStatusCode() == 500) {
+            if ($e->getStatusCode() == 500 && config('app.debug') == false) {
                  return response()->view('errors.404', [], 404);
             }
         }
         
         // Catch-all for non-http exceptions treated as 500 server errors
-        if ($e instanceof \Error || $e instanceof \ErrorException) {
+        if (($e instanceof \Error || $e instanceof \ErrorException) && config('app.debug') == false) {
              return response()->view('errors.404', [], 404);
         }
 

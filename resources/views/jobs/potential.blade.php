@@ -19,9 +19,9 @@
                 @foreach($jobs as $job)
                 <div class="col">
                     <div class="card h-100 border-0 shadow-sm hover-shadow transition-all" style="border-radius: 12px;">
-                        <a href="{{ url('/vaga/' . $job->slug) }}" class="text-decoration-none text-dark">
+                        <a href="{{ url('/vagas/' . $job->slug) }}" class="text-decoration-none text-dark">
                             <div class="position-relative">
-                                <img src="{{ $job->image_url ?? asset('assets/img/job-placeholder.jpg') }}" class="card-img-top object-fit-cover" alt="{{ $job->title }}" style="height: 180px; border-top-left-radius: 12px; border-top-right-radius: 12px;">
+                                <img src="{{ $job->image }}" class="card-img-top object-fit-cover" alt="{{ $job->title }}" style="height: 180px; border-top-left-radius: 12px; border-top-right-radius: 12px;">
                                 <span class="position-absolute top-0 end-0 m-3 badge bg-light text-dark shadow-sm">
                                     {{ $job->type ?? 'Tempo Inteiro' }}
                                 </span>
@@ -34,7 +34,7 @@
                                 </div>
                                 <h5 class="card-title fw-bold mb-2 text-truncate">{{ $job->title }}</h5>
                                 <p class="card-text text-muted small mb-3">
-                                    <i class="bi bi-building me-1"></i> {{ $job->company ?? 'Empresa Confidencial' }}
+                                    <i class="bi bi-building me-1"></i> {{ $job->company }}
                                 </p>
                                 <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
                                     <small class="text-muted"><i class="bi bi-geo-alt me-1"></i> {{ $job->location ?? 'Angola' }}</small>

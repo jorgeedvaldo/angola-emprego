@@ -7,7 +7,7 @@ Bem-vindo ao repositório do **Angola Emprego**, uma plataforma desenvolvida par
 O Angola Emprego tem como missão:
 - Divulgar vagas de emprego em diversas regiões de Angola.
 - Auxiliar candidatos a encontrar oportunidades compatíveis com suas habilidades.
-- Permitir que empresas anunciem vagas e encontrem talentos locais.
+- Permitir que empresas anunciem vagas e encontrem talentos locais
 
 ## Funcionalidades
 

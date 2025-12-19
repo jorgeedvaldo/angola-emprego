@@ -16,7 +16,7 @@ class User extends Authenticatable implements FilamentUser
 
     public function canAccessFilament(): bool
     {
-        return $this->is_admin === 1;
+        return $this->is_admin;
     }
 
     /**
@@ -73,5 +73,6 @@ class User extends Authenticatable implements FilamentUser
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'is_admin' => 'boolean',
     ];
 }

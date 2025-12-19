@@ -55,6 +55,4 @@ Route::middleware(['auth'])->group(function () {
 
 Route::get('/cursos', [CourseController::class, 'index'])->name('courses.index');
 Route::get('/cursos/{slug}', [CourseController::class, 'show'])->name('courses.show');
-
-
 Route::get('/{slug}', [BlogController::class, 'getBySlug']);

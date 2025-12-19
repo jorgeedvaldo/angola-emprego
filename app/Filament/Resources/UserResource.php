@@ -40,6 +40,17 @@ class UserResource extends Resource
                     ->required()
                     ->label('É Administrador?')
                     ->helperText('Habilite para dar acesso ao painel administrativo.'),
+                
+                Forms\Components\Section::make('Documentos')
+                    ->schema([
+                        Forms\Components\FileUpload::make('cv_path')
+                            ->label('Curriculum Vitae (CV)')
+                            ->directory('cvs')
+                            ->acceptedFileTypes(['application/pdf'])
+                            ->enableDownload()
+                            ->enableOpen()
+                            ->columnSpan('full'),
+                    ]),
             ]);
     }
 
@@ -63,6 +74,14 @@ class UserResource extends Resource
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
             ]);
+    }
+    
+    public static function getRelations(): array
+    {
+        return [
+            UserResource\RelationManagers\CategoriesRelationManager::class,
+            UserResource\RelationManagers\CoursesRelationManager::class,
+        ];
     }
     
     public static function getPages(): array

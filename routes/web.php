@@ -46,6 +46,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/perfil', [App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');
     Route::put('/perfil', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
     Route::get('/vagas-sugeridas', [App\Http\Controllers\ProfileController::class, 'potentialJobs'])->name('jobs.potential');
+    Route::get('/planos', [App\Http\Controllers\ProfileController::class, 'plans'])->name('plans.index');
+    Route::get('/planos/confirmar', [App\Http\Controllers\ProfileController::class, 'confirm'])->name('plans.confirm');
+    Route::post('/planos/subscrever', [App\Http\Controllers\ProfileController::class, 'subscribe'])->name('plans.subscribe');
 
     // Course routes that require authentication
     Route::get('/cursos/{slug}/certificado', [CourseController::class, 'certificate'])->name('courses.certificate');

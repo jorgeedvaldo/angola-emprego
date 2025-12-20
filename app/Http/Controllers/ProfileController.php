@@ -28,9 +28,21 @@ class ProfileController extends Controller
         $user = Auth::user();
 
         $request->validate([
+            'name' => 'required|string|max:255',
+            'mobile' => 'nullable|string|max:20',
+            'sex' => 'nullable|string|in:Masculino,Feminino',
+            'birth_date' => 'nullable|date',
             'cv' => 'nullable|mimes:pdf|max:2048', // Max 2MB PDF
             'categories' => 'array',
             'categories.*' => 'exists:categories,id',
+        ]);
+
+        // Update Basic Info
+        $user->update([
+            'name' => $request->name,
+            'mobile' => $request->mobile,
+            'sex' => $request->sex,
+            'birth_date' => $request->birth_date,
         ]);
 
         // Handle CV Upload
@@ -72,5 +84,62 @@ class ProfileController extends Controller
         ->paginate(12);
 
         return view('jobs.potential', compact('jobs'));
+    }
+
+    /**
+     * Show subscription plans.
+     */
+    public function plans()
+    {
+        return view('plans');
+    }
+
+    /**
+     * Show confirmation page with requirement checks.
+     */
+    public function confirm(Request $request)
+    {
+        $plan = $request->query('plan');
+        $validPlans = ['weekly', 'monthly', 'quarterly', 'yearly'];
+
+        if (!in_array($plan, $validPlans)) {
+            return redirect()->route('plans.index');
+        }
+
+        $user = Auth::user();
+        $hasCv = !empty($user->cv_path);
+        $hasCategories = $user->categories()->count() > 0;
+        $canSubscribe = $hasCv && $hasCategories;
+
+        return view('plans.confirm', compact('plan', 'hasCv', 'hasCategories', 'canSubscribe'));
+    }
+
+    /**
+     * Handle subscription interest.
+     */
+    public function subscribe(Request $request)
+    {
+        $request->validate([
+            'plan' => 'required|string|in:weekly,monthly,quarterly,yearly',
+        ]);
+
+        $user = Auth::user();
+
+        // Server-side validation just in case
+        if (empty($user->cv_path) || $user->categories()->count() == 0) {
+            return redirect()->route('plans.index')->with('error', 'Requisitos não cumpridos.');
+        }
+
+        // Create subscription request
+        \App\Models\SubscriptionRequest::create([
+            'user_id' => $user->id,
+            'plan' => $request->plan,
+            'status' => 'pending',
+        ]);
+
+        // Update user status to pending
+        $user->update(['subscription_status' => 'pending']);
+
+        return redirect()->route('profile.show')->with('success', 'Pedido de subscrição enviado! Aguarde o nosso contacto.');
     }
 }

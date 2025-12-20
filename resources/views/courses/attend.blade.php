@@ -16,7 +16,7 @@
 </div>
 
 <section class="section bg-light py-5">
-    <div class="container" data-aos="fade-up">
+    <div class="container">
 
         <div class="row g-4">
             <div class="col-lg-8">

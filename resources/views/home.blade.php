@@ -13,7 +13,7 @@
 
         <div class="container">
             <div class="row justify-content-center text-center">
-            <div class="col-lg-8" data-aos="zoom-out">
+            <div class="col-lg-8">
                 <h1 class="display-4 fw-bold text-dark mb-4">Encontre o emprego ideal para si</h1>
                 <p class="lead text-muted mb-5">Milhares de oportunidades de emprego e formação em Angola à sua espera.</p>
                 
@@ -79,11 +79,95 @@
       </div>
     </section>
 
+    <!-- Subscription Plans Section -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold text-dark">Candidaturas Automáticas</h2>
+                <p class="text-muted lead">Aumente as suas chances deixando que nós apliquemos por si.</p>
+            </div>
+
+            <div class="row row-cols-1 row-cols-md-4 mb-3 text-center">
+                <!-- Semanal -->
+                <div class="col">
+                  <div class="card mb-4 rounded-3 shadow-sm border-0 h-100">
+                    <div class="card-header py-3 bg-white border-0">
+                      <h4 class="my-0 fw-normal">Semanal</h4>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                      <h1 class="card-title pricing-card-title">1.000 <small class="text-muted fw-light">Kz</small></h1>
+                      <ul class="list-unstyled mt-3 mb-4 flex-grow-1">
+                        <li class="mb-2"><i class="bi bi-check text-success me-2"></i>Candidaturas Automáticas</li>
+                        <li class="mb-2"><i class="bi bi-check text-success me-2"></i>Válido por 7 dias</li>
+                        <li class="mb-2"><i class="bi bi-check text-success me-2"></i>Suporte Prioritário</li>
+                      </ul>
+                      <a href="{{ route('plans.confirm', ['plan' => 'weekly']) }}" class="w-100 btn btn-lg btn-outline-primary rounded-pill">Escolher Semanal</a>
+                    </div>
+                  </div>
+                </div>
+    
+                <!-- Mensal -->
+                <div class="col">
+                  <div class="card mb-4 rounded-3 shadow border-primary h-100 border-2">
+                    <div class="card-header py-3 bg-primary text-white border-primary">
+                      <h4 class="my-0 fw-normal">Mensal</h4>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                      <h1 class="card-title pricing-card-title">3.000 <small class="text-muted fw-light">Kz</small></h1>
+                      <ul class="list-unstyled mt-3 mb-4 flex-grow-1">
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Candidaturas Automáticas</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Válido por 30 dias</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Destaque no Perfil</li>
+                      </ul>
+                      <a href="{{ route('plans.confirm', ['plan' => 'monthly']) }}" class="w-100 btn btn-lg btn-primary rounded-pill">Escolher Mensal</a>
+                    </div>
+                  </div>
+                </div>
+    
+                <!-- Trimestral -->
+                <div class="col">
+                  <div class="card mb-4 rounded-3 shadow-sm border-0 h-100">
+                    <div class="card-header py-3 bg-white border-0">
+                      <h4 class="my-0 fw-normal">Trimestral</h4>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                      <h1 class="card-title pricing-card-title">6.950 <small class="text-muted fw-light">Kz</small></h1>
+                      <ul class="list-unstyled mt-3 mb-4 flex-grow-1">
+                        <li class="mb-2"><i class="bi bi-check text-success me-2"></i>Candidaturas Automáticas</li>
+                        <li class="mb-2"><i class="bi bi-check text-success me-2"></i>Válido por 90 dias</li>
+                        <li class="mb-2"><i class="bi bi-check text-success me-2"></i>Poupança de 3.000 Kz</li>
+                      </ul>
+                       <a href="{{ route('plans.confirm', ['plan' => 'quarterly']) }}" class="w-100 btn btn-lg btn-outline-primary rounded-pill">Escolher Trimestral</a>
+                    </div>
+                  </div>
+                </div>
+                
+                 <!-- Anual -->
+                <div class="col">
+                  <div class="card mb-4 rounded-3 shadow-sm border-0 h-100">
+                    <div class="card-header py-3 bg-white border-0">
+                      <h4 class="my-0 fw-normal">Anual</h4>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                      <h1 class="card-title pricing-card-title">10.000 <small class="text-muted fw-light">Kz</small></h1>
+                      <ul class="list-unstyled mt-3 mb-4 flex-grow-1">
+                        <li class="mb-2"><i class="bi bi-check text-success me-2"></i>Candidaturas Automáticas</li>
+                        <li class="mb-2"><i class="bi bi-check text-success me-2"></i>Válido por 1 ano</li>
+                        <li class="mb-2"><i class="bi bi-check text-success me-2"></i>Poupança Máxima</li>
+                      </ul>
+                       <a href="{{ route('plans.confirm', ['plan' => 'yearly']) }}" class="w-100 btn btn-lg btn-outline-primary rounded-pill">Escolher Anual</a>
+                    </div>
+                  </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Job Section -->
-    <section id="about" class="about section bg-light py-5">
+    <section id="about" class="about section bg-white py-5">
 
         <!-- Section Title -->
-        <div class="container section-title mb-5 text-center" data-aos="fade-up">
+        <div class="container section-title mb-5 text-center">
           <h2 class="fw-bold text-dark">Destaques</h2>
           <p class="text-muted">As vagas mais recentes em Angola</p>
         </div><!-- End Section Title -->
@@ -93,7 +177,7 @@
           <div class="row gy-4">
 
             @foreach($jobs as $job)
-              <div class="col-md-6 col-lg-4 d-flex align-items-stretch" data-aos="fade-up">
+              <div class="col-md-6 col-lg-4 d-flex align-items-stretch">
                   <a href="{{ url('/vagas/' . $job->slug) }}" class="text-decoration-none w-100">
                       <div class="card h-100 border-0 shadow-sm shadow-hover transition-all p-3" style="border-radius: 12px;">
                           <div class="card-body">

@@ -5,7 +5,7 @@
 
 @section('content')
 <div class="bg-light py-5">
-    <div class="container" data-aos="fade-up">
+    <div class="container">
 
         <div class="text-center mb-5">
             <h2 class="fw-bold text-dark">Desenvolva as suas competências</h2>
@@ -14,7 +14,7 @@
 
         <div class="row g-4">
             @forelse($courses as $course)
-            <div class="col-lg-4 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="100">
+            <div class="col-lg-4 col-md-6 d-flex align-items-stretch">
                 <a href="{{ route('courses.show', $course->slug) }}" class="text-decoration-none w-100">
                     <div class="card h-100 border-0 shadow-hover transition-all" style="border-radius: 12px; overflow: hidden;">
                         <div class="position-relative">

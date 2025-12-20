@@ -87,9 +87,16 @@
                     </div>
                 </div>
                 <div class="col-lg-3 text-lg-end">
-                    <div class="d-grid gap-2">
-                        <a href="#apply-section" class="btn btn-primary fw-bold py-2 px-4 rounded-pill">Candidatar-se</a>
-                        <button class="btn btn-outline-secondary btn-sm rounded-pill" onclick="window.print()"><i class="bi bi-printer me-1"></i> Imprimir</button>
+                    @if(filter_var($job->email_or_link, FILTER_VALIDATE_EMAIL))
+                        <a href="mailto:{{ $job->email_or_link }}" class="btn btn-primary fw-bold py-2 px-4 rounded-pill">
+                            <i class="bi bi-envelope-fill me-2"></i> Candidatar-se
+                        </a>
+                    @else
+                        <a href="{{ $job->email_or_link }}" target="_blank" class="btn btn-primary fw-bold py-2 px-4 rounded-pill">
+                             <i class="bi bi-box-arrow-up-right me-2"></i> Candidatar-se
+                        </a>
+                    @endif
+                        <button class="btn btn-outline-secondary rounded-pill m-3" onclick="window.print()"><i class="bi bi-printer me-1"></i> Imprimir</button>
                     </div>
                 </div>
             </div>
@@ -142,7 +149,7 @@
                     </div>
                     <h2 class="fw-bold mb-3">Candidaturas Automáticas</h2>
                     <p class="mb-4 fs-5 opacity-75">Deixe que nós façamos as candidaturas por você! Com base no seu CV, aplicamos automaticamente às vagas que combinam com o seu perfil.</p>
-                    <a href="https://pay.kuenha.com/856ed35c-7b33-4e98-9352-954d22bc56a2" class="btn btn-warning btn-lg fw-bold rounded-pill px-5 text-dark shadow-sm hover-scale">
+                    <a href="{{ route('plans.index') }}" class="btn btn-warning btn-lg fw-bold rounded-pill px-5 text-dark shadow-sm hover-scale">
                         <i class="bi bi-eye me-2"></i>Ver Planos
                     </a>
                 </div>

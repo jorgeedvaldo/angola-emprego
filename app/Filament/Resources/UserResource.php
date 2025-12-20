@@ -51,6 +51,30 @@ class UserResource extends Resource
                             ->enableOpen()
                             ->columnSpan('full'),
                     ]),
+
+                Forms\Components\Section::make('Assinatura')
+                    ->schema([
+                        Forms\Components\Select::make('subscription_plan')
+                            ->label('Plano')
+                            ->options([
+                                'weekly' => 'Semanal',
+                                'monthly' => 'Mensal',
+                                'quarterly' => 'Trimestral',
+                                'yearly' => 'Anual',
+                            ]),
+                        Forms\Components\Select::make('subscription_status')
+                            ->label('Status')
+                            ->options([
+                                'active' => 'Ativo',
+                                'inactive' => 'Inativo',
+                                'cancelled' => 'Cancelado',
+                            ])
+                            ->default('inactive'),
+                        Forms\Components\DatePicker::make('subscription_start')
+                            ->label('Início'),
+                        Forms\Components\DatePicker::make('subscription_end')
+                            ->label('Fim'),
+                    ])->columns(2),
             ]);
     }
 

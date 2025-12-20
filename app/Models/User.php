@@ -33,6 +33,10 @@ class User extends Authenticatable implements FilamentUser
         'mobile',
         'is_admin',
         'cv_path',
+        'subscription_plan',
+        'subscription_start',
+        'subscription_end',
+        'subscription_status',
     ];
 
     public function courses()
@@ -48,6 +52,13 @@ class User extends Authenticatable implements FilamentUser
     public function categories()
     {
         return $this->belongsToMany(Category::class, 'category_user')->withTimestamps();
+    }
+
+    public function hasActiveSubscription()
+    {
+        return $this->subscription_status === 'active' && 
+               $this->subscription_end && 
+               $this->subscription_end->isFuture();
     }
 
     public function getCvUrlAttribute()
@@ -74,5 +85,7 @@ class User extends Authenticatable implements FilamentUser
     protected $casts = [
         'email_verified_at' => 'datetime',
         'is_admin' => 'boolean',
+        'subscription_start' => 'date',
+        'subscription_end' => 'date',
     ];
 }

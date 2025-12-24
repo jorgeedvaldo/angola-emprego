@@ -69,39 +69,118 @@
     body {
       font-family: 'Open Sans', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       color: var(--text-color);
-      background-color: #fff;
+      background-color: #f8f9fa;
     }
     .header {
       background: #fff;
       border-bottom: 1px solid #e4e2e0;
-      padding: 15px 0;
-      box-shadow: none; /* Remove heavy shadow */
+      padding: 0;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+      height: 72px;
+      display: flex;
+      align-items: center;
     }
     .header .logo img {
-      max-height: 40px;
+      max-height: 38px;
+    }
+    /* Navmenu Desktop */
+    .navmenu {
+        flex-grow: 1;
+        display: flex;
+        justify-content: center;
+    }
+    .navmenu ul {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      list-style: none;
+      align-items: center;
+      gap: 15px;
     }
     .navmenu ul li a {
-      color: var(--text-color);
+      color: #595959;
       font-weight: 600;
-      font-size: 15px;
-      padding: 10px 15px;
+      font-size: 14px;
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 50px;
+      transition: all 0.2s;
+    }
+    .navmenu ul li a i {
+        font-size: 16px;
+        color: #8c8c8c;
+        transition: color 0.2s;
     }
     .navmenu ul li a:hover, .navmenu ul li a.active {
       color: var(--primary-color);
+      background-color: #eaf1fb;
     }
-    .btn-get-started {
-      background: var(--primary-color);
-      color: #fff !important;
-      border-radius: 8px;
-      padding: 10px 20px !important;
-      font-weight: 700;
-      border: 1px solid var(--primary-color);
+    .navmenu ul li a:hover i, .navmenu ul li a.active i {
+      color: var(--primary-color);
     }
-    .btn-get-started:hover {
-      background: #1e468a;
+    
+    /* Buttons and User Actions */
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
     }
+    .btn-create-cv {
+        background-color: #fff;
+        color: var(--primary-color);
+        border: 1px solid #d4d2d0;
+        font-weight: 700;
+        padding: 8px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .btn-create-cv:hover {
+        background-color: #f3f2f1;
+        border-color: #a4a2a0;
+        color: var(--primary-color);
+    }
+    .btn-login {
+        font-weight: 700;
+        color: var(--primary-color);
+        text-decoration: none;
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+    
+    .nav-profile-img {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        object-fit: cover;
+        background-color: var(--primary-color);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 16px;
+    }
+    
+    .mobile-nav-toggle {
+        font-size: 28px;
+        color: var(--text-color);
+        margin-left: 15px;
+        cursor: pointer;
+        z-index: 9999;
+    }
+    body.mobile-nav-active .mobile-nav-toggle {
+        color: #fff;
+    }
+
     .footer {
-      background: #f3f2f1;
+      background: #fff;
       border-top: 1px solid #e4e2e0;
       color: #595959;
       padding-top: 50px;
@@ -126,47 +205,75 @@
 <body class="index-page">
 
   <header id="header" class="header sticky-top">
+    <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
 
-    <div class="branding d-flex align-items-center">
+      <a href="{{url('/')}}" class="logo d-flex align-items-center text-decoration-none me-4">
+        <img src="{{asset('assets/img/logo.svg')}}" alt="Angola Emprego" style="height: 48px; width: auto;">
+      </a>
 
-      <div class="container position-relative d-flex align-items-center justify-content-between">
-        <a href="{{url('/')}}" class="logo d-flex align-items-center text-decoration-none">
-          <!-- Uncomment the line below if you also wish to use an image logo -->
-          <img src="{{asset('assets/img/logo.svg')}}" alt="Angola Emprego" style="height: 40px;">
-          <!-- <h1 class="sitename">AngolaEmprego</h1> -->
-        </a>
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="{{url('/')}}" class="{{ Request::is('/') ? 'active' : '' }}"><i class="bi bi-house-door"></i> Início</a></li>
+          <li><a href="{{url('/vagas')}}" class="{{ Request::is('vagas*') ? 'active' : '' }}"><i class="bi bi-briefcase"></i> Vagas</a></li>
+          <li><a href="{{route('courses.index')}}" class="{{ Request::is('cursos*') ? 'active' : '' }}"><i class="bi bi-journal-bookmark"></i> Cursos</a></li>
+          <li><a href="{{url('/blog')}}" class="{{ Request::is('blog*') ? 'active' : '' }}"><i class="bi bi-newspaper"></i> Blog</a></li>
+          
+          <!-- Mobile Only Actions -->
+          @guest
+              <li class="d-xl-none"><a href="{{route('login')}}"><i class="bi bi-box-arrow-in-right"></i> Entrar</a></li>
+              <li class="d-xl-none"><a href="{{route('register')}}"><i class="bi bi-person-plus"></i> Criar Conta</a></li>
+          @else
+              <li class="d-xl-none"><a href="{{route('profile.show')}}"><i class="bi bi-person"></i> Meu Perfil</a></li>
+              <li class="d-xl-none"><a href="{{route('jobs.potential')}}"><i class="bi bi-stars"></i> Vagas Sugeridas</a></li>
+              <li class="d-xl-none">
+                  <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="text-danger">
+                      <i class="bi bi-box-arrow-right"></i> Sair
+                  </a>
+              </li>
+          @endguest
+        </ul>
+      </nav>
 
-        <nav id="navmenu" class="navmenu">
-          <ul>
-            <li><a href="{{url('/')}}">Início</a></li>
-            <li><a href="{{url('/vagas')}}">Empregos</a></li>
-            <li><a href="{{route('courses.index')}}">Cursos</a></li>
-            <li><a href="{{url('/blog')}}">Blog</a></li>
-            <li><a href="{{url('/atm-com-dinheiro')}}">ATMs</a></li>
+      <div class="header-actions">
+        @guest
+            <a href="{{route('login')}}" class="btn-login d-none d-md-block">Entrar</a>
+            <a href="{{route('register')}}" class="btn-create-cv">
+                <i class="bi bi-person-plus"></i> Criar Conta
+            </a>
+        @else
+            <a href="{{route('profile.show')}}" class="btn-create-cv d-none d-md-flex" title="Ver Perfil">
+                <i class="bi bi-person-badge"></i> Meu Perfil
+            </a>
             
-            @guest
-                <li class="ms-lg-3"><a href="{{route('login')}}" class="text-primary fw-bold">Entrar</a></li>
-                <li><a href="{{route('register')}}" class="btn-get-started ms-2">Criar perfil</a></li>
-            @else
-                <li><a href="{{route('jobs.potential')}}" class="text-primary">Vagas Sugeridas</a></li>
-                <li class="dropdown"><a href="#"><span>{{ Auth::user()->name }}</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-                    <ul>
-                    <li><a href="{{route('profile.show')}}">Meu Perfil</a></li>
-                    <li><a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Sair</a></li>
-                    </ul>
-                </li>
-                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                    @csrf
-                </form>
-            @endguest
-          </ul>
-          <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
-        </nav>
-
+            <div class="dropdown">
+                <a href="#" class="d-flex align-items-center text-decoration-none" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                    <div class="nav-profile-img">
+                        {{ substr(Auth::user()->name, 0, 1) }}
+                    </div>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" aria-labelledby="dropdownUser1">
+                    <li class="px-3 py-2 border-bottom">
+                         <div class="fw-bold text-dark">{{ Auth::user()->name }}</div>
+                         <div class="text-muted small">{{ Auth::user()->email }}</div>
+                    </li>
+                    <li><a class="dropdown-item py-2" href="{{route('profile.show')}}"><i class="bi bi-person me-2"></i> Meu Perfil</a></li>
+                    <li><a class="dropdown-item py-2" href="{{route('jobs.potential')}}"><i class="bi bi-stars me-2"></i> Vagas Sugeridas</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <a class="dropdown-item py-2 text-danger" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                            <i class="bi bi-box-arrow-right me-2"></i> Sair
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                @csrf
+            </form>
+        @endguest
+        <i class="mobile-nav-toggle d-xl-none bi bi-list ms-3 cursor-pointer"></i>
       </div>
 
     </div>
-
   </header>
 
   <main class="main">
@@ -181,7 +288,7 @@
       <div class="row gy-4">
         <div class="col-lg-5 col-md-12 footer-about">
           <a href="{{url('/')}}" class="d-flex align-items-center text-decoration-none">
-            <span class="sitename">Angola Emprego</span>
+            <img src="{{asset('assets/img/logo.svg')}}" alt="Angola Emprego" style="height: 48px; width: auto;">
           </a>
           <div class="footer-contact pt-3">
             <p>Conectando talentos às melhores oportunidades em Angola.</p>

@@ -8,10 +8,29 @@ use Illuminate\Http\Request;
 
 class JobController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $jobs = Job::orderByRaw('id DESC')->paginate(30);
-        //$categories = Category::orderBy('name')->get();
+        $query = Job::query();
+
+        if ($request->filled('q')) {
+            $search = $request->input('q');
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('company', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('location')) {
+            $location = $request->input('location');
+            $query->where('location', 'like', "%{$location}%");
+        }
+
+        $jobs = $query->orderByRaw('id DESC')->paginate(30);
+        
+        // Append query parameters to pagination links
+        $jobs->appends($request->all());
+
         return view('jobs', compact('jobs'));
     }
 

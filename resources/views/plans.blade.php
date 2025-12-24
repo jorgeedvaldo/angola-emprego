@@ -4,20 +4,58 @@
 
 @section('content')
 <section class="py-5 bg-light">
-    <div class="container py-5">
-        <div class="row text-center justify-content-center mb-5">
-             <div class="col-lg-8">
-                 <h1 class="fw-bold text-dark">Escolha o Seu Plano</h1>
-                 <p class="text-muted lead">Receba candidaturas automáticas e aumente as suas chances de conseguir um emprego.</p>
-             </div>
-        </div>
-
-        @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show text-center mb-5" role="alert">
-                <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <!-- Cloud Service Explanation Section -->
+    <div class="container mb-5">
+        <div class="bg-white p-5 rounded-3 shadow-sm border">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold text-dark">Como Funcionam as Candidaturas Automáticas?</h2>
+                <p class="text-muted lead">Deixe que nós tratamos de tudo por si. Veja como é simples:</p>
             </div>
-        @endif
+
+            <div class="row g-4 text-center justify-content-center">
+                <div class="col-md-4">
+                    <div class="p-4">
+                         <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary rounded-circle mb-3" style="width: 80px; height: 80px;">
+                            <i class="bi bi-file-person fs-1"></i>
+                        </div>
+                        <h5 class="fw-bold">1. Análise de Perfil</h5>
+                        <p class="text-muted">Com base no seu CV e preferências, identificamos as vagas que combinam perfeitamente com o seu perfil.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-4">
+                        <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary rounded-circle mb-3" style="width: 80px; height: 80px;">
+                            <i class="bi bi-send-check fs-1"></i>
+                        </div>
+                        <h5 class="fw-bold">2. Candidatura Automática</h5>
+                        <p class="text-muted">Sempre que surgir uma nova vaga na sua área (ex: Motorista, Vendas), nós enviamos a sua candidatura automaticamente.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-4">
+                        <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary rounded-circle mb-3" style="width: 80px; height: 80px;">
+                            <i class="bi bi-clipboard-data fs-1"></i>
+                        </div>
+                        <h5 class="fw-bold">3. Relatórios Periódicos</h5>
+                        <p class="text-muted">Receba periodicamente um relatório detalhado de todas as candidaturas que efectuamos em seu nome.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row justify-content-center mt-4">
+                <div class="col-lg-10">
+                    <div class="alert alert-warning border-0 shadow-sm d-flex align-items-center p-3" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill fs-3 me-3 text-warning"></i>
+                        <div>
+                            <strong>Nota Importante:</strong> Este serviço garante o envio das suas candidaturas aos nossos clientes, mas <span class="text-decoration-underline">não garante a obtenção de emprego</span>. O recrutamento depende sempre da avaliação da empresa empregadora.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container py-5">
 
         <div class="row row-cols-1 row-cols-md-4 mb-3 text-center">
             

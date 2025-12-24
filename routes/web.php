@@ -20,7 +20,12 @@ use App\Http\Controllers\CourseController;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
+Route::get('/linkstorage', function () {
+    // Cria o link simbólico (storage -> public)
+    Artisan::call('storage:link');
+    
+    return 'Symlink criado: <pre>' . Artisan::output() . '</pre>';
+});
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/sobre', [AboutController::class, 'index'])->name('sobre');
 Route::get('/vagas', [JobController::class, 'index'])->name('vagas');

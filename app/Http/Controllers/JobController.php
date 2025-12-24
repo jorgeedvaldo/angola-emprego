@@ -26,12 +26,26 @@ class JobController extends Controller
             $query->where('location', 'like', "%{$location}%");
         }
 
-        $jobs = $query->orderByRaw('id DESC')->paginate(30);
-        
-        // Append query parameters to pagination links
+        if ($request->filled('category')) {
+            $categorySlug = $request->input('category');
+            $query->whereHas('categories', function($q) use ($categorySlug) {
+                $q->where('slug', $categorySlug);
+            });
+        }
+
+        $jobs = $query->orderByRaw('id DESC')->paginate(15);
         $jobs->appends($request->all());
 
-        return view('jobs', compact('jobs'));
+        // Sidebar Data
+        $categories = Category::withCount('jobs')->orderBy('name')->get();
+        // Top 15 companies by job count
+        $topCompanies = Job::select('company', \DB::raw('count(*) as total'))
+                            ->groupBy('company')
+                            ->orderByDesc('total')
+                            ->limit(15)
+                            ->get();
+
+        return view('jobs', compact('jobs', 'categories', 'topCompanies'));
     }
 
     public function getBySlug($slug)

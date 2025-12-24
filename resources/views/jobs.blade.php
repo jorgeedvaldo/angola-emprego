@@ -63,7 +63,7 @@
                     </div>
 
                     <!-- Categories Widget -->
-                    <div class="card border-0 shadow-sm mb-4">
+                    <div class="card border-0 shadow-sm mb-4 d-none d-lg-block">
                         <div class="card-body p-4">
                             <h5 class="fw-bold mb-3">Categorias</h5>
                             <ul class="list-unstyled mb-0 filter-list">

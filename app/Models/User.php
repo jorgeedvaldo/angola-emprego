@@ -37,6 +37,8 @@ class User extends Authenticatable implements FilamentUser
         'subscription_start',
         'subscription_end',
         'subscription_status',
+        'google_id',
+        'avatar',
     ];
 
     public function courses()

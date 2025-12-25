@@ -52,10 +52,10 @@ class ProfileController extends Controller
                 Storage::disk('public')->delete($user->cv_path);
             }
             // Store new CV
-            $extension = $request->file('cv')->getClientOriginalExtension();
+            // Store new CV
             $userName = \Illuminate\Support\Str::slug($user->name);
-            $randomString = \Illuminate\Support\Str::random(10);
-            $filename = "CV - {$userName} - {$randomString}.{$extension}";
+            $hashName = $request->file('cv')->hashName(); // Generates random string + extension
+            $filename = "CV - {$userName} - {$hashName}";
             
             $path = $request->file('cv')->storeAs('cvs', $filename, 'public');
             $user->update(['cv_path' => $path]);

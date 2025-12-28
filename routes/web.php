@@ -63,6 +63,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/cursos/{slug}/certificado', [CourseController::class, 'certificate'])->name('courses.certificate');
     Route::get('/cursos/{slug}/{lessonSlug}', [CourseController::class, 'attend'])->name('courses.attend');
     Route::post('/cursos/{slug}/{lessonSlug}/complete', [CourseController::class, 'completeLesson'])->name('courses.complete');
+    
+    // Payment Confirmation
+    Route::get('/pagamento/sucesso', [App\Http\Controllers\PaymentController::class, 'success'])->name('payment.success');
 });
 
 Route::get('/cursos', [CourseController::class, 'index'])->name('courses.index');

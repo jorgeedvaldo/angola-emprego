@@ -48,6 +48,23 @@
                                     <a href="{{ route('profile.show') }}" class="btn btn-sm btn-outline-danger">Selecionar</a>
                                 @endif
                             </li>
+
+                            <!-- Active Subscription Check -->
+                            <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                <div>
+                                    <h6 class="mb-0 fw-bold">3. Estado da Subscrição</h6>
+                                    @if(!$isSubscriptionActive)
+                                        <small class="text-success">Sem subscrição ativa.</small>
+                                    @else
+                                        <small class="text-danger">Já possui uma subscrição ativa.</small>
+                                    @endif
+                                </div>
+                                @if(!$isSubscriptionActive)
+                                    <i class="bi bi-check-circle-fill text-success fs-4"></i>
+                                @else
+                                    <i class="bi bi-x-circle-fill text-danger fs-4"></i>
+                                @endif
+                            </li>
                         </ul>
 
                         @if($canSubscribe)

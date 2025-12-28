@@ -114,9 +114,14 @@ class ProfileController extends Controller
         $user = Auth::user();
         $hasCv = !empty($user->cv_path);
         $hasCategories = $user->categories()->count() > 0;
-        $canSubscribe = $hasCv && $hasCategories;
+        
+        $isSubscriptionActive = $user->subscription_status === 'active' 
+            && $user->subscription_end 
+            && \Carbon\Carbon::parse($user->subscription_end)->isFuture();
 
-        return view('plans.confirm', compact('plan', 'hasCv', 'hasCategories', 'canSubscribe'));
+        $canSubscribe = $hasCv && $hasCategories && !$isSubscriptionActive;
+
+        return view('plans.confirm', compact('plan', 'hasCv', 'hasCategories', 'canSubscribe', 'isSubscriptionActive'));
     }
 
     /**
@@ -135,6 +140,11 @@ class ProfileController extends Controller
             return redirect()->route('plans.index')->with('error', 'Requisitos não cumpridos.');
         }
 
+        // Check if user already has an active subscription with valid date
+        if ($user->subscription_status === 'active' && $user->subscription_end && \Carbon\Carbon::parse($user->subscription_end)->isFuture()) {
+             return redirect()->route('profile.show')->with('info', 'Já possui uma subscrição ativa.');
+        }
+
         // Create subscription request
         \App\Models\SubscriptionRequest::create([
             'user_id' => $user->id,
@@ -144,6 +154,20 @@ class ProfileController extends Controller
 
         // Update user status to pending
         $user->update(['subscription_status' => 'pending']);
+
+        // Redirect to Kuenha payment page
+        $paymentUrls = [
+            'weekly' => 'https://pay.kuenha.com/856ed35c-7b33-4e98-9352-954d22bc56a2',
+            'monthly' => 'https://pay.kuenha.com/2dc13ec4-5a1d-4ddf-a5f0-aa5324e29c39',
+            'quarterly' => 'https://pay.kuenha.com/40074bfc-54a0-4429-97ba-30955cc5cce3',
+            'yearly' => 'https://pay.kuenha.com/22850349-da68-4fe2-a453-3d6884c5df16',
+        ];
+
+        $redirectUrl = $paymentUrls[$request->plan] ?? route('profile.show');
+
+        if (isset($paymentUrls[$request->plan])) {
+            return redirect($redirectUrl);
+        }
 
         return redirect()->route('profile.show')->with('success', 'Pedido de subscrição enviado! Aguarde o nosso contacto.');
     }

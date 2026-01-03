@@ -84,6 +84,14 @@ class UserResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')->sortable()->searchable()->label('Nome'),
                 Tables\Columns\TextColumn::make('email')->sortable()->searchable(),
+                Tables\Columns\BadgeColumn::make('subscription_status')
+                    ->label('Status Assinatura')
+                    ->colors([
+                        'success' => 'active',
+                        'secondary' => 'inactive',
+                        'danger' => 'cancelled',
+                    ])
+                    ->sortable(),
                 Tables\Columns\BooleanColumn::make('is_admin')->sortable()->label('Admin'),
                 Tables\Columns\TextColumn::make('created_at')->dateTime()->label('Criado em'),
             ])
@@ -91,6 +99,13 @@ class UserResource extends Resource
                 Tables\Filters\Filter::make('is_admin')
                     ->query(fn ($query) => $query->where('is_admin', true))
                     ->label('Apenas Admins'),
+                Tables\Filters\SelectFilter::make('subscription_status')
+                    ->label('Status Assinatura')
+                    ->options([
+                        'active' => 'Ativo',
+                        'inactive' => 'Inativo',
+                        'cancelled' => 'Cancelado',
+                    ]),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

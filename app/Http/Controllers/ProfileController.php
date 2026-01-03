@@ -127,6 +127,9 @@ class ProfileController extends Controller
     /**
      * Handle subscription interest.
      */
+    /**
+     * Handle subscription interest with payment intent creation.
+     */
     public function subscribe(Request $request)
     {
         $request->validate([
@@ -144,31 +147,86 @@ class ProfileController extends Controller
         if ($user->subscription_status === 'active' && $user->subscription_end && \Carbon\Carbon::parse($user->subscription_end)->isFuture()) {
              return redirect()->route('profile.show')->with('info', 'Já possui uma subscrição ativa.');
         }
+        
+        $planIds = [
+            'weekly' => '856ed35c-7b33-4e98-9352-954d22bc56a2',
+            'monthly' => '2dc13ec4-5a1d-4ddf-a5f0-aa5324e29c39',
+            'quarterly' => '40074bfc-54a0-4429-97ba-30955cc5cce3',
+            'yearly' => '22850349-da68-4fe2-a453-3d6884c5df16',
+        ];
 
-        // Create subscription request
-        \App\Models\SubscriptionRequest::create([
+        $offerId = $planIds[$request->plan] ?? null;
+
+        if (!$offerId) {
+             return redirect()->route('plans.index')->with('error', 'Plano inválido.');
+        }
+
+        // Create initial subscription request
+        $subscriptionRequest = \App\Models\SubscriptionRequest::create([
             'user_id' => $user->id,
             'plan' => $request->plan,
             'status' => 'pending',
         ]);
 
-        // Update user status to pending
-        $user->update(['subscription_status' => 'pending']);
+        // Call Kuenha API
+        try {
+            $payload = [
+                "offerId" => $offerId,
+                "bumps" => [],
+                "payMethod" => "GPO_MCX",
+                "buyerId" => env('KUENHA_BUYER_ID'),
+                "trackingParams" => [
+                    "src" => null,
+                    "sck" => null,
+                    "utm_source" => null,
+                    "utm_campaign" => null,
+                    "utm_medium" => null,
+                    "utm_content" => null,
+                    "utm_term" => null
+                ]
+            ];
 
-        // Redirect to Kuenha payment page
-        $paymentUrls = [
-            'weekly' => 'https://pay.kuenha.com/856ed35c-7b33-4e98-9352-954d22bc56a2',
-            'monthly' => 'https://pay.kuenha.com/2dc13ec4-5a1d-4ddf-a5f0-aa5324e29c39',
-            'quarterly' => 'https://pay.kuenha.com/40074bfc-54a0-4429-97ba-30955cc5cce3',
-            'yearly' => 'https://pay.kuenha.com/22850349-da68-4fe2-a453-3d6884c5df16',
-        ];
+            $response = \Illuminate\Support\Facades\Http::withoutVerifying()
+                ->timeout(60)
+                ->withBody(json_encode($payload), 'application/json')
+                ->post(env('KUENHA_API_URL'));
 
-        $redirectUrl = $paymentUrls[$request->plan] ?? route('profile.show');
+            if ($response->successful()) {
+                $data = $response->json();
+                $saleId = $data['id']; // This is the token/sale_id
+                
+                // Update subscription request with sale_id
+                $subscriptionRequest->update(['sale_id' => $saleId]);
+                $user->update(['subscription_status' => 'pending']);
 
-        if (isset($paymentUrls[$request->plan])) {
-            return redirect($redirectUrl);
+                return view('plans.payment', [
+                    'token' => $saleId,
+                    'subscriptionRequestId' => $subscriptionRequest->id
+                ]);
+
+            } else {
+                 \Illuminate\Support\Facades\Log::error('Kuenha Payment API Failed', ['status' => $response->status(), 'body' => $response->body()]);
+                 // Dump body to see the error
+                 return redirect()->route('plans.index')->with('error', 'Erro API (' . $response->status() . '): ' . $response->body());
+            }
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Kuenha Payment Error: ' . $e->getMessage());
+            return redirect()->route('plans.index')->with('error', 'Erro Sistema: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Check subscription status for polling.
+     */
+    public function checkStatus($id)
+    {
+        $subscriptionRequest = \App\Models\SubscriptionRequest::find($id);
+
+        if (!$subscriptionRequest) {
+            return response()->json(['status' => 'error'], 404);
         }
 
-        return redirect()->route('profile.show')->with('success', 'Pedido de subscrição enviado! Aguarde o nosso contacto.');
+        return response()->json(['status' => $subscriptionRequest->status]);
     }
 }

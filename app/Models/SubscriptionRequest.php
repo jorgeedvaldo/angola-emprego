@@ -9,7 +9,7 @@ class SubscriptionRequest extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'plan', 'status'];
+    protected $fillable = ['user_id', 'plan', 'status', 'sale_id'];
     
     public function user()
     {

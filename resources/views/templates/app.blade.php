@@ -300,7 +300,7 @@
           <h4>Links Úteis</h4>
           <ul class="list-unstyled">
             <li><a href="{{url('/')}}" class="text-decoration-none text-muted">Início</a></li>
-            li><a href="{{url('/sobre')}}" class="text-decoration-none text-muted">Sobre</a></li>
+            <li><a href="{{url('/sobre')}}" class="text-decoration-none text-muted">Sobre</a></li>
             <li><a href="{{url('/vagas')}}" class="text-decoration-none text-muted">Vagas</a></li>
             <li><a href="{{route('courses.index')}}" class="text-decoration-none text-muted">Cursos</a></li>
             <li><a href="{{url('/blog')}}" class="text-decoration-none text-muted">Blog</a></li>

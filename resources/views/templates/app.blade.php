@@ -6,6 +6,11 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title>@yield('title') - {{env('APP_NAME')}}</title>
   <meta name="description" content="@yield('description')" />
+  
+  @hasSection('canonical_link')
+  <link rel="canonical" href="@yield('canonical_link')" />
+  @endif
+
   <meta name="robots" content="follow, index, max-snippet:-1, max-video-preview:-1, max-image-preview:large"/>
 
   <!-- Favicons -->

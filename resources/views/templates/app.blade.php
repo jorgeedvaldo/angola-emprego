@@ -291,7 +291,7 @@
             <img src="{{asset('assets/img/logo.svg')}}" alt="Angola Emprego" style="height: 48px; width: auto;">
           </a>
           <div class="footer-contact pt-3">
-            <p>Conectando talentos às melhores oportunidades em Angola.</p>
+            <p>Angola Emprego é o maior portal de emprego em Angola. Conectamos talentos às melhores oportunidades em Angola.</p>
             <p class="mt-3"><strong>Email:</strong> <span>geral@angolaemprego.com</span></p>
           </div>
         </div>
@@ -300,6 +300,7 @@
           <h4>Links Úteis</h4>
           <ul class="list-unstyled">
             <li><a href="{{url('/')}}" class="text-decoration-none text-muted">Início</a></li>
+            li><a href="{{url('/sobre')}}" class="text-decoration-none text-muted">Sobre</a></li>
             <li><a href="{{url('/vagas')}}" class="text-decoration-none text-muted">Vagas</a></li>
             <li><a href="{{route('courses.index')}}" class="text-decoration-none text-muted">Cursos</a></li>
             <li><a href="{{url('/blog')}}" class="text-decoration-none text-muted">Blog</a></li>

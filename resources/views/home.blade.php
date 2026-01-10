@@ -14,7 +14,7 @@
         <div class="container">
             <div class="row justify-content-center text-center">
             <div class="col-lg-8">
-                <h1 class="display-4 fw-bold text-dark mb-4">Encontre o emprego ideal para si</h1>
+                <h1 class="display-4 fw-bold text-dark mb-4">Somos o maior portal de emprego em Angola</h1>
                 <p class="lead text-muted mb-5">Milhares de oportunidades de emprego e formação em Angola à sua espera.</p>
                 
                 <div class="bg-white p-4 rounded-3 shadow-sm border">

@@ -1,12 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd http://www.google.com/schemas/sitemap-image/1.1 http://www.google.com/schemas/sitemap-image/1.1/sitemap-image.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
+    <!-- Static Pages -->
+    @foreach ($staticPages as $page)
+    <url>
+        <loc>{{url($page)}}</loc>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    @endforeach
+
+    <!-- Categories -->
+    @foreach ($categories as $category)
+    <url>
+        <loc>{{url('/vagas?category='. $category['slug'])}}</loc>
+        <changefreq>daily</changefreq>
+        <priority>0.8</priority>
+    </url>
+    @endforeach
+
 	@foreach ($jobs as $job)
     <url>
 		<loc>{{url('/vagas/'. $job['slug'])}}</loc>
 		<lastmod>{{ date_format(new DateTime($job['updated_at']), DATE_ATOM) }}</lastmod>
 		<image:image>
-			<image:loc>{{asset('storage/' . $job['photo'])}}</image:loc>
+			<image:loc>{{asset('storage/' . $job['image'])}}</image:loc>
 		</image:image>
 	</url>
     @endforeach
@@ -16,7 +34,7 @@
 		<loc>{{url('/'. $post['slug'])}}</loc>
 		<lastmod>{{ date_format(new DateTime($post['updated_at']), DATE_ATOM) }}</lastmod>
 		<image:image>
-			<image:loc>{{asset('storage/' . $post['photo'])}}</image:loc>
+			<image:loc>{{asset('storage/' . $post['image'])}}</image:loc>
 		</image:image>
 	</url>
     @endforeach

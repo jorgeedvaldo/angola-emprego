@@ -2,6 +2,7 @@
 @section('title', $post->title)
 @section('description', strip_tags($post->description))
 @section('canonical_link', url('/'.$post->slug))
+@section('og_type', 'article')
 @section('created_at', $post->created_at)
 @section('updated_at', $post->updated_at)
 @section('url', asset('storage/' . $post->image))
@@ -43,7 +44,7 @@
 
           <div class="col-lg-8">
             <div class="mb-4 rounded-3 overflow-hidden shadow-sm">
-                 <img src="{{asset('storage/' . $post->image)}}" alt="" class="img-fluid w-100">
+                 <img src="{{asset('storage/' . $post->image)}}" alt="{{ $post->title }}" class="img-fluid w-100">
             </div>
 
             <div class="bg-white p-lg-5 p-4 rounded-3 text-dark shadow-sm border mb-4 article-content">

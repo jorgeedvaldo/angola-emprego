@@ -8,7 +8,23 @@
 @section('url', asset('storage/' . $post->image))
 
 @section('head-scripts')
-
+<script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "NewsArticle",
+      "headline": "{{$post->title}}",
+      "image": [
+        "{{asset('storage/' . $post->image)}}"
+       ],
+      "datePublished": "{{ date_format(new DateTime($post->created_at), DATE_ATOM) }}",
+      "dateModified": "{{ date_format(new DateTime($post->updated_at), DATE_ATOM) }}",
+      "author": [{
+          "@type": "Person",
+          "name": "Yuri Kiluanji",
+          "url": "{{ url('/') }}"
+        }]
+    }
+</script>
 @endsection
 
 @section('content')

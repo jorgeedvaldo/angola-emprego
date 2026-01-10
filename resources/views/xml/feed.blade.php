@@ -22,9 +22,9 @@
         <generator>https://wordpress.org/?v=6.4.2</generator>
 
         <image>
-            <url>https://angolaemprego.com/storage/images/logo-full.jpg</url>
+            <url>{{ asset('storage/images/logo-full.jpg') }}</url>
             <title>Angola Emprego</title>
-            <link>https://angolaemprego.com/</link>
+            <link>{{ url('/') }}</link>
             <width>32</width>
             <height>32</height>
         </image>
@@ -34,15 +34,18 @@
         @foreach($posts as $post)
             <item>
                 <title>{{$post->title}}</title>
-                <link>https://angolaemprego.com/{{$post->slug}}</link>
+                <link>{{ url('/'. $post->slug) }}</link>
                 <dc:creator><![CDATA[Edivaldo Jorge]]></dc:creator>
                 <pubDate>{{ date_format(new DateTime($post['created_at']), DATE_ATOM) }}</pubDate>
                 <category><![CDATA[Emprego]]></category>
                 <category><![CDATA[Estágio]]></category>
-                <guid isPermaLink="false">https://angolaemprego.com/{{$post->slug}}</guid>
-                <description><![CDATA[<p>{!! \Illuminate\Support\Str::limit(strip_tags($post->description), 402, $end='...') !!}</p><p>O conteúdo <a href="https://angolaemprego.com/empregos/{{$post->slug}}">{{$post->title}}</a> aparece primeiro em <a href="https://angolaemprego.com">Angola Emprego</a>.</p>
+                <guid isPermaLink="false">{{ url('/'. $post->slug) }}</guid>
+                <description><![CDATA[<p>{!! \Illuminate\Support\Str::limit(strip_tags($post->description), 402, $end='...') !!}</p><p>O conteúdo <a href="{{ url('/'. $post->slug) }}">{{$post->title}}</a> aparece primeiro em <a href="{{ url('/') }}">Angola Emprego</a>.</p>
                 ]]></description>
                 <content:encoded><![CDATA[{{$post->description}}]]></content:encoded>
+                @if($post->image)
+                    <media:content url="{{ asset('storage/' . $post->image) }}" medium="image" />
+                @endif
                 <post-id xmlns="com-wordpress:feed-additions:1">{{$post->id}}</post-id>
             </item>
         @endforeach

@@ -19,9 +19,16 @@ class HomeController extends Controller
 
     public function siteMapGenerator()
     {
+        $staticPages = [
+            '/', '/sobre', '/vagas', '/blog', '/cursos'
+        ];
+
         $jobs = Job::orderByRaw('id DESC')->paginate(500);
 		$posts = Post::orderByRaw('id DESC')->paginate(300);
-        return response()->view('xml.sitemap', compact('jobs', 'posts'))->header('Content-Type', 'text/xml');
+        $categories = Category::orderBy('name')->get();
+
+        return response()->view('xml.sitemap', compact('jobs', 'posts', 'categories', 'staticPages'))
+            ->header('Content-Type', 'text/xml');
     }
 
 	public function feedGenerator()

@@ -12,7 +12,7 @@ class HomeController extends Controller
     public function index()
     {
         $jobs = Job::orderByRaw('id DESC')->paginate(12);
-        $posts = Post::orderBy('id', 'desc')->paginate(6);
+        $posts = Post::orderBy('id', 'desc')->paginate(9);
         $categories = Category::orderBy('name')->get();
         return view('home', compact('posts','jobs', 'categories'));
     }

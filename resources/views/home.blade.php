@@ -265,6 +265,48 @@
 
       </section><!-- /Job Section -->
 
+    <!-- Recent Articles Section -->
+    <section id="blog" class="blog section py-5 bg-light">
+        <div class="container section-title mb-5 text-center">
+            <h2 class="fw-bold text-dark">Artigos Recentes</h2>
+            <p class="text-muted">Notícias e dicas de carreira para impulsionar o seu sucesso</p>
+        </div>
+        <div class="container">
+            <div class="row gy-4">
+               @foreach($posts as $post)
+                <div class="col-md-6 col-lg-4 d-flex align-items-stretch">
+                  <article class="card h-100 border-0 shadow-sm shadow-hover transition-all w-100" style="border-radius: 12px; overflow: hidden;">
+                    <a href="{{ url('/' . $post->slug) }}" class="text-decoration-none text-dark">
+                        <div class="post-img overflow-hidden position-relative" style="height: 200px;">
+                           <img src="{{asset('storage/thumb/' . $post->image)}}" alt="{{ $post->title }}" class="img-fluid w-100 h-100" style="object-fit: cover; transition: transform 0.5s ease;">
+                        </div>
+
+                         <div class="card-body p-4">
+                            <div class="post-meta mb-2 small text-muted">
+                                <span class="me-3"><i class="bi bi-calendar me-1"></i> {{ date_format(new DateTime($post->created_at), 'd/m/Y') }}</span>
+                            </div>
+
+                            <h5 class="card-title fw-bold mb-3">{{ $post->title }}</h5>
+                            
+                            <p class="card-text text-muted small">
+                                {!! \Illuminate\Support\Str::limit(strip_tags($post->description), 100) !!}
+                            </p>
+                        </div>
+                        <div class="card-footer bg-white border-0 px-4 pb-4 pt-0">
+                            <span class="text-primary fw-bold small">Ler mais <i class="bi bi-arrow-right ms-1"></i></span>
+                        </div>
+                    </a>
+                  </article>
+                </div>
+                @endforeach
+
+                <div class="col-12 text-center mt-5">
+                     <a href="{{url('/blog')}}" class="btn btn-outline-primary btn-lg fw-bold px-5 rounded-pill">Ver Mais Artigos</a>
+                </div>
+            </div>
+        </div>
+    </section><!-- /Recent Articles Section -->
+
     <!-- Social Media CTA Section -->
 @include('partials.social-cta')
 

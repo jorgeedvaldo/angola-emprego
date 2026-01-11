@@ -8,6 +8,7 @@
 	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
 	xmlns:georss="http://www.georss.org/georss"
 	xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#"
+	xmlns:media="http://search.yahoo.com/mrss/"
 	>
 
     <channel>

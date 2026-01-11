@@ -23,8 +23,8 @@ class HomeController extends Controller
             '/', '/sobre', '/vagas', '/blog', '/cursos'
         ];
 
-        $jobs = Job::orderByRaw('id DESC')->paginate(500);
-		$posts = Post::orderByRaw('id DESC')->paginate(300);
+        $jobs = Job::orderByRaw('id DESC')->paginate(12500);
+		$posts = Post::orderByRaw('id DESC')->paginate(12500);
         $categories = Category::orderBy('name')->get();
 
         return response()->view('xml.sitemap', compact('jobs', 'posts', 'categories', 'staticPages'))

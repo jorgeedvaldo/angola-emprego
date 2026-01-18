@@ -252,9 +252,13 @@
             
             <div class="dropdown">
                 <a href="#" class="d-flex align-items-center text-decoration-none" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-                    <div class="nav-profile-img">
-                        {{ substr(Auth::user()->name, 0, 1) }}
-                    </div>
+                    @if(Auth::user()->avatar)
+                        <img src="{{ Auth::user()->avatar }}" alt="{{ Auth::user()->name }}" class="nav-profile-img">
+                    @else
+                        <div class="nav-profile-img">
+                            {{ substr(Auth::user()->name, 0, 1) }}
+                        </div>
+                    @endif
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" aria-labelledby="dropdownUser1">
                     <li class="px-3 py-2 border-bottom">

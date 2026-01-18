@@ -13,6 +13,18 @@
                 <p class="text-muted small">Bem-vindo de volta! Entre para continuar.</p>
             </div>
 
+            <div class="d-grid gap-2 mb-3">
+                <a href="{{ route('auth.google') }}" class="btn btn-white border fw-bold py-3 d-flex align-items-center justify-content-center gap-2 shadow-sm" style="border-radius: 8px;">
+                     <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" width="20" height="20">
+                     Iniciar sessão com Google
+                </a>
+            </div>
+
+            <div class="position-relative text-center mb-4">
+                <span class="bg-white px-2 small text-muted position-relative z-1">Ou continue com email</span>
+                <hr class="position-absolute w-100 top-50 start-0 z-0 my-0 border-muted opacity-25">
+            </div>
+
             <form method="POST" action="{{ route('login') }}">
                 @csrf
 
@@ -37,15 +49,7 @@
                         Entrar
                     </button>
 
-                    <div class="position-relative text-center my-3">
-                        <span class="bg-white px-2 small text-muted position-relative z-1">Ou continue com</span>
-                        <hr class="position-absolute w-100 top-50 start-0 z-0 my-0 border-muted opacity-25">
-                    </div>
 
-                    <a href="{{ route('auth.google') }}" class="btn btn-white border fw-bold py-3 d-flex align-items-center justify-content-center gap-2 shadow-sm" style="border-radius: 8px;">
-                         <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" width="20" height="20">
-                         Iniciar sessão com Google
-                    </a>
                 </div>
 
                 <div class="text-center">

@@ -31,9 +31,13 @@
             <div class="col-lg-4">
                 <div class="card border-0 shadow-sm rounded-3 text-center p-4">
                     <div class="mb-3">
-                         <div class="avatar-placeholder rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center fs-2 fw-bold" style="width: 80px; height: 80px;">
-                            {{ substr(Auth::user()->name, 0, 1) }}
-                         </div>
+                        @if(Auth::user()->avatar)
+                            <img src="{{ Auth::user()->avatar }}" alt="{{ Auth::user()->name }}" class="rounded-circle" style="width: 80px; height: 80px; object-fit: cover;">
+                        @else
+                            <div class="avatar-placeholder rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center fs-2 fw-bold" style="width: 80px; height: 80px;">
+                                {{ substr(Auth::user()->name, 0, 1) }}
+                            </div>
+                        @endif
                     </div>
                     <h5 class="fw-bold mb-1">{{ Auth::user()->name }}</h5>
                     <p class="text-muted small mb-3">{{ Auth::user()->email }}</p>

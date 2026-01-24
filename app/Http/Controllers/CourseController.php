@@ -75,13 +75,13 @@ class CourseController extends Controller
         $this->checkCompletion($course);
 
         // Generate PDF
-        try {
+        //try {
              $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('courses.certificate', compact('course'))
                     ->setPaper('a4', 'landscape');
              return $pdf->download('certificado-' . $course->slug . '.pdf');
-        } catch (\Exception $e) {
-             return back()->with('error', 'Erro ao gerar certificado. Contacte o suporte: ' . $e->getMessage());
-        }
+        //} catch (\Exception $e) {
+          //   return back()->with('error', 'Erro ao gerar certificado. Contacte o suporte: ' . $e->getMessage());
+       // }
     }
 
     public function verifyCertificate(\App\Models\User $user, $courseSlug)

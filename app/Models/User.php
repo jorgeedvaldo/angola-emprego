@@ -56,6 +56,31 @@ class User extends Authenticatable implements FilamentUser
         return $this->belongsToMany(Category::class, 'category_user')->withTimestamps();
     }
 
+    public function getCompletedCoursesAttribute()
+    {
+        // Get courses based on lessons the user has interacted with
+        $userLessonIds = $this->lessons()->pluck('lesson_id');
+        
+        if ($userLessonIds->isEmpty()) {
+            return collect();
+        }
+
+        $courseIds = \App\Models\Lesson::whereIn('id', $userLessonIds)->distinct()->pluck('course_id');
+        $courses = \App\Models\Course::whereIn('id', $courseIds)->get();
+
+        return $courses->filter(function ($course) {
+            $totalLessons = $course->lessons()->count();
+            if ($totalLessons === 0) return false;
+            
+            $completedLessons = $this->lessons()
+                ->whereIn('lesson_id', $course->lessons()->pluck('id'))
+                ->whereNotNull('completed_at')
+                ->count();
+                
+            return $completedLessons === $totalLessons;
+        });
+    }
+
     public function hasActiveSubscription()
     {
         return $this->subscription_status === 'active' && 

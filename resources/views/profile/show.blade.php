@@ -167,6 +167,50 @@
                         </form>
                     </div>
                 </div>
+
+                <!-- Completed Courses Section -->
+                @if($user->completed_courses->count() > 0)
+                <div class="card border-0 shadow-sm rounded-3 mt-4">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="card-title fw-bold mb-0">Cursos Concluídos & Certificados</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="table-responsive">
+                            <table class="table align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Curso</th>
+                                        <th>Concluído em</th>
+                                        <th class="text-end">Ação</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($user->completed_courses as $course)
+                                        <tr>
+                                            <td class="fw-bold">{{ $course->title }}</td>
+                                            <td>
+                                                @php
+                                                    $lastLesson = Auth::user()->lessons()
+                                                        ->whereIn('lesson_id', $course->lessons->pluck('id'))
+                                                        ->whereNotNull('lesson_user.completed_at')
+                                                        ->orderBy('lesson_user.completed_at', 'desc')
+                                                        ->first();
+                                                @endphp
+                                                {{ $lastLesson ? \Carbon\Carbon::parse($lastLesson->pivot->completed_at)->format('d/m/Y') : 'Data Indisponível' }}
+                                            </td>
+                                            <td class="text-end">
+                                                <a href="{{ route('certificates.verify', ['user' => $user->id, 'course' => $course->slug]) }}" class="btn btn-sm btn-outline-primary rounded-pill">
+                                                    <i class="bi bi-award me-1"></i> Ver Certificado
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                @endif
             </div>
         </div>
     </div>

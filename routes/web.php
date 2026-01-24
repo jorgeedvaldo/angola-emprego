@@ -61,7 +61,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/planos/status/{id}', [App\Http\Controllers\ProfileController::class, 'checkStatus'])->name('subscription.check_status');
 
     // Course routes that require authentication
-    Route::get('/cursos/{slug}/certificado', [CourseController::class, 'certificate'])->name('courses.certificate');
+    Route::get('/cursos/{slug}/certificado/preview', [CourseController::class, 'previewCertificate'])->name('courses.certificate.preview');
+    Route::get('/cursos/{slug}/certificado', [CourseController::class, 'downloadCertificate'])->name('courses.certificate');
     Route::get('/cursos/{slug}/{lessonSlug}', [CourseController::class, 'attend'])->name('courses.attend');
     Route::post('/cursos/{slug}/{lessonSlug}/complete', [CourseController::class, 'completeLesson'])->name('courses.complete');
     
@@ -70,5 +71,6 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::get('/cursos', [CourseController::class, 'index'])->name('courses.index');
+Route::get('/certificado/validar/{user}/{course}', [CourseController::class, 'verifyCertificate'])->name('certificates.verify');
 Route::get('/cursos/{slug}', [CourseController::class, 'show'])->name('courses.show');
 Route::get('/{slug}', [BlogController::class, 'getBySlug']);

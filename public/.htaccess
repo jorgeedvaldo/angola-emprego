@@ -19,3 +19,9 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
+
+<IfModule mod_headers.c>
+    <FilesMatch "\.(ttf|otf|eot|woff|woff2|png|jpg|jpeg|gif|ico|svg|webp|pdf|zip|rar|exe|apk|mp3|mp4|robots\.txt)$">
+        Header set Access-Control-Allow-Origin "*"
+    </FilesMatch>
+</IfModule>

@@ -13,10 +13,10 @@
     <!-- Posts -->
     @foreach ($posts as $post)
     <url>
-		<loc>{{url('/'. $post['slug'])}}</loc>
-		<lastmod>{{ date_format(new DateTime($post['updated_at']), DATE_ATOM) }}</lastmod>
+		<loc>{{url('/noticias/'. $post->slug)}}</loc>
+		<lastmod>{{ date_format(new DateTime($post->updated_at), DATE_ATOM) }}</lastmod>
 		<image:image>
-			<image:loc>{{asset('storage/' . $post['image'])}}</image:loc>
+			<image:loc>{{asset('storage/' . $post->image)}}</image:loc>
 		</image:image>
 	</url>
     @endforeach

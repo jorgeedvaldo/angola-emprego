@@ -1,7 +1,7 @@
 @extends('templates.app')
 @section('title', $post->title)
 @section('description', strip_tags($post->description))
-@section('canonical_link', url('/'.$post->slug))
+@section('canonical_link', url('/noticias/' . $post->slug))
 @section('og_type', 'article')
 @section('created_at', $post->created_at)
 @section('updated_at', $post->updated_at)

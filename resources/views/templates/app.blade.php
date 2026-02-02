@@ -64,6 +64,15 @@
   <meta name="twitter:image" content="@yield('url')" />
   <meta name="twitter:card" content="summary_large_image" />
 
+  <script type="application/ld+json">
+      {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Angola Emprego",
+      "url": "https://angolaemprego.com/"
+    }
+  </script>
+
   @yield('head-scripts')
   <style>
     :root {

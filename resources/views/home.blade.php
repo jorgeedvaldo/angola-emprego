@@ -268,7 +268,7 @@
     <!-- Recent Articles Section -->
     <section id="blog" class="blog section py-5 bg-light">
         <div class="container section-title mb-5 text-center">
-            <h2 class="fw-bold text-dark">Artigos Recentes</h2>
+            <h2 class="fw-bold text-dark">Últimas Notícias</h2>
             <p class="text-muted">Notícias e dicas de carreira para impulsionar o seu sucesso</p>
         </div>
         <div class="container">
@@ -276,7 +276,7 @@
                @foreach($posts as $post)
                 <div class="col-md-6 col-lg-4 d-flex align-items-stretch">
                   <article class="card h-100 border-0 shadow-sm shadow-hover transition-all w-100" style="border-radius: 12px; overflow: hidden;">
-                    <a href="{{ url('/' . $post->slug) }}" class="text-decoration-none text-dark">
+                    <a href="{{ url('/noticias/' . $post->slug) }}" class="text-decoration-none text-dark">
                         <div class="post-img overflow-hidden position-relative" style="height: 200px;">
                            <img src="{{asset('storage/thumb/' . $post->image)}}" alt="{{ $post->title }}" class="img-fluid w-100 h-100" style="object-fit: cover; transition: transform 0.5s ease;">
                         </div>
@@ -301,7 +301,7 @@
                 @endforeach
 
                 <div class="col-12 text-center mt-5">
-                     <a href="{{url('/blog')}}" class="btn btn-outline-primary btn-lg fw-bold px-5 rounded-pill">Ver Mais Artigos</a>
+                     <a href="{{url('/noticias')}}" class="btn btn-outline-primary btn-lg fw-bold px-5 rounded-pill">Ver Mais Notícias</a>
                 </div>
             </div>
         </div>

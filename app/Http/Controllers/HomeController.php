@@ -20,7 +20,7 @@ class HomeController extends Controller
     public function siteMapGenerator()
     {
         $staticPages = [
-            '/', '/sobre', '/vagas', '/blog', '/cursos'
+            '/', '/sobre', '/vagas', '/noticias', '/cursos'
         ];
 
         $jobs = Job::orderByRaw('id DESC')->paginate(12500);

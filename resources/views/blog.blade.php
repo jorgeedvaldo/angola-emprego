@@ -1,7 +1,7 @@
 @extends('templates.app')
-@section('title', 'Blog')
+@section('title', 'Notícias')
 @section('description', 'Angola Emprego é o maior portal de emprego em Angola, comprometido em ajudar milhares de angolanos a encontrar as melhores oportunidades de trabalho diariamente')
-@section('canonical_link', url('/blog'))
+@section('canonical_link', url('/noticias'))
 
 @section('head-scripts')
 
@@ -13,14 +13,14 @@
       <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-8">
-                 <h1 class="fw-bold mb-2 text-dark">Blog e Notícias</h1>
-                 <p class="text-muted mb-0">Dicas de carreira, notícias e atualizações do mercado.</p>
+                 <h1 class="fw-bold mb-2 text-dark">Últimas Notícias</h1>
+                 <p class="text-muted mb-0">Notícias, dicas de carreira e atualizações do mercado.</p>
             </div>
             <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
                  <nav aria-label="breadcrumb">
                   <ol class="breadcrumb justify-content-lg-end mb-0">
                     <li class="breadcrumb-item"><a href="{{url('/')}}">Início</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Blog</li>
+                    <li class="breadcrumb-item active" aria-current="page">Notícias</li>
                   </ol>
                 </nav>
             </div>
@@ -38,7 +38,7 @@
                 @foreach($posts as $post)
                 <div class="col-md-6 col-lg-4 d-flex align-items-stretch">
                   <article class="card h-100 border-0 shadow-sm shadow-hover transition-all w-100" style="border-radius: 12px; overflow: hidden;">
-                    <a href="{{ url('/' . $post->slug) }}" class="text-decoration-none text-dark">
+                    <a href="{{ url('/noticias/' . $post->slug) }}" class="text-decoration-none text-dark">
                         <div class="post-img overflow-hidden position-relative" style="height: 200px;">
                            <img src="{{asset('storage/thumb/' . $post->image)}}" alt="{{ $post->title }}" class="img-fluid w-100 h-100" style="object-fit: cover; transition: transform 0.5s ease;">
                            <div class="overlay-hover position-absolute top-0 start-0 w-100 h-100 bg-dark opacity-0"></div>

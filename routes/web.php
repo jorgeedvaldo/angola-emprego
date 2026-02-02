@@ -30,6 +30,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/sobre', [AboutController::class, 'index'])->name('sobre');
 Route::get('/vagas', [JobController::class, 'index'])->name('vagas');
 Route::get('/blog', [BlogController::class, 'index']);
+Route::get('/noticias', [BlogController::class, 'index']);
 Route::get('/atm-com-dinheiro', [ToolsController::class, 'index']);
 Route::get('/sitemap.xml', [HomeController::class, 'siteMapGenerator'])->name('sitemap');
 Route::get('/feed', [HomeController::class, 'feedGenerator'])->name('feed');
@@ -73,4 +74,5 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/cursos', [CourseController::class, 'index'])->name('courses.index');
 Route::get('/certificado/validar/{user}/{course}', [CourseController::class, 'verifyCertificate'])->name('certificates.verify');
 Route::get('/cursos/{slug}', [CourseController::class, 'show'])->name('courses.show');
+Route::get('/noticias/{slug}', [BlogController::class, 'getBySlug']);
 Route::get('/{slug}', [BlogController::class, 'getBySlug']);

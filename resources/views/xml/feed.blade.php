@@ -35,13 +35,13 @@
         @foreach($posts as $post)
             <item>
                 <title>{{$post->title}}</title>
-                <link>{{ url('/'. $post->slug) }}</link>
+                <link>{{ url('/noticias/'. $post->slug) }}</link>
                 <dc:creator><![CDATA[Edivaldo Jorge]]></dc:creator>
                 <pubDate>{{ date_format(new DateTime($post['created_at']), DATE_ATOM) }}</pubDate>
                 <category><![CDATA[Emprego]]></category>
                 <category><![CDATA[Estágio]]></category>
-                <guid isPermaLink="false">{{ url('/'. $post->slug) }}</guid>
-                <description><![CDATA[<p>{!! \Illuminate\Support\Str::limit(strip_tags($post->description), 402, $end='...') !!}</p><p>O conteúdo <a href="{{ url('/'. $post->slug) }}">{{$post->title}}</a> aparece primeiro em <a href="{{ url('/') }}">Angola Emprego</a>.</p>
+                <guid isPermaLink="false">{{ url('/noticias/'. $post->slug) }}</guid>
+                <description><![CDATA[<p>{!! \Illuminate\Support\Str::limit(strip_tags($post->description), 402, $end='...') !!}</p><p>O conteúdo <a href="{{ url('/noticias/'. $post->slug) }}">{{$post->title}}</a> aparece primeiro em <a href="{{ url('/') }}">Angola Emprego</a>.</p>
                 ]]></description>
                 <content:encoded><![CDATA[{{$post->description}}]]></content:encoded>
                 @if($post->image)

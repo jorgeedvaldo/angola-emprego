@@ -221,7 +221,7 @@
           <li><a href="{{url('/')}}" class="{{ Request::is('/') ? 'active' : '' }}"><i class="bi bi-house-door"></i> Início</a></li>
           <li><a href="{{url('/vagas')}}" class="{{ Request::is('vagas*') ? 'active' : '' }}"><i class="bi bi-briefcase"></i> Vagas</a></li>
           <li><a href="{{route('courses.index')}}" class="{{ Request::is('cursos*') ? 'active' : '' }}"><i class="bi bi-journal-bookmark"></i> Cursos</a></li>
-          <li><a href="{{url('/blog')}}" class="{{ Request::is('blog*') ? 'active' : '' }}"><i class="bi bi-newspaper"></i> Blog</a></li>
+          <li><a href="{{url('/noticias')}}" class="{{ Request::is('noticias*') || Request::is('blog*') ? 'active' : '' }}"><i class="bi bi-newspaper"></i> Notícias</a></li>
           
           <!-- Mobile Only Actions -->
           @guest
@@ -312,7 +312,7 @@
             <li><a href="{{url('/sobre')}}" class="text-decoration-none text-muted">Sobre</a></li>
             <li><a href="{{url('/vagas')}}" class="text-decoration-none text-muted">Vagas</a></li>
             <li><a href="{{route('courses.index')}}" class="text-decoration-none text-muted">Cursos</a></li>
-            <li><a href="{{url('/blog')}}" class="text-decoration-none text-muted">Blog</a></li>
+            <li><a href="{{url('/noticias')}}" class="text-decoration-none text-muted">Notícias</a></li>
           </ul>
         </div>
 

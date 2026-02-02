@@ -13,15 +13,20 @@
       "@context": "https://schema.org",
       "@type": "NewsArticle",
       "headline": "{{$post->title}}",
+      "url": "{{ url('/noticias/'. $post->slug) }}",
       "image": [
         "{{asset('storage/' . $post->image)}}"
        ],
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "{{ url('/noticias/'. $post->slug) }}"
+      },
       "datePublished": "{{ date_format(new DateTime($post->created_at), DATE_ATOM) }}",
       "dateModified": "{{ date_format(new DateTime($post->updated_at), DATE_ATOM) }}",
       "author": [{
           "@type": "Person",
           "name": "Yuri Kiluanji",
-          "url": "{{ url('/') }}"
+          "url": "{{ url('/#YuriKiluanji') }}"
         }]
     }
 </script>
@@ -34,7 +39,7 @@
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb mb-4">
              <li class="breadcrumb-item"><a href="{{url('/')}}">Início</a></li>
-             <li class="breadcrumb-item"><a href="{{url('/blog')}}">Blog</a></li>
+             <li class="breadcrumb-item"><a href="{{url('/noticias')}}">Notícias</a></li>
              <li class="breadcrumb-item active" aria-current="page">{{ \Illuminate\Support\Str::limit($post->title, 50) }}</li>
           </ol>
         </nav>
@@ -66,8 +71,8 @@
             <div class="bg-white p-lg-5 p-4 rounded-3 text-dark shadow-sm border mb-4 article-content">
                 <!-- Botões de compartilhamento -->
                 <div class="d-flex gap-2 mb-4">
-                    <a class="btn btn-outline-primary btn-sm rounded-pill px-3" href="https://www.facebook.com/sharer/sharer.php?u={{ url('/'. $post->slug) }}" target="_blank"><i class="bi bi-facebook me-1"></i> Partilhar</a>
-                    <a class="btn btn-outline-success btn-sm rounded-pill px-3" href="https://api.whatsapp.com/send?text={{ $post->title }} {{ url('/'. $post->slug) }}" target="_blank"><i class="bi bi-whatsapp me-1"></i> WhatsApp</a>
+                    <a class="btn btn-outline-primary btn-sm rounded-pill px-3" href="https://www.facebook.com/sharer/sharer.php?u={{ url('/noticias/'. $post->slug) }}" target="_blank"><i class="bi bi-facebook me-1"></i> Partilhar</a>
+                    <a class="btn btn-outline-success btn-sm rounded-pill px-3" href="https://api.whatsapp.com/send?text={{ $post->title }} {{ url('/noticias/'. $post->slug) }}" target="_blank"><i class="bi bi-whatsapp me-1"></i> WhatsApp</a>
                 </div>
 
                 <div class="lead mb-4">

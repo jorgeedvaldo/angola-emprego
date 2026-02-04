@@ -103,7 +103,7 @@
                     </div>
                     <div class="list-group list-group-flush">
                       @foreach($LastPosts as $item)
-                        <a href="{{ url('/' . $item->slug) }}" class="list-group-item list-group-item-action py-3 border-0 border-bottom">
+                        <a href="{{ url('/noticias/' . $item->slug) }}" class="list-group-item list-group-item-action py-3 border-0 border-bottom">
                             <h6 class="mb-1 fw-bold text-dark">{{ $item->title }}</h6>
                             <small class="text-muted">{{ date_format(new DateTime($item->created_at), 'd/m/Y') }}</small>
                         </a>

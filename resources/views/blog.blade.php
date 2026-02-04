@@ -1,6 +1,6 @@
 @extends('templates.app')
-@section('title', 'Notícias')
-@section('description', 'Angola Emprego é o maior portal de emprego em Angola, comprometido em ajudar milhares de angolanos a encontrar as melhores oportunidades de trabalho diariamente')
+@section('title', 'Notícias de Angola e do Mundo')
+@section('description', 'Fique atualizado com as últimas notícias de Angola e do mundo, incluindo notícias de emprego, notícias de tecnologia, notícias de política e muito mais.')
 @section('canonical_link', url('/noticias'))
 
 @section('head-scripts')

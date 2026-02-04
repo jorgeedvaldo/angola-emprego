@@ -1,5 +1,5 @@
 @extends('templates.app')
-@section('title', 'Notícias de Angola e do Mundo')
+@section('title', 'Notícias de Angola e do mundo')
 @section('description', 'Fique atualizado com as últimas notícias de Angola e do mundo, incluindo notícias de emprego, notícias de tecnologia, notícias de política e muito mais.')
 @section('canonical_link', url('/noticias'))
 

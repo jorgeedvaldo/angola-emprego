@@ -72,6 +72,26 @@
       "url": "https://angolaemprego.com/"
     }
   </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "url": "https://www.angolaemprego.com",
+  "sameAs": [
+    "https://www.facebook.com/aoemprego"
+  ],
+  "logo": "https://angolaemprego.com/assets/img/logo.svg",
+  "name": "Angola Emprego",
+  "description": "Portal líder em recrutamento e ofertas de emprego em Angola, facilitando a conexão entre empresas e talentos em todo o país.",
+  "email": "geral@angolaemprego.com",
+  "telephone": "+244-951-014-936",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Luanda",
+    "addressCountry": "AO"
+  }
+}
+</script>
 
   @yield('head-scripts')
   <style>

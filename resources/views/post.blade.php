@@ -12,22 +12,31 @@
     {
       "@context": "https://schema.org",
       "@type": "NewsArticle",
-      "headline": "{{$post->title}}",
+      "headline": "{{ $post->title }}",
+      "description": "{{ Str::limit(strip_tags($post->content), 160) }}", 
       "url": "{{ url('/noticias/'. $post->slug) }}",
       "image": [
-        "{{asset('storage/' . $post->image)}}"
+        "{{ asset('storage/' . $post->image) }}"
        ],
       "mainEntityOfPage": {
         "@type": "WebPage",
         "@id": "{{ url('/noticias/'. $post->slug) }}"
       },
-      "datePublished": "{{ date_format(new DateTime($post->created_at), DATE_ATOM) }}",
-      "dateModified": "{{ date_format(new DateTime($post->updated_at), DATE_ATOM) }}",
+      "datePublished": "{{ $post->created_at->toIso8601String() }}",
+      "dateModified": "{{ $post->updated_at->toIso8601String() }}",
       "author": [{
           "@type": "Person",
           "name": "Yuri Kiluanji",
           "url": "{{ url('/#YuriKiluanji') }}"
-        }]
+      }],
+      "publisher": {
+        "@type": "Organization",
+        "name": "Angola Emprego",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://angolaemprego.com/assets/img/logo.svg"
+        }
+      }
     }
 </script>
 @endsection

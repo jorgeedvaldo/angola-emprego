@@ -1,10 +1,10 @@
 @extends('templates.app')
 @section('title', $post->title)
-@section('description', strip_tags($post->description))
+@section('description', Str::limit(strip_tags($post->description), 160))
 @section('canonical_link', url('/noticias/' . $post->slug))
 @section('og_type', 'article')
-@section('created_at', $post->created_at)
-@section('updated_at', $post->updated_at)
+@section('created_at', $post->created_at->toIso8601String())
+@section('updated_at', $post->updated_at->toIso8601String())
 @section('url', asset('storage/' . $post->image))
 
 @section('head-scripts')
@@ -39,6 +39,64 @@
       }
     }
 </script>
+<script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "headline": "{{ $post->title }}",
+      "description": "{{ Str::limit(strip_tags($post->description), 160) }}",
+      "image": {
+        "@type": "ImageObject",
+        "url": "{{ asset('storage/' . $post->image) }}",
+        "width": 1200,
+        "height": 675
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Yuri Kiluanji",
+        "url": "{{ url('/#YuriKiluanji') }}"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Angola Emprego",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://angolaemprego.com/assets/img/logo.svg"
+        }
+      },
+      "datePublished": "{{ $post->created_at->toIso8601String() }}",
+      "dateModified": "{{ $post->updated_at->toIso8601String() }}",
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "{{ url('/noticias/'. $post->slug) }}"
+      }
+    }
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+    "@type": "ListItem",
+    "position": 1,
+    "name": "Início",
+    "item": "{{ url('/') }}"
+  },{
+    "@type": "ListItem",
+    "position": 2,
+    "name": "Notícias",
+    "item": "{{ url('/noticias') }}"
+  },{
+    "@type": "ListItem",
+    "position": 3,
+    "name": "{{ $post->title }}",
+    "item": "{{ url('/noticias/' . $post->slug) }}"
+  }]
+}
+</script>
+
+<meta property="article:section" content="Notícias" />
 @endsection
 
 @section('content')

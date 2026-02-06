@@ -59,7 +59,7 @@
   <meta property="og:image:height" content="700" />
   <meta property="og:image:alt" content />
   <meta property="og:locale" content="pt_PT" />
-  <meta name="author" content="Edivaldo" />
+  <meta name="author" content="Yuri Kiluanji" />
   <meta name="twitter:text:title" content="@yield('title') - {{env('APP_NAME')}}" />
   <meta name="twitter:image" content="@yield('url')" />
   <meta name="twitter:card" content="summary_large_image" />

@@ -13,7 +13,7 @@
       "@context": "https://schema.org",
       "@type": "NewsArticle",
       "headline": "{{ $post->title }}",
-      "description": "{{ Str::limit(strip_tags($post->content), 160) }}", 
+      "description": "{{ Str::limit(strip_tags($post->description), 160) }}", 
       "url": "{{ url('/noticias/'. $post->slug) }}",
       "image": [
         "{{ asset('storage/' . $post->image) }}"

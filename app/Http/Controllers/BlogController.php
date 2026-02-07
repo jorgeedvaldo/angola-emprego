@@ -29,7 +29,7 @@ class BlogController extends Controller
         } else {
             $posts = Post::orderByRaw('id DESC')->paginate(30);
         }
-        $categories = Category::orderBy('name')->get();
+        $categories = Category::getCachedAll();
         return view('blog', compact('posts', 'categories'));
     }
 
@@ -41,7 +41,7 @@ class BlogController extends Controller
                 return Post::where('slug', $slug)->firstOrFail();
             });
 
-            $categories = Category::orderBy('name')->get();
+            $categories = Category::getCachedAll();
 
             $LastPosts = Post::getCachedLatest()
                         ->reject(function ($value) use ($slug) {

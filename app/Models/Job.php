@@ -32,11 +32,13 @@ class Job extends Model
         static::saved(function ($job) {
             Cache::forget('latest_jobs_50');
             Cache::forget('job_' . $job->slug);
+            Cache::forget('categories_with_jobs');
         });
 
         static::deleted(function ($job) {
             Cache::forget('latest_jobs_50');
             Cache::forget('job_' . $job->slug);
+            Cache::forget('categories_with_jobs');
         });
     }
 

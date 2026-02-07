@@ -14,7 +14,7 @@ class HomeController extends Controller
     {
         $jobs = Job::getCachedLatest()->take(12);
         $posts = Post::getCachedLatest()->take(9);
-        $categories = Category::orderBy('name')->get();
+        $categories = Category::getCachedAll();
         return view('home', compact('posts','jobs', 'categories'));
     }
 
@@ -26,7 +26,7 @@ class HomeController extends Controller
 
         $jobs = Job::orderByRaw('id DESC')->paginate(12500);
 		$posts = Post::orderByRaw('id DESC')->paginate(12500);
-        $categories = Category::orderBy('name')->get();
+        $categories = Category::getCachedAll();
 
         return response()->view('xml.sitemap', compact('jobs', 'posts', 'categories', 'staticPages'))
             ->header('Content-Type', 'text/xml');

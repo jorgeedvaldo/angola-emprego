@@ -59,7 +59,7 @@ class JobController extends Controller
         $jobs->appends($request->all());
 
         // Sidebar Data
-        $categories = Category::withCount('jobs')->orderBy('name')->get();
+        $categories = Category::getCachedWithJobs();
         // Top 15 companies by job count
         $topCompanies = Job::select('company', \DB::raw('count(*) as total'))
                             ->groupBy('company')
@@ -78,7 +78,7 @@ class JobController extends Controller
                 return Job::with('categories')->where('slug', $slug)->firstOrFail();
             });
 
-            $categories = Category::orderBy('name')->get();
+            $categories = Category::getCachedAll();
 
             $LastJobs = Job::getCachedLatest()
                         ->reject(function ($value) use ($slug) {

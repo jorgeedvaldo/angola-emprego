@@ -23,10 +23,18 @@ class Job extends Model
             $job->slug = $job->generateSlug($job->title, $job->id);
             $job->save();
 
-			SocialMediaJob::create([
+            SocialMediaJob::create([
                 'job_id' => $job->id,
                 'post_status' => 0,
             ]);
+        });
+
+        static::saved(function ($job) {
+            Cache::forget('latest_jobs_50');
+        });
+
+        static::deleted(function ($job) {
+            Cache::forget('latest_jobs_50');
         });
     }
 
@@ -45,7 +53,8 @@ class Job extends Model
 
     public static function getCachedLatest()
     {
-        return Cache::remember('latest_jobs_50', 60, function () {
+        // 1440 minutes = 24 hours
+        return Cache::remember('latest_jobs_50', 1440, function () {
             return self::orderByRaw('id DESC')->limit(50)->get();
         });
     }

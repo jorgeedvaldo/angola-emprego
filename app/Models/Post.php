@@ -31,6 +31,14 @@ class Post extends Model
         static::updated(function ($post) {
             $post->generateThumb($post->image);
         });
+
+        static::saved(function ($post) {
+            Cache::forget('latest_posts_50');
+        });
+
+        static::deleted(function ($post) {
+            Cache::forget('latest_posts_50');
+        });
     }
 
     private function generateSlug($title, $id)
@@ -59,7 +67,8 @@ class Post extends Model
 
     public static function getCachedLatest()
     {
-        return Cache::remember('latest_posts_50', 60, function () {
+        // 1440 minutes = 24 hours
+        return Cache::remember('latest_posts_50', 1440, function () {
             return self::orderByRaw('id DESC')->limit(50)->get();
         });
     }

@@ -132,7 +132,7 @@
 
           <div class="col-lg-8">
             <div class="mb-4 rounded-3 overflow-hidden shadow-sm">
-                 <img src="{{asset('storage/' . $post->image)}}" alt="{{ $post->title }}" class="img-fluid w-100">
+                 <img src="{{asset('storage/' . $post->image)}}" alt="{{ $post->title }}" class="img-fluid w-100" fetchpriority="high">
             </div>
 
             <div class="bg-white p-lg-5 p-4 rounded-3 text-dark shadow-sm border mb-4 article-content">

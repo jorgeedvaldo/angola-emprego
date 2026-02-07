@@ -34,10 +34,12 @@ class Post extends Model
 
         static::saved(function ($post) {
             Cache::forget('latest_posts_50');
+            Cache::forget('post_' . $post->slug);
         });
 
         static::deleted(function ($post) {
             Cache::forget('latest_posts_50');
+            Cache::forget('post_' . $post->slug);
         });
     }
 

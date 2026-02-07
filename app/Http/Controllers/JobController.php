@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Job;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Cache;
 
 class JobController extends Controller
 {
@@ -73,7 +74,9 @@ class JobController extends Controller
     {
         try
         {
-            $job = Job::with('categories')->where('slug', $slug)->get()[0];
+            $job = Cache::remember('job_' . $slug, 1440, function () use ($slug) {
+                return Job::with('categories')->where('slug', $slug)->firstOrFail();
+            });
 
             $categories = Category::orderBy('name')->get();
 

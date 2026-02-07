@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Cache;
 
 class BlogController extends Controller
 {
@@ -36,7 +37,9 @@ class BlogController extends Controller
     {
         try
         {
-            $post = Post::where('slug', $slug)->get()[0];
+            $post = Cache::remember('post_' . $slug, 1440, function () use ($slug) {
+                return Post::where('slug', $slug)->firstOrFail();
+            });
 
             $categories = Category::orderBy('name')->get();
 

@@ -33,19 +33,6 @@
   <!-- Main CSS File -->
   <link href="{{ asset('assets/css/main.css') }}" rel="stylesheet">
 
-  <!-- Google Analytcs tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VW5BKCFM0R"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-VW5BKCFM0R');
-  </script>
-
-  <!-- AdSense -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2118765549976668" crossorigin="anonymous"></script>
-
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="@yield('og_type', 'website')" />
   <meta property="og:title" content="@yield('title') - {{env('APP_NAME')}}" />
@@ -380,6 +367,20 @@
   <!-- Scroll Top -->
   <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
+  <!-- Google Analytcs tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VW5BKCFM0R"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-VW5BKCFM0R');
+  </script>
+
+  <!-- AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2118765549976668" crossorigin="anonymous"></script>
+
+  
   <!-- Vendor JS Files -->
   <script src="{{ asset('assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
   <script src="{{ asset('assets/vendor/php-email-form/validate.js') }}"></script>

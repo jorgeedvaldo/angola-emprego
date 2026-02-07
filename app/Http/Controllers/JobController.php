@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Job;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class JobController extends Controller
 {
@@ -33,7 +34,27 @@ class JobController extends Controller
             });
         }
 
-        $jobs = $query->orderByRaw('id DESC')->paginate(15);
+
+        if (!$request->hasAny(['q', 'location', 'category']) && ($request->get('page', 1) == 1)) {
+            $cachedJobs = Job::getCachedLatest();
+            $perPage = 15;
+            $currentPage = 1;
+            $currentItems = $cachedJobs->slice(0, $perPage);
+            // We use a simple count query for total, or just a large number if we want to avoid it.
+            // For accurate pagination links, we need real count.
+            $total = Job::count(); 
+            
+            $jobs = new LengthAwarePaginator(
+                $currentItems, 
+                $total, 
+                $perPage, 
+                $currentPage, 
+                ['path' => $request->url(), 'query' => $request->query()]
+            );
+        } else {
+             $jobs = $query->orderByRaw('id DESC')->paginate(15);
+        }
+        
         $jobs->appends($request->all());
 
         // Sidebar Data
@@ -56,7 +77,11 @@ class JobController extends Controller
 
             $categories = Category::orderBy('name')->get();
 
-            $LastJobs = Job::where('slug', '<>', $slug)->orderByRaw('id DESC')->paginate(8);
+            $LastJobs = Job::getCachedLatest()
+                        ->reject(function ($value) use ($slug) {
+                            return $value->slug === $slug;
+                        })
+                        ->take(8);
 
             return view('job-detail', compact('job', 'categories', 'LastJobs'));
         }

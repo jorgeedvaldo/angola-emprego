@@ -6,13 +6,14 @@ use App\Models\Post;
 use App\Models\Category;
 use App\Models\Job;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class HomeController extends Controller
 {
     public function index()
     {
-        $jobs = Job::orderByRaw('id DESC')->paginate(12);
-        $posts = Post::orderBy('id', 'desc')->paginate(9);
+        $jobs = Job::getCachedLatest()->take(12);
+        $posts = Post::getCachedLatest()->take(9);
         $categories = Category::orderBy('name')->get();
         return view('home', compact('posts','jobs', 'categories'));
     }

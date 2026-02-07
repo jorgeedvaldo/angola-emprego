@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Cache;
 
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
@@ -54,5 +55,12 @@ class Post extends Model
 
         // save modified image in new format
         $image->save('storage/thumb/' . $url);
+    }
+
+    public static function getCachedLatest()
+    {
+        return Cache::remember('latest_posts_50', 60, function () {
+            return self::orderByRaw('id DESC')->limit(50)->get();
+        });
     }
 }

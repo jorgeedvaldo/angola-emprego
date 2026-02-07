@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Cache;
 
 class Job extends Model
 {
@@ -40,5 +41,12 @@ class Job extends Model
     public function categories()
     {
         return $this->belongsToMany('App\Models\Category', 'category_jobs');
+    }
+
+    public static function getCachedLatest()
+    {
+        return Cache::remember('latest_jobs_50', 60, function () {
+            return self::orderByRaw('id DESC')->limit(50)->get();
+        });
     }
 }

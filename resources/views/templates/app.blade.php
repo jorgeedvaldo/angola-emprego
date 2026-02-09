@@ -53,7 +53,7 @@
   <meta property="og:description" content="@yield('description')" />
   <meta property="article:published_time" content="@yield('created_at')" />
   <meta property="article:modified_time" content="@yield('updated_at')" />
-  <meta property="og:site_name" content="Angola Emprego" />
+  <meta property="og:site_name" content="Angola Emprego - Notícias e Emprego" />
   <meta property="og:image" content="@yield('url')" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="700" />
@@ -68,7 +68,7 @@
       {
       "@context": "https://schema.org",
       "@type": "WebSite",
-      "name": "Angola Emprego",
+      "name": "Angola Emprego - Notícias e Emprego",
       "url": "https://angolaemprego.com/"
     }
   </script>
@@ -81,7 +81,7 @@
     "https://www.facebook.com/aoemprego"
   ],
   "logo": "https://angolaemprego.com/assets/img/logo.svg",
-  "name": "Angola Emprego",
+  "name": "Angola Emprego - Notícias e Emprego",
   "description": "Portal líder em recrutamento e ofertas de emprego em Angola, facilitando a conexão entre empresas e talentos em todo o país.",
   "email": "geral@angolaemprego.com",
   "telephone": "+244-951-014-936",
@@ -242,7 +242,7 @@
     <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
 
       <a href="{{url('/')}}" class="logo d-flex align-items-center text-decoration-none me-4">
-        <img src="{{asset('assets/img/logo.svg')}}" alt="Angola Emprego" style="height: 48px; width: auto;">
+        <img src="{{asset('assets/img/logo.svg')}}" alt="Angola Emprego - Notícias e Emprego" style="height: 48px; width: auto;">
       </a>
 
       <nav id="navmenu" class="navmenu">
@@ -326,10 +326,10 @@
       <div class="row gy-4">
         <div class="col-lg-5 col-md-12 footer-about">
           <a href="{{url('/')}}" class="d-flex align-items-center text-decoration-none">
-            <img src="{{asset('assets/img/logo.svg')}}" alt="Angola Emprego" style="height: 48px; width: auto;">
+            <img src="{{asset('assets/img/logo.svg')}}" alt="Angola Emprego - Notícias e Emprego" style="height: 48px; width: auto;">
           </a>
           <div class="footer-contact pt-3">
-            <p>Angola Emprego é o maior portal de emprego em Angola. Conectamos talentos às melhores oportunidades em Angola.</p>
+            <p>Angola Emprego é o maior portal de emprego e notícias em Angola. Conectamos talentos às melhores oportunidades em Angola.</p>
             <p class="mt-3"><strong>Email:</strong> <span>geral@angolaemprego.com</span></p>
           </div>
         </div>
@@ -372,7 +372,7 @@
     </div>
     
     <div class="container copyright text-center mt-4 pt-4 border-top">
-      <p>&copy; <span>Copyright</span> <strong class="px-1">Angola Emprego</strong> <span>Todos os direitos reservados</span></p>
+      <p>&copy; <span>Copyright</span> <strong class="px-1">Angola Emprego - Notícias e Emprego</strong> <span>Todos os direitos reservados</span></p>
     </div>
 
   </footer>

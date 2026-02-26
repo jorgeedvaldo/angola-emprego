@@ -55,6 +55,8 @@ Route::middleware(['auth'])->group(function () {
     // Profile & Recommendations
     Route::get('/perfil', [App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');
     Route::put('/perfil', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/perfil/cv/{id}/primary', [App\Http\Controllers\ProfileController::class, 'setPrimaryCv'])->name('profile.cv.primary');
+    Route::delete('/perfil/cv/{id}', [App\Http\Controllers\ProfileController::class, 'deleteCv'])->name('profile.cv.delete');
     Route::get('/vagas-sugeridas', [App\Http\Controllers\ProfileController::class, 'potentialJobs'])->name('jobs.potential');
     Route::get('/planos', [App\Http\Controllers\ProfileController::class, 'plans'])->name('plans.index');
     Route::get('/planos/confirmar', [App\Http\Controllers\ProfileController::class, 'confirm'])->name('plans.confirm');

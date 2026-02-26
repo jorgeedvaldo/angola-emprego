@@ -42,10 +42,10 @@
                     <h5 class="fw-bold mb-1">{{ Auth::user()->name }}</h5>
                     <p class="text-muted small mb-3">{{ Auth::user()->email }}</p>
                     
-                    @if(Auth::user()->cv_path)
+                    @if($user->cvs->count() > 0 || $user->cv_path)
                         <div class="d-grid">
-                             <a href="{{ Auth::user()->cv_url }}" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill">
-                                <i class="bi bi-file-earmark-pdf me-2"></i> Visualizar Meu CV Atual
+                             <a href="{{ $user->cv_url }}" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill">
+                                <i class="bi bi-file-earmark-pdf me-2"></i> Ver Meu CV Principal
                              </a>
                         </div>
                     @else
@@ -134,10 +134,68 @@
                             </div>
 
                             <div class="mb-4">
-                                <h6 class="fw-bold border-bottom pb-2 mb-3">Documentos</h6>
-                                <label for="cv" class="form-label fw-bold">Carregar Novo CV (PDF)</label>
+                                <h6 class="fw-bold border-bottom pb-2 mb-3">Documentos (Currículos)</h6>
+
+                                @if($user->cvs->count() > 0)
+                                    <div class="table-responsive mb-3 border rounded-3">
+                                        <table class="table table-hover align-middle mb-0">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Ficheiro</th>
+                                                    <th>Data</th>
+                                                    <th class="text-end">Ações</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($user->cvs as $cv)
+                                                    <tr>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <i class="bi bi-file-earmark-pdf text-danger fs-4 me-2"></i>
+                                                                <div>
+                                                                    <a href="{{ asset('storage/' . $cv->path) }}" target="_blank" class="text-decoration-none text-dark fw-medium d-block">
+                                                                        {{ Str::limit($cv->name, 35) }}
+                                                                    </a>
+                                                                    @if($cv->is_primary)
+                                                                        <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-2" style="font-size: 0.7rem;">
+                                                                            <i class="bi bi-star-fill me-1"></i> Principal
+                                                                        </span>
+                                                                    @endif
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td class="text-muted small">
+                                                            {{ $cv->created_at->format('d/m/Y') }}
+                                                        </td>
+                                                        <td class="text-end">
+                                                            <div class="d-flex justify-content-end gap-2">
+                                                                @if(!$cv->is_primary)
+                                                                    <button type="button" class="btn btn-sm btn-outline-success rounded-pill" onclick="document.getElementById('set-primary-form-{{ $cv->id }}').submit();" title="Definir como Principal">
+                                                                        <i class="bi bi-star"></i>
+                                                                    </button>
+                                                                    <form id="set-primary-form-{{ $cv->id }}" action="{{ route('profile.cv.primary', $cv->id) }}" method="POST" class="d-none">
+                                                                        @csrf
+                                                                    </form>
+                                                                @endif
+                                                                <button type="button" class="btn btn-sm btn-outline-danger rounded-pill" onclick="if(confirm('Tem certeza que deseja eliminar este CV?')) document.getElementById('delete-cv-form-{{ $cv->id }}').submit();" title="Eliminar CV">
+                                                                    <i class="bi bi-trash"></i>
+                                                                </button>
+                                                                <form id="delete-cv-form-{{ $cv->id }}" action="{{ route('profile.cv.delete', $cv->id) }}" method="POST" class="d-none">
+                                                                    @csrf
+                                                                    @method('DELETE')
+                                                                </form>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                @endif
+
+                                <label for="cv" class="form-label fw-bold mt-2">Carregar Novo CV (PDF)</label>
                                 <input class="form-control" type="file" id="cv" name="cv" accept=".pdf">
-                                <div class="form-text">Tamanho máximo: 2MB. Apenas formato PDF.</div>
+                                <div class="form-text">Tamanho máximo: 2MB. Apenas formato PDF. Pode manter múltiplos CVs e escolher o principal.</div>
                             </div>
 
                             <div class="mb-4">

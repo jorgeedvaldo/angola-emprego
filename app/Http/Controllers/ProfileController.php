@@ -47,18 +47,20 @@ class ProfileController extends Controller
 
         // Handle CV Upload
         if ($request->hasFile('cv')) {
-            // Delete old CV if exists
-            if ($user->cv_path) {
-                Storage::disk('public')->delete($user->cv_path);
-            }
-            // Store new CV
-            // Store new CV
             $userName = \Illuminate\Support\Str::slug($user->name);
             $hashName = $request->file('cv')->hashName(); // Generates random string + extension
             $filename = "CV - {$userName} - {$hashName}";
             
             $path = $request->file('cv')->storeAs('cvs', $filename, 'public');
-            $user->update(['cv_path' => $path]);
+            
+            // Check if this is the user's first CV
+            $isFirstCv = $user->cvs()->count() === 0 && empty($user->cv_path);
+
+            $user->cvs()->create([
+                'path' => $path,
+                'name' => $request->file('cv')->getClientOriginalName(),
+                'is_primary' => $isFirstCv
+            ]);
         }
 
         // Handle Categories Sync
@@ -70,6 +72,50 @@ class ProfileController extends Controller
         }
 
         return redirect()->back()->with('success', 'Perfil atualizado com sucesso!');
+    }
+
+    /**
+     * Set a specific CV as primary.
+     */
+    public function setPrimaryCv(Request $request, $id)
+    {
+        $user = Auth::user();
+        $cv = $user->cvs()->findOrFail($id);
+
+        // Remove primary flag from all other CVs
+        $user->cvs()->update(['is_primary' => false]);
+        
+        // Set this one as primary
+        $cv->update(['is_primary' => true]);
+
+        return redirect()->back()->with('success', 'CV principal atualizado com sucesso!');
+    }
+
+    /**
+     * Delete a specific CV.
+     */
+    public function deleteCv($id)
+    {
+        $user = Auth::user();
+        $cv = $user->cvs()->findOrFail($id);
+
+        // Delete from storage
+        Storage::disk('public')->delete($cv->path);
+        
+        $wasPrimary = $cv->is_primary;
+        
+        // Delete from database
+        $cv->delete();
+
+        // If we deleted the primary CV, try to set another one as primary
+        if ($wasPrimary) {
+            $nextCv = $user->cvs()->first();
+            if ($nextCv) {
+                $nextCv->update(['is_primary' => true]);
+            }
+        }
+
+        return redirect()->back()->with('success', 'CV removido com sucesso!');
     }
 
     /**
@@ -113,7 +159,7 @@ class ProfileController extends Controller
         }
 
         $user = Auth::user();
-        $hasCv = !empty($user->cv_path);
+        $hasCv = !empty($user->cv_path) || $user->cvs()->count() > 0;
         $hasCategories = $user->categories()->count() > 0;
         
         $isSubscriptionActive = $user->subscription_status === 'active' 
@@ -229,7 +275,7 @@ class ProfileController extends Controller
         $user = Auth::user();
 
         // Server-side validation just in case
-        if (empty($user->cv_path) || $user->categories()->count() == 0) {
+        if ((empty($user->cv_path) && $user->cvs()->count() == 0) || $user->categories()->count() == 0) {
             return redirect()->route('plans.index')->with('error', 'Requisitos não cumpridos.');
         }
 

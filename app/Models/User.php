@@ -56,6 +56,16 @@ class User extends Authenticatable implements FilamentUser
         return $this->belongsToMany(Category::class, 'category_user')->withTimestamps();
     }
 
+    public function cvs()
+    {
+        return $this->hasMany(Cv::class);
+    }
+
+    public function primaryCv()
+    {
+        return $this->hasOne(Cv::class)->where('is_primary', true);
+    }
+
     public function getCompletedCoursesAttribute()
     {
         // Get courses based on lessons the user has interacted with
@@ -90,6 +100,11 @@ class User extends Authenticatable implements FilamentUser
 
     public function getCvUrlAttribute()
     {
+        // Try getting primary cv first, fallback to legacy path
+        $primary = $this->primaryCv;
+        if ($primary) {
+            return asset('storage/' . $primary->path);
+        }
         return $this->cv_path ? asset('storage/' . $this->cv_path) : null;
     }
 

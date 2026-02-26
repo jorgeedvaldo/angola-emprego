@@ -96,8 +96,7 @@ class ProfileController extends Controller
      */
     public function plans()
     {
-        $paymentType = env('PAYMENT_GATEWAY_METHOD', 'reference'); // Can be 'gpo' or 'reference'
-        return view('plans', compact('paymentType'));
+        return view('plans');
     }
 
     /**
@@ -106,7 +105,7 @@ class ProfileController extends Controller
     public function confirm(Request $request)
     {
         $plan = $request->query('plan');
-        $payment_type = $request->query('payment_type', 'gpo');
+        $payment_type = env('PAYMENT_GATEWAY_METHOD', 'reference');
         $validPlans = ['weekly', 'monthly', 'quarterly', 'yearly'];
 
         if (!in_array($plan, $validPlans)) {

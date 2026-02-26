@@ -86,7 +86,7 @@
                     <li class="mb-2"><i class="bi bi-check text-success me-2"></i>Válido por 7 dias</li>
                     <li class="mb-2"><i class="bi bi-check text-success me-2"></i>Suporte Prioritário</li>
                   </ul>
-                  <a href="{{ route('plans.confirm', ['plan' => 'weekly', 'payment_type' => $paymentType]) }}" class="w-100 btn btn-lg btn-outline-primary rounded-pill">Escolher Semanal</a>
+                  <a href="{{ route('plans.confirm', ['plan' => 'weekly']) }}" class="w-100 btn btn-lg btn-outline-primary rounded-pill">Escolher Semanal</a>
                 </div>
               </div>
             </div>
@@ -104,7 +104,7 @@
                     <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Válido por 30 dias</li>
                     <li class="mb-2"><i class="bi bi-check-circle-fill text-primary me-2"></i>Destaque no Perfil</li>
                   </ul>
-                  <a href="{{ route('plans.confirm', ['plan' => 'monthly', 'payment_type' => $paymentType]) }}" class="w-100 btn btn-lg btn-primary rounded-pill">Escolher Mensal</a>
+                  <a href="{{ route('plans.confirm', ['plan' => 'monthly']) }}" class="w-100 btn btn-lg btn-primary rounded-pill">Escolher Mensal</a>
                 </div>
               </div>
             </div>
@@ -122,7 +122,7 @@
                     <li class="mb-2"><i class="bi bi-check text-success me-2"></i>Válido por 90 dias</li>
                     <li class="mb-2"><i class="bi bi-check text-success me-2"></i>Poupança de 3.000 Kz</li>
                   </ul>
-                   <a href="{{ route('plans.confirm', ['plan' => 'quarterly', 'payment_type' => $paymentType]) }}" class="w-100 btn btn-lg btn-outline-primary rounded-pill">Escolher Trimestral</a>
+                   <a href="{{ route('plans.confirm', ['plan' => 'quarterly']) }}" class="w-100 btn btn-lg btn-outline-primary rounded-pill">Escolher Trimestral</a>
                 </div>
               </div>
             </div>
@@ -140,7 +140,7 @@
                     <li class="mb-2"><i class="bi bi-check text-success me-2"></i>Válido por 1 ano</li>
                     <li class="mb-2"><i class="bi bi-check text-success me-2"></i>Poupança Máxima</li>
                   </ul>
-                   <a href="{{ route('plans.confirm', ['plan' => 'yearly', 'payment_type' => $paymentType]) }}" class="w-100 btn btn-lg btn-outline-primary rounded-pill">Escolher Anual</a>
+                   <a href="{{ route('plans.confirm', ['plan' => 'yearly']) }}" class="w-100 btn btn-lg btn-outline-primary rounded-pill">Escolher Anual</a>
                 </div>
               </div>
             </div>

@@ -21,8 +21,23 @@ class PaymentCallbackController extends Controller
         $updated = 0;
         $deleted = 0;
 
+        $payload = $request->all();
+
         foreach ($pendingRequests as $subRequest) {
             $saleId = $subRequest->sale_id;
+
+            // Check if it's a reference (e.g. numerical Kuenha reference) instead of EMIS GPO token
+            if (is_numeric($saleId) && strlen($saleId) < 15) {
+                // The prompt requests: "se a rota do call back receber qualquer visita ou qualquer objecto json então o pagamento deve ser considerado como pago"
+                // Approving if callback is hit (by GET visit or POST webhook)
+                if (!empty($payload) || $request->method() === 'POST' || $request->method() === 'GET') {
+                    $subRequest->update(['status' => 'approved']);
+                    $updated++;
+                    Log::info("Approved reference subscription request ID {$subRequest->id} triggered by callback visit or payload.");
+                }
+                $processed++;
+                continue;
+            }
 
             try {
                 // 2. Call EMIS API for each request

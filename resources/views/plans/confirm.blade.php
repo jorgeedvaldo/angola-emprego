@@ -75,11 +75,11 @@
                                 </div>
                             </div>
                             
-                            <form action="{{ route('plans.subscribe') }}" method="POST">
+                            <form action="{{ $payment_type === 'reference' ? route('plans.subscribereference') : route('plans.subscribe') }}" method="POST">
                                 @csrf
                                 <input type="hidden" name="plan" value="{{ $plan }}">
                                 <button type="submit" class="btn btn-primary w-100 btn-lg rounded-pill fw-bold shadow-sm">
-                                    Confirmar Pedido <i class="bi bi-arrow-right ms-2"></i>
+                                    {{ $payment_type === 'reference' ? 'Gerar Referência' : 'Confirmar Pedido' }} <i class="bi bi-arrow-right ms-2"></i>
                                 </button>
                             </form>
                         @else

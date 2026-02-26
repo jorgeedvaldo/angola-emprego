@@ -96,7 +96,8 @@ class ProfileController extends Controller
      */
     public function plans()
     {
-        return view('plans');
+        $paymentType = env('PAYMENT_GATEWAY_METHOD', 'reference'); // Can be 'gpo' or 'reference'
+        return view('plans', compact('paymentType'));
     }
 
     /**
@@ -105,6 +106,7 @@ class ProfileController extends Controller
     public function confirm(Request $request)
     {
         $plan = $request->query('plan');
+        $payment_type = $request->query('payment_type', 'gpo');
         $validPlans = ['weekly', 'monthly', 'quarterly', 'yearly'];
 
         if (!in_array($plan, $validPlans)) {
@@ -121,7 +123,7 @@ class ProfileController extends Controller
 
         $canSubscribe = $hasCv && $hasCategories && !$isSubscriptionActive;
 
-        return view('plans.confirm', compact('plan', 'hasCv', 'hasCategories', 'canSubscribe', 'isSubscriptionActive'));
+        return view('plans.confirm', compact('plan', 'hasCv', 'hasCategories', 'canSubscribe', 'isSubscriptionActive', 'payment_type'));
     }
 
     /**
@@ -212,6 +214,99 @@ class ProfileController extends Controller
 
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Kuenha Payment Error: ' . $e->getMessage());
+            return redirect()->route('plans.index')->with('error', 'Erro Sistema: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Handle subscription interest for reference payment.
+     */
+    public function subscribeReference(Request $request)
+    {
+        $request->validate([
+            'plan' => 'required|string|in:weekly,monthly,quarterly,yearly',
+        ]);
+
+        $user = Auth::user();
+
+        // Server-side validation just in case
+        if (empty($user->cv_path) || $user->categories()->count() == 0) {
+            return redirect()->route('plans.index')->with('error', 'Requisitos não cumpridos.');
+        }
+
+        // Check if user already has an active subscription with valid date
+        if ($user->subscription_status === 'active' && $user->subscription_end && \Carbon\Carbon::parse($user->subscription_end)->isFuture()) {
+             return redirect()->route('profile.show')->with('info', 'Já possui uma subscrição ativa.');
+        }
+        
+        $planIds = [
+            'weekly' => '856ed35c-7b33-4e98-9352-954d22bc56a2',
+            'monthly' => '2dc13ec4-5a1d-4ddf-a5f0-aa5324e29c39',
+            'quarterly' => '40074bfc-54a0-4429-97ba-30955cc5cce3',
+            'yearly' => '22850349-da68-4fe2-a453-3d6884c5df16',
+        ];
+
+        $offerId = $planIds[$request->plan] ?? null;
+
+        if (!$offerId) {
+             return redirect()->route('plans.index')->with('error', 'Plano inválido.');
+        }
+
+        // Create initial subscription request
+        $subscriptionRequest = \App\Models\SubscriptionRequest::create([
+            'user_id' => $user->id,
+            'plan' => $request->plan,
+            'status' => 'pending',
+        ]);
+
+        // Call Kuenha API for reference
+        try {
+            $payload = [
+                "offerId" => $offerId,
+                "bumps" => [],
+                "payMethod" => "MCX_REFERENCE",
+                "buyerId" => env('KUENHA_BUYER_ID', 'c44885a3-abe8-45ff-b8ac-5455a6f05c2d'),
+                "trackingParams" => [
+                    "src" => null,
+                    "sck" => null,
+                    "utm_source" => null,
+                    "utm_campaign" => null,
+                    "utm_medium" => null,
+                    "utm_content" => null,
+                    "utm_term" => null
+                ]
+            ];
+
+            $response = \Illuminate\Support\Facades\Http::withoutVerifying()
+                ->timeout(60)
+                ->withBody(json_encode($payload), 'application/json')
+                ->post('https://kuenha-api-test.onrender.com/api/sales/create-payment-intent-mcx-reference');
+
+            if ($response->successful()) {
+                $data = $response->json();
+                $reference = $data['reference'] ?? null;
+                $total = $data['total'] ?? 0;
+                
+                if ($reference) {
+                    // Update subscription request with reference id
+                    $subscriptionRequest->update(['sale_id' => $reference]);
+                    $user->update(['subscription_status' => 'pending']);
+
+                    return view('plans.payment_reference', [
+                        'reference' => $reference,
+                        'total' => $total,
+                        'subscriptionRequestId' => $subscriptionRequest->id
+                    ]);
+                } else {
+                    return redirect()->route('plans.index')->with('error', 'Referência não recebida da Kuenha.');
+                }
+            } else {
+                 \Illuminate\Support\Facades\Log::error('Kuenha Reference API Failed', ['status' => $response->status(), 'body' => $response->body()]);
+                 return redirect()->route('plans.index')->with('error', 'Erro API Kuenha (' . $response->status() . ')');
+            }
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Kuenha Reference Payment Error: ' . $e->getMessage());
             return redirect()->route('plans.index')->with('error', 'Erro Sistema: ' . $e->getMessage());
         }
     }

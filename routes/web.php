@@ -36,6 +36,8 @@ Route::get('/sitemap.xml', [HomeController::class, 'siteMapGenerator'])->name('s
 Route::get('/feed', [HomeController::class, 'feedGenerator'])->name('feed');
 
 
+Route::get('/ae/{id}', [App\Http\Controllers\ProfileController::class, 'publicProfile'])->name('profile.public');
+
 Route::get('/vagas/{slug}', [JobController::class, 'getBySlug']);
 
 Route::middleware(['guest'])->group(function () {

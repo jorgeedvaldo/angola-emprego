@@ -379,4 +379,14 @@ class ProfileController extends Controller
 
         return response()->json(['status' => $subscriptionRequest->status]);
     }
+
+    /**
+     * Show the public profile page for a user.
+     */
+    public function publicProfile($id)
+    {
+        $user = \App\Models\User::with(['categories', 'cvs'])->findOrFail($id);
+        
+        return view('profile.public', compact('user'));
+    }
 }

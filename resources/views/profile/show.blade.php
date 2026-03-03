@@ -53,6 +53,21 @@
                             <i class="bi bi-exclamation-triangle me-1"></i> Nenhum CV carregado.
                         </div>
                     @endif
+
+                    <!-- Public Profile Link -->
+                    <div class="mt-4 pt-4 border-top">
+                        <h6 class="fw-bold mb-2">O Meu Perfil Público</h6>
+                        <p class="small text-muted mb-2">Partilhe o seu perfil com recrutadores:</p>
+                        <div class="input-group input-group-sm mb-3">
+                            <input type="text" class="form-control bg-light" id="publicProfileLink" value="{{ url('/ae/' . Auth::id()) }}" readonly>
+                            <button class="btn btn-outline-primary" type="button" id="copyLinkBtn" onclick="copyPublicLink()" title="Copiar Link">
+                                <i class="bi bi-clipboard"></i>
+                            </button>
+                            <a href="{{ route('profile.public', Auth::id()) }}" target="_blank" class="btn btn-outline-secondary" title="Ver Perfil Público">
+                                <i class="bi bi-box-arrow-up-right"></i>
+                            </a>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Subscription Card -->
@@ -324,5 +339,25 @@
             });
         });
     });
+
+    function copyPublicLink() {
+        var copyText = document.getElementById("publicProfileLink");
+        copyText.select();
+        copyText.setSelectionRange(0, 99999); // For mobile devices
+        
+        navigator.clipboard.writeText(copyText.value).then(function() {
+            var btn = document.getElementById('copyLinkBtn');
+            var originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="bi bi-check2"></i>';
+            btn.classList.add('btn-success');
+            btn.classList.remove('btn-outline-primary');
+            
+            setTimeout(function() {
+                btn.innerHTML = originalHtml;
+                btn.classList.remove('btn-success');
+                btn.classList.add('btn-outline-primary');
+            }, 2000);
+        });
+    }
 </script>
 @endsection

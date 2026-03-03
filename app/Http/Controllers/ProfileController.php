@@ -56,11 +56,15 @@ class ProfileController extends Controller
             // Check if this is the user's first CV
             $isFirstCv = $user->cvs()->count() === 0 && empty($user->cv_path);
 
-            $user->cvs()->create([
+            $cvModel = $user->cvs()->create([
                 'path' => $path,
                 'name' => $request->file('cv')->getClientOriginalName(),
                 'is_primary' => $isFirstCv
             ]);
+
+            if ($isFirstCv) {
+                $user->update(['cv_path' => $path]);
+            }
         }
 
         // Handle Categories Sync
@@ -88,6 +92,9 @@ class ProfileController extends Controller
         // Set this one as primary
         $cv->update(['is_primary' => true]);
 
+        // Sync user cv_path
+        $user->update(['cv_path' => $cv->path]);
+
         return redirect()->back()->with('success', 'CV principal atualizado com sucesso!');
     }
 
@@ -112,6 +119,9 @@ class ProfileController extends Controller
             $nextCv = $user->cvs()->first();
             if ($nextCv) {
                 $nextCv->update(['is_primary' => true]);
+                $user->update(['cv_path' => $nextCv->path]);
+            } else {
+                $user->update(['cv_path' => null]);
             }
         }
 

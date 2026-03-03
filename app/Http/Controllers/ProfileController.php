@@ -33,6 +33,7 @@ class ProfileController extends Controller
             'sex' => 'nullable|string|in:Masculino,Feminino',
             'birth_date' => 'nullable|date',
             'cv' => 'nullable|mimes:pdf|max:2048', // Max 2MB PDF
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048', // Max 2MB image
             'categories' => 'array',
             'categories.*' => 'exists:categories,id',
         ]);
@@ -44,6 +45,12 @@ class ProfileController extends Controller
             'sex' => $request->sex,
             'birth_date' => $request->birth_date,
         ]);
+
+        // Handle Avatar Upload
+        if ($request->hasFile('avatar')) {
+            $avatarPath = $request->file('avatar')->store('avatars', 'public');
+            $user->update(['avatar' => asset('storage/' . $avatarPath)]);
+        }
 
         // Handle CV Upload
         if ($request->hasFile('cv')) {

@@ -42,6 +42,12 @@
                     <h5 class="fw-bold mb-1">{{ Auth::user()->name }}</h5>
                     <p class="text-muted small mb-3">{{ Auth::user()->email }}</p>
                     
+                    <div class="mb-3">
+                        <a href="{{ route('auth.google') }}" class="btn btn-sm btn-outline-danger rounded-pill" title="Atualize pelo Google usando o mesmo email">
+                            <i class="bi bi-google me-1"></i> Sincronizar Avatar
+                        </a>
+                    </div>
+                    
                     @if($user->cvs->count() > 0 || $user->cv_path)
                         <div class="d-grid">
                              <a href="{{ $user->cv_url }}" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill">
@@ -172,6 +178,11 @@
                                         <div class="col-md-6">
                                             <label for="birth_date" class="form-label fw-bold">Data de Nascimento</label>
                                             <input type="date" class="form-control" id="birth_date" name="birth_date" value="{{ old('birth_date', optional($user->birth_date)->format('Y-m-d')) }}">
+                                        </div>
+                                        <div class="col-12 mt-3">
+                                            <label for="avatar" class="form-label fw-bold">Foto de Perfil (Opcional)</label>
+                                            <input class="form-control" type="file" id="avatar" name="avatar" accept="image/jpeg,image/png,image/jpg,image/webp">
+                                            <div class="form-text">Tamanho máximo: 2MB. Formatos aceites: JPEG, PNG, WEBP. Também pode usar o botão "Sincronizar Avatar" na barra lateral.</div>
                                         </div>
                                     </div>
                                 </div>

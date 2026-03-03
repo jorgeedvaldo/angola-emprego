@@ -67,6 +67,17 @@
                                 <i class="bi bi-box-arrow-up-right"></i>
                             </a>
                         </div>
+                        <div class="d-flex gap-2">
+                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(url('/ae/' . Auth::id())) }}" target="_blank" class="btn btn-sm text-white" style="background-color: #3b5998;" title="Partilhar no Facebook">
+                                <i class="bi bi-facebook"></i> Facebook
+                            </a>
+                            <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ urlencode(url('/ae/' . Auth::id())) }}&title={{ urlencode('Perfil Profissional de ' . Auth::user()->name) }}" target="_blank" class="btn btn-sm text-white" style="background-color: #0077b5;" title="Partilhar no LinkedIn">
+                                <i class="bi bi-linkedin"></i> LinkedIn
+                            </a>
+                            <a href="https://api.whatsapp.com/send?text={{ urlencode('Veja o meu perfil profissional: ' . url('/ae/' . Auth::id())) }}" target="_blank" class="btn btn-sm text-white" style="background-color: #25D366;" title="Partilhar no WhatsApp">
+                                <i class="bi bi-whatsapp"></i> WhatsApp
+                            </a>
+                        </div>
                     </div>
                 </div>
 

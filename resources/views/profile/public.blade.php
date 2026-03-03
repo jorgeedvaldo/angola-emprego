@@ -16,9 +16,21 @@
             @endif
         </div>
         <h1 class="fw-bold mb-2 text-dark">{{ $user->name }}</h1>
-        <p class="text-muted d-inline-flex align-items-center bg-white px-3 py-1 rounded-pill shadow-sm">
+        <p class="text-muted d-inline-flex align-items-center bg-white px-3 py-1 rounded-pill shadow-sm mb-3">
             <i class="bi bi-person-badge fs-5 me-2 text-primary"></i> Perfil Profissional
         </p>
+        
+        <div class="d-flex justify-content-center gap-2">
+            <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(url('/ae/' . $user->id)) }}" target="_blank" class="btn text-white rounded-circle shadow-sm" style="background-color: #3b5998; width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center;" title="Partilhar no Facebook">
+                <i class="bi bi-facebook"></i>
+            </a>
+            <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ urlencode(url('/ae/' . $user->id)) }}&title={{ urlencode('Perfil Profissional de ' . $user->name) }}" target="_blank" class="btn text-white rounded-circle shadow-sm" style="background-color: #0077b5; width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center;" title="Partilhar no LinkedIn">
+                <i class="bi bi-linkedin"></i>
+            </a>
+            <a href="https://api.whatsapp.com/send?text={{ urlencode('Veja o meu perfil profissional: ' . url('/ae/' . $user->id)) }}" target="_blank" class="btn text-white rounded-circle shadow-sm" style="background-color: #25D366; width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center;" title="Partilhar no WhatsApp">
+                <i class="bi bi-whatsapp"></i>
+            </a>
+        </div>
     </div>
 </div>
 

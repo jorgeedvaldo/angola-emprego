@@ -62,11 +62,11 @@ class ProfileController extends Controller
             // Create ImageManager instance with desired driver
             $manager = new ImageManager(new Driver());
 
-            // Read image from file, crop to exact 96x96 and save
+            // Read image from file, crop to exact 128x128 and save
             $image = $manager->read($file->getPathname());
             
             // Note: intervention/image v3 uses cover() for a center crop that fills bounds
-            $image->cover(96, 96)->save($path);
+            $image->cover(128, 128)->save($path);
 
             $user->update(['avatar' => asset('storage/' . $filename)]);
         }

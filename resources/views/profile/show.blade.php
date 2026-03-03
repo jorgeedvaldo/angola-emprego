@@ -99,125 +99,135 @@
             <!-- Profile Form -->
             <div class="col-lg-8">
                 <div class="card border-0 shadow-sm rounded-3">
-                    <div class="card-header bg-white py-3">
-                        <h5 class="card-title fw-bold mb-0">Editar Preferências e CV</h5>
+                    <div class="card-header bg-white py-0 pt-3 border-bottom-0">
+                        <ul class="nav nav-tabs card-header-tabs m-0" id="profileTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active fw-bold text-dark px-4" id="personal-tab" data-bs-toggle="tab" data-bs-target="#personal" type="button" role="tab" aria-controls="personal" aria-selected="true">
+                                    <i class="bi bi-person me-1"></i> Dados Pessoais
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link fw-bold text-dark px-4" id="cvs-tab" data-bs-toggle="tab" data-bs-target="#cvs" type="button" role="tab" aria-controls="cvs" aria-selected="false">
+                                    <i class="bi bi-file-earmark-pdf me-1"></i> Os Meus CVs
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link fw-bold text-dark px-4" id="preferences-tab" data-bs-toggle="tab" data-bs-target="#preferences" type="button" role="tab" aria-controls="preferences" aria-selected="false">
+                                    <i class="bi bi-tags me-1"></i> Preferências
+                                </button>
+                            </li>
+                        </ul>
                     </div>
-                    <div class="card-body p-4">
-                        <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data">
+                    <div class="card-body p-4 border rounded-bottom border-top-0">
+                        <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" id="profile-form">
                             @csrf
                             @method('PUT')
 
-                            <div class="row g-3 mb-4">
-                                <div class="col-12">
-                                    <h6 class="fw-bold border-bottom pb-2 mb-3">Dados Pessoais</h6>
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="name" class="form-label fw-bold">Nome Completo</label>
-                                    <input type="text" class="form-control" id="name" name="name" value="{{ old('name', $user->name) }}" required>
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="mobile" class="form-label fw-bold">Telefone</label>
-                                    <input type="text" class="form-control" id="mobile" name="mobile" value="{{ old('mobile', $user->mobile) }}">
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="sex" class="form-label fw-bold">Gênero</label>
-                                    <select class="form-select" id="sex" name="sex">
-                                        <option value="" disabled {{ !$user->sex ? 'selected' : '' }}>Selecione</option>
-                                        <option value="Masculino" {{ $user->sex === 'Masculino' ? 'selected' : '' }}>Masculino</option>
-                                        <option value="Feminino" {{ $user->sex === 'Feminino' ? 'selected' : '' }}>Feminino</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="birth_date" class="form-label fw-bold">Data de Nascimento</label>
-                                    <input type="date" class="form-control" id="birth_date" name="birth_date" value="{{ old('birth_date', optional($user->birth_date)->format('Y-m-d')) }}">
-                                </div>
-                            </div>
-
-                            <div class="mb-4">
-                                <h6 class="fw-bold border-bottom pb-2 mb-3">Documentos (Currículos)</h6>
-
-                                @if($user->cvs->count() > 0)
-                                    <div class="table-responsive mb-3 border rounded-3">
-                                        <table class="table table-hover align-middle mb-0">
-                                            <thead class="table-light">
-                                                <tr>
-                                                    <th>Ficheiro</th>
-                                                    <th>Data</th>
-                                                    <th class="text-end">Ações</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach($user->cvs as $cv)
-                                                    <tr>
-                                                        <td>
-                                                            <div class="d-flex align-items-center">
-                                                                <i class="bi bi-file-earmark-pdf text-danger fs-4 me-2"></i>
-                                                                <div>
-                                                                    <a href="{{ asset('storage/' . $cv->path) }}" target="_blank" class="text-decoration-none text-dark fw-medium d-block">
-                                                                        {{ Str::limit($cv->name, 35) }}
-                                                                    </a>
-                                                                    @if($cv->is_primary)
-                                                                        <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-2" style="font-size: 0.7rem;">
-                                                                            <i class="bi bi-star-fill me-1"></i> Principal
-                                                                        </span>
-                                                                    @endif
-                                                                </div>
-                                                            </div>
-                                                        </td>
-                                                        <td class="text-muted small">
-                                                            {{ $cv->created_at->format('d/m/Y') }}
-                                                        </td>
-                                                        <td class="text-end">
-                                                            <div class="d-flex justify-content-end gap-2">
-                                                                @if(!$cv->is_primary)
-                                                                    <button type="button" class="btn btn-sm btn-outline-success rounded-pill" onclick="document.getElementById('set-primary-form-{{ $cv->id }}').submit();" title="Definir como Principal">
-                                                                        <i class="bi bi-star"></i>
-                                                                    </button>
-                                                                    <form id="set-primary-form-{{ $cv->id }}" action="{{ route('profile.cv.primary', $cv->id) }}" method="POST" class="d-none">
-                                                                        @csrf
-                                                                    </form>
-                                                                @endif
-                                                                <button type="button" class="btn btn-sm btn-outline-danger rounded-pill" onclick="if(confirm('Tem certeza que deseja eliminar este CV?')) document.getElementById('delete-cv-form-{{ $cv->id }}').submit();" title="Eliminar CV">
-                                                                    <i class="bi bi-trash"></i>
-                                                                </button>
-                                                                <form id="delete-cv-form-{{ $cv->id }}" action="{{ route('profile.cv.delete', $cv->id) }}" method="POST" class="d-none">
-                                                                    @csrf
-                                                                    @method('DELETE')
-                                                                </form>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                @endif
-
-                                <label for="cv" class="form-label fw-bold mt-2">Carregar Novo CV (PDF)</label>
-                                <input class="form-control" type="file" id="cv" name="cv" accept=".pdf">
-                                <div class="form-text">Tamanho máximo: 2MB. Apenas formato PDF. Pode manter múltiplos CVs e escolher o principal.</div>
-                            </div>
-
-                            <div class="mb-4">
-                                <label class="form-label fw-bold mb-3">Categorias de Interesse</label>
-                                <p class="text-muted small">Selecione as categorias para receber recomendações de vagas na página "Vagas Sugeridas".</p>
-                                
-                                <div class="row row-cols-1 row-cols-md-2 g-2" style="max-height: 300px; overflow-y: auto;">
-                                    @foreach($categories as $category)
-                                        <div class="col">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" name="categories[]" value="{{ $category->id }}" id="cat-{{ $category->id }}"
-                                                    {{ $user->categories->contains($category->id) ? 'checked' : '' }}>
-                                                <label class="form-check-label" for="cat-{{ $category->id }}">
-                                                    {{ $category->name }}
-                                                </label>
-                                            </div>
+                            <div class="tab-content" id="profileTabsContent">
+                                <!-- Personal Data Tab -->
+                                <div class="tab-pane fade show active" id="personal" role="tabpanel" aria-labelledby="personal-tab">
+                                    <div class="row g-3 mb-2">
+                                        <div class="col-md-6">
+                                            <label for="name" class="form-label fw-bold">Nome Completo</label>
+                                            <input type="text" class="form-control" id="name" name="name" value="{{ old('name', $user->name) }}" required>
                                         </div>
-                                    @endforeach
+                                        <div class="col-md-6">
+                                            <label for="mobile" class="form-label fw-bold">Telefone</label>
+                                            <input type="text" class="form-control" id="mobile" name="mobile" value="{{ old('mobile', $user->mobile) }}">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="sex" class="form-label fw-bold">Gênero</label>
+                                            <select class="form-select" id="sex" name="sex">
+                                                <option value="" disabled {{ !$user->sex ? 'selected' : '' }}>Selecione</option>
+                                                <option value="Masculino" {{ $user->sex === 'Masculino' ? 'selected' : '' }}>Masculino</option>
+                                                <option value="Feminino" {{ $user->sex === 'Feminino' ? 'selected' : '' }}>Feminino</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="birth_date" class="form-label fw-bold">Data de Nascimento</label>
+                                            <input type="date" class="form-control" id="birth_date" name="birth_date" value="{{ old('birth_date', optional($user->birth_date)->format('Y-m-d')) }}">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- CVs Tab -->
+                                <div class="tab-pane fade" id="cvs" role="tabpanel" aria-labelledby="cvs-tab">
+                                    @if($user->cvs->count() > 0)
+                                        <div class="table-responsive mb-4 border rounded-3">
+                                            <table class="table table-hover align-middle mb-0">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th>Ficheiro</th>
+                                                        <th>Data</th>
+                                                        <th class="text-end">Ações</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach($user->cvs as $cv)
+                                                        <tr>
+                                                            <td>
+                                                                <div class="d-flex align-items-center">
+                                                                    <i class="bi bi-file-earmark-pdf text-danger fs-4 me-2"></i>
+                                                                    <div>
+                                                                        <a href="{{ asset('storage/' . $cv->path) }}" target="_blank" class="text-decoration-none text-dark fw-medium d-block">
+                                                                            {{ Str::limit($cv->name, 35) }}
+                                                                        </a>
+                                                                        @if($cv->is_primary)
+                                                                            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-2" style="font-size: 0.7rem;">
+                                                                                <i class="bi bi-star-fill me-1"></i> Principal
+                                                                            </span>
+                                                                        @endif
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td class="text-muted small">
+                                                                {{ $cv->created_at->format('d/m/Y') }}
+                                                            </td>
+                                                            <td class="text-end">
+                                                                <div class="d-flex justify-content-end gap-2">
+                                                                    @if(!$cv->is_primary)
+                                                                        <button type="button" class="btn btn-sm btn-outline-success rounded-pill" onclick="event.preventDefault(); document.getElementById('set-primary-form-{{ $cv->id }}').submit();" title="Definir como Principal">
+                                                                            <i class="bi bi-star"></i>
+                                                                        </button>
+                                                                    @endif
+                                                                    <button type="button" class="btn btn-sm btn-outline-danger rounded-pill" onclick="event.preventDefault(); if(confirm('Tem certeza que deseja eliminar este CV?')) document.getElementById('delete-cv-form-{{ $cv->id }}').submit();" title="Eliminar CV">
+                                                                        <i class="bi bi-trash"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    @endif
+
+                                    <label for="cv" class="form-label fw-bold mt-2">Carregar Novo CV (PDF)</label>
+                                    <input class="form-control" type="file" id="cv" name="cv" accept=".pdf">
+                                    <div class="form-text">Tamanho máximo: 2MB. Apenas formato PDF. Pode manter múltiplos CVs e escolher o principal.</div>
+                                </div>
+
+                                <!-- Preferences Tab -->
+                                <div class="tab-pane fade" id="preferences" role="tabpanel" aria-labelledby="preferences-tab">
+                                    <p class="text-muted small mb-3">Selecione as categorias para receber recomendações de vagas na página "Vagas Sugeridas".</p>
+                                    
+                                    <div class="row row-cols-1 row-cols-md-2 g-2 mt-2" style="max-height: 300px; overflow-y: auto;">
+                                        @foreach($categories as $category)
+                                            <div class="col">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" name="categories[]" value="{{ $category->id }}" id="cat-{{ $category->id }}"
+                                                        {{ $user->categories->contains($category->id) ? 'checked' : '' }}>
+                                                    <label class="form-check-label" for="cat-{{ $category->id }}">
+                                                        {{ $category->name }}
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="d-grid d-md-flex justify-content-md-end">
+                            <div class="d-grid d-md-flex justify-content-md-end mt-4 pt-4 border-top">
                                 <button type="submit" class="btn btn-primary px-4 rounded-pill">
                                     <i class="bi bi-save me-2"></i> Guardar Alterações
                                 </button>
@@ -273,4 +283,46 @@
         </div>
     </div>
 </section>
+</section>
+
+<!-- Nested Forms Extracted Outside -->
+@foreach($user->cvs as $cv)
+    @if(!$cv->is_primary)
+    <form id="set-primary-form-{{ $cv->id }}" action="{{ route('profile.cv.primary', $cv->id) }}" method="POST" class="d-none">
+        @csrf
+    </form>
+    @endif
+    <form id="delete-cv-form-{{ $cv->id }}" action="{{ route('profile.cv.delete', $cv->id) }}" method="POST" class="d-none">
+        @csrf
+        @method('DELETE')
+    </form>
+@endforeach
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Restore active tab from session storage
+        const activeTab = sessionStorage.getItem('profileActiveTab');
+        if (activeTab) {
+            const tabButton = document.querySelector(`button[data-bs-target="${activeTab}"]`);
+            if (tabButton) {
+                // Remove active class from all
+                document.querySelectorAll('#profileTabs .nav-link').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('#profileTabsContent .tab-pane').forEach(pane => {
+                    pane.classList.remove('show', 'active');
+                });
+                
+                // Add active class to saved
+                tabButton.classList.add('active');
+                document.querySelector(activeTab).classList.add('show', 'active');
+            }
+        }
+
+        // Save active tab to session storage on click
+        document.querySelectorAll('#profileTabs .nav-link').forEach(button => {
+            button.addEventListener('click', function() {
+                sessionStorage.setItem('profileActiveTab', this.getAttribute('data-bs-target'));
+            });
+        });
+    });
+</script>
 @endsection

@@ -7,6 +7,8 @@ use App\Models\Job;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 
 class ProfileController extends Controller
 {
@@ -46,10 +48,27 @@ class ProfileController extends Controller
             'birth_date' => $request->birth_date,
         ]);
 
-        // Handle Avatar Upload
+        // Handle Avatar Upload with Cropping to 96x96
         if ($request->hasFile('avatar')) {
-            $avatarPath = $request->file('avatar')->store('avatars', 'public');
-            $user->update(['avatar' => asset('storage/' . $avatarPath)]);
+            $file = $request->file('avatar');
+            $filename = 'avatars/' . \Illuminate\Support\Str::random(40) . '.' . $file->getClientOriginalExtension();
+            $path = storage_path('app/public/' . $filename);
+
+            // Ensure directory exists
+            if (!file_exists(storage_path('app/public/avatars'))) {
+                mkdir(storage_path('app/public/avatars'), 0755, true);
+            }
+
+            // Create ImageManager instance with desired driver
+            $manager = new ImageManager(new Driver());
+
+            // Read image from file, crop to exact 96x96 and save
+            $image = $manager->read($file->getPathname());
+            
+            // Note: intervention/image v3 uses cover() for a center crop that fills bounds
+            $image->cover(96, 96)->save($path);
+
+            $user->update(['avatar' => asset('storage/' . $filename)]);
         }
 
         // Handle CV Upload

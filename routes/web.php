@@ -22,7 +22,7 @@ use App\Http\Controllers\CourseController;
 */
 Route::get('/linkstorage', function () {
     // Cria o link simbólico (storage -> public)
-    Artisan::call('migrate');
+    Artisan::call('optimize:clear');
     
     return 'Symlink criado: <pre>' . Artisan::output() . '</pre>';
 });

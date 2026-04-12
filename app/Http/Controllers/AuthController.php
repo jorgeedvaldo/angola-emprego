@@ -54,6 +54,11 @@ class AuthController extends Controller
             'password' => \Illuminate\Support\Facades\Hash::make($validated['password']),
         ]);
 
+        // Generate unique username from name
+        $user->update([
+            'username' => \App\Models\User::generateUsername($validated['name'], $user->id),
+        ]);
+
         \Illuminate\Support\Facades\Auth::login($user);
 
         return redirect('/');

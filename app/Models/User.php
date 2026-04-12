@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Str;
 
 use Filament\Models\Contracts\FilamentUser;
 
@@ -26,6 +27,7 @@ class User extends Authenticatable implements FilamentUser
      */
     protected $fillable = [
         'name',
+        'username',
         'email',
         'password',
         'sex',
@@ -39,7 +41,44 @@ class User extends Authenticatable implements FilamentUser
         'subscription_status',
         'google_id',
         'avatar',
+        'bio',
     ];
+
+    /**
+     * Generate a unique username from a user's name.
+     *
+     * Uses Str::slug with '.' as separator. If the slug already exists,
+     * appends '.{id}' to ensure uniqueness.
+     *
+     * @param string $name The user's full name
+     * @param int|null $id The user's ID (used for deduplication)
+     * @return string
+     */
+    public static function generateUsername(string $name, ?int $id = null): string
+    {
+        $baseSlug = Str::slug($name, '.');
+
+        // Fallback for names that produce empty slugs (e.g. non-latin)
+        if (empty($baseSlug)) {
+            $baseSlug = 'user';
+        }
+
+        $username = $baseSlug;
+
+        // Check if this username already exists
+        $query = self::where('username', $username);
+        if ($id) {
+            $query->where('id', '!=', $id);
+        }
+
+        if ($query->exists()) {
+            // Append the user ID or a random number for uniqueness
+            $suffix = $id ?? rand(1000, 9999);
+            $username = $baseSlug . '.' . $suffix;
+        }
+
+        return $username;
+    }
 
     public function courses()
     {
@@ -64,6 +103,26 @@ class User extends Authenticatable implements FilamentUser
     public function primaryCv()
     {
         return $this->hasOne(Cv::class)->where('is_primary', true);
+    }
+
+    public function skills()
+    {
+        return $this->hasMany(UserSkill::class);
+    }
+
+    public function educations()
+    {
+        return $this->hasMany(UserEducation::class);
+    }
+
+    public function experiences()
+    {
+        return $this->hasMany(UserExperience::class)->orderBy('start_date', 'desc');
+    }
+
+    public function languages()
+    {
+        return $this->hasMany(UserLanguage::class);
     }
 
     public function getCompletedCoursesAttribute()

@@ -22,8 +22,8 @@ use App\Http\Controllers\CourseController;
 */
 Route::get('/linkstorage', function () {
     // Cria o link simbólico (storage -> public)
-    Artisan::call('optimize:clear');
-    
+    Artisan::call('migrate');
+
     return 'Symlink criado: <pre>' . Artisan::output() . '</pre>';
 });
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -36,7 +36,8 @@ Route::get('/sitemap.xml', [HomeController::class, 'siteMapGenerator'])->name('s
 Route::get('/feed', [HomeController::class, 'feedGenerator'])->name('feed');
 
 
-Route::get('/ae/{id}', [App\Http\Controllers\ProfileController::class, 'publicProfile'])->name('profile.public');
+// Public profile by username (e.g. /@joao.silva)
+Route::get('/@{username}', [App\Http\Controllers\ProfileController::class, 'publicProfile'])->name('profile.public');
 
 Route::get('/vagas/{slug}', [JobController::class, 'getBySlug']);
 
@@ -45,7 +46,7 @@ Route::middleware(['guest'])->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
-    
+
     // Google Auth
     Route::get('auth/google', [App\Http\Controllers\Auth\GoogleController::class, 'redirectToGoogle'])->name('auth.google');
     Route::get('auth/google/callback', [App\Http\Controllers\Auth\GoogleController::class, 'handleGoogleCallback']);
@@ -53,7 +54,7 @@ Route::middleware(['guest'])->group(function () {
 
 Route::middleware(['auth'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-    
+
     // Profile & Recommendations
     Route::get('/perfil', [App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');
     Route::put('/perfil', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
@@ -66,12 +67,23 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/planos/subscrever-referencia', [App\Http\Controllers\ProfileController::class, 'subscribeReference'])->name('plans.subscribereference');
     Route::get('/planos/status/{id}', [App\Http\Controllers\ProfileController::class, 'checkStatus'])->name('subscription.check_status');
 
+    // Profile Extended Sections
+    Route::put('/perfil/bio', [App\Http\Controllers\ProfileController::class, 'updateBio'])->name('profile.bio.update');
+    Route::post('/perfil/habilidades', [App\Http\Controllers\ProfileController::class, 'storeSkill'])->name('profile.skills.store');
+    Route::delete('/perfil/habilidades/{id}', [App\Http\Controllers\ProfileController::class, 'deleteSkill'])->name('profile.skills.delete');
+    Route::post('/perfil/formacao', [App\Http\Controllers\ProfileController::class, 'storeEducation'])->name('profile.education.store');
+    Route::delete('/perfil/formacao/{id}', [App\Http\Controllers\ProfileController::class, 'deleteEducation'])->name('profile.education.delete');
+    Route::post('/perfil/experiencia', [App\Http\Controllers\ProfileController::class, 'storeExperience'])->name('profile.experience.store');
+    Route::delete('/perfil/experiencia/{id}', [App\Http\Controllers\ProfileController::class, 'deleteExperience'])->name('profile.experience.delete');
+    Route::post('/perfil/idiomas', [App\Http\Controllers\ProfileController::class, 'storeLanguage'])->name('profile.languages.store');
+    Route::delete('/perfil/idiomas/{id}', [App\Http\Controllers\ProfileController::class, 'deleteLanguage'])->name('profile.languages.delete');
+
     // Course routes that require authentication
     Route::get('/cursos/{slug}/certificado/preview', [CourseController::class, 'previewCertificate'])->name('courses.certificate.preview');
     Route::get('/cursos/{slug}/certificado', [CourseController::class, 'downloadCertificate'])->name('courses.certificate');
     Route::get('/cursos/{slug}/{lessonSlug}', [CourseController::class, 'attend'])->name('courses.attend');
     Route::post('/cursos/{slug}/{lessonSlug}/complete', [CourseController::class, 'completeLesson'])->name('courses.complete');
-    
+
     // Payment Confirmation
     Route::get('/pagamento/sucesso', [App\Http\Controllers\PaymentController::class, 'success'])->name('payment.success');
 });

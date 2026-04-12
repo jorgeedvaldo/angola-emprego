@@ -4,6 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Job;
+use App\Models\User;
+use App\Models\UserSkill;
+use App\Models\UserEducation;
+use App\Models\UserExperience;
+use App\Models\UserLanguage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -18,6 +23,15 @@ class ProfileController extends Controller
     public function show()
     {
         $user = Auth::user();
+
+        // Ensure user has a username (for users created before the migration)
+        if (empty($user->username)) {
+            $user->update([
+                'username' => User::generateUsername($user->name, $user->id),
+            ]);
+            $user->refresh();
+        }
+
         $categories = Category::all();
         return view('profile.show', compact('user', 'categories'));
     }
@@ -408,11 +422,147 @@ class ProfileController extends Controller
 
     /**
      * Show the public profile page for a user.
+     * Resolves user by username instead of ID for cleaner URLs.
      */
-    public function publicProfile($id)
+    public function publicProfile($username)
     {
-        $user = \App\Models\User::with(['categories', 'cvs'])->findOrFail($id);
+        $user = User::where('username', $username)
+            ->with(['categories', 'cvs', 'skills', 'educations', 'experiences', 'languages'])
+            ->firstOrFail();
         
-        return view('profile.public', compact('user'));
+        $completedCourses = $user->completed_courses;
+        
+        return view('profile.public', compact('user', 'completedCourses'));
+    }
+
+    // ================================================================
+    // Profile Extended Sections — Bio, Skills, Education, Experience, Languages
+    // ================================================================
+
+    /**
+     * Update the user's bio (sobre mim).
+     */
+    public function updateBio(Request $request)
+    {
+        $request->validate([
+            'bio' => 'nullable|string|max:1000',
+        ]);
+
+        Auth::user()->update(['bio' => $request->bio]);
+
+        return redirect()->back()->with('success', 'Biografia atualizada com sucesso!');
+    }
+
+    /**
+     * Store a new skill.
+     */
+    public function storeSkill(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:100',
+        ]);
+
+        Auth::user()->skills()->create(['name' => $request->name]);
+
+        return redirect()->back()->with('success', 'Habilidade adicionada com sucesso!');
+    }
+
+    /**
+     * Delete a skill.
+     */
+    public function deleteSkill($id)
+    {
+        $skill = Auth::user()->skills()->findOrFail($id);
+        $skill->delete();
+
+        return redirect()->back()->with('success', 'Habilidade removida com sucesso!');
+    }
+
+    /**
+     * Store a new education entry.
+     */
+    public function storeEducation(Request $request)
+    {
+        $request->validate([
+            'institution' => 'required|string|max:255',
+            'degree' => 'nullable|string|max:255',
+            'field_of_study' => 'nullable|string|max:255',
+            'start_year' => 'nullable|string|max:4',
+            'end_year' => 'nullable|string|max:4',
+        ]);
+
+        Auth::user()->educations()->create($request->only([
+            'institution', 'degree', 'field_of_study', 'start_year', 'end_year'
+        ]));
+
+        return redirect()->back()->with('success', 'Formação adicionada com sucesso!');
+    }
+
+    /**
+     * Delete an education entry.
+     */
+    public function deleteEducation($id)
+    {
+        $education = Auth::user()->educations()->findOrFail($id);
+        $education->delete();
+
+        return redirect()->back()->with('success', 'Formação removida com sucesso!');
+    }
+
+    /**
+     * Store a new experience entry.
+     */
+    public function storeExperience(Request $request)
+    {
+        $request->validate([
+            'company' => 'required|string|max:255',
+            'position' => 'required|string|max:255',
+            'description' => 'nullable|string|max:1000',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+        ]);
+
+        Auth::user()->experiences()->create($request->only([
+            'company', 'position', 'description', 'start_date', 'end_date'
+        ]));
+
+        return redirect()->back()->with('success', 'Experiência adicionada com sucesso!');
+    }
+
+    /**
+     * Delete an experience entry.
+     */
+    public function deleteExperience($id)
+    {
+        $experience = Auth::user()->experiences()->findOrFail($id);
+        $experience->delete();
+
+        return redirect()->back()->with('success', 'Experiência removida com sucesso!');
+    }
+
+    /**
+     * Store a new language entry.
+     */
+    public function storeLanguage(Request $request)
+    {
+        $request->validate([
+            'language' => 'required|string|max:100',
+            'level' => 'required|string|in:Básico,Intermediário,Avançado,Fluente,Nativo',
+        ]);
+
+        Auth::user()->languages()->create($request->only(['language', 'level']));
+
+        return redirect()->back()->with('success', 'Idioma adicionado com sucesso!');
+    }
+
+    /**
+     * Delete a language entry.
+     */
+    public function deleteLanguage($id)
+    {
+        $language = Auth::user()->languages()->findOrFail($id);
+        $language->delete();
+
+        return redirect()->back()->with('success', 'Idioma removido com sucesso!');
     }
 }

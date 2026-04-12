@@ -40,6 +40,12 @@ class GoogleController extends Controller
                         'avatar' => $googleUser->avatar,
                         'password' => bcrypt('123456dummy')
                     ]);
+
+                    // Generate unique username from name
+                    $newUser->update([
+                        'username' => \App\Models\User::generateUsername($googleUser->name, $newUser->id),
+                    ]);
+
                     \Illuminate\Support\Facades\Auth::login($newUser);
                 }
 

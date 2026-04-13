@@ -2,6 +2,57 @@
 
 @section('title', $course->title)
 @section('description', \Illuminate\Support\Str::limit(strip_tags($course->description), 150))
+@section('canonical_link', url('/cursos/' . $course->slug))
+@section('og_type', 'article')
+@section('og_image', asset('storage/' . $course->image))
+
+@section('head-scripts')
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Course",
+  "name": "{{ $course->title }}",
+  "description": "{{ Str::limit(strip_tags($course->description), 300) }}",
+  "url": "{{ url('/cursos/' . $course->slug) }}",
+  "provider": {
+    "@type": "Organization",
+    "name": "Angola Emprego",
+    "sameAs": "{{ url('/') }}"
+  },
+  "inLanguage": "pt-AO",
+  "isAccessibleForFree": true,
+  "image": "{{ asset('storage/' . $course->image) }}",
+  "numberOfCredits": {{ $course->lessons->count() }},
+  "hasCourseInstance": {
+    "@type": "CourseInstance",
+    "courseMode": "online",
+    "courseWorkload": "PT{{ $course->lessons->sum('duration_minutes') }}M"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+    "@type": "ListItem",
+    "position": 1,
+    "name": "Início",
+    "item": "{{ url('/') }}"
+  },{
+    "@type": "ListItem",
+    "position": 2,
+    "name": "Cursos",
+    "item": "{{ url('/cursos') }}"
+  },{
+    "@type": "ListItem",
+    "position": 3,
+    "name": "{{ $course->title }}",
+    "item": "{{ url('/cursos/' . $course->slug) }}"
+  }]
+}
+</script>
+@endsection
 
 @section('content')
 <div class="bg-light py-5">

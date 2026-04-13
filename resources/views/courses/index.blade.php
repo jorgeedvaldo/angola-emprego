@@ -1,7 +1,36 @@
 @extends('templates.app')
 
-@section('title', 'Cursos')
-@section('description', 'Aprenda com nossos cursos online')
+@section('title', 'Cursos Gratuitos Online em Angola')
+@section('description', 'Cursos online gratuitos para desenvolver as suas competências profissionais. Aprenda ao seu ritmo e obtenha certificados reconhecidos. Formação em diversas áreas.')
+@section('canonical_link', url('/cursos'))
+
+@section('head-scripts')
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "Cursos Gratuitos Online — Angola Emprego",
+  "description": "Cursos online gratuitos para desenvolver as suas competências profissionais em Angola.",
+  "url": "{{ url('/cursos') }}",
+  "inLanguage": "pt-AO",
+  "mainEntity": {
+    "@type": "ItemList",
+    "itemListOrder": "https://schema.org/ItemListOrderDescending",
+    "numberOfItems": {{ $courses->count() }},
+    "itemListElement": [
+      @foreach($courses as $index => $course)
+      {
+        "@type": "ListItem",
+        "position": {{ $index + 1 }},
+        "url": "{{ url('/cursos/' . $course->slug) }}",
+        "name": "{{ $course->title }}"
+      }@if(!$loop->last),@endif
+      @endforeach
+    ]
+  }
+}
+</script>
+@endsection
 
 @section('content')
 <div class="bg-light py-5">

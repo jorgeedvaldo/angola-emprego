@@ -1,15 +1,22 @@
 User-agent: *
 Allow: /
 
-# Bloquear áreas administrativas e de login
-Disallow: /admin/
-Disallow: /login/
-Disallow: /register/
-Disallow: /minha-conta/
+# Bloquear áreas privadas
+Disallow: /login
+Disallow: /register
+Disallow: /perfil
+Disallow: /planos
+Disallow: /pagamento
+Disallow: /vagas-sugeridas
+Disallow: /linkstorage
+Disallow: /auth/
 
-# Bloquear buscas internas (importante para SEO)
+# Bloquear buscas internas (evitar conteúdo duplicado)
+Disallow: /vagas?q=
+Disallow: /vagas?location=
+Disallow: /vagas?category=
 Disallow: /?s=
 Disallow: /search/
 
-# Indicação do Sitemap
+# Indicação do Sitemap e Feed RSS
 Sitemap: https://angolaemprego.com/sitemap.xml

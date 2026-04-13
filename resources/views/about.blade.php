@@ -1,7 +1,38 @@
 @extends('templates.app')
-@section('title', 'Sobre')
-@section('description', 'Angola Emprego é o maior portal de emprego em Angola, comprometido em ajudar milhares de angolanos a encontrar as melhores oportunidades de trabalho diariamente')
+@section('title', 'Sobre Nós')
+@section('description', 'Conheça o Angola Emprego, o maior portal de emprego em Angola. Desde 2019 a conectar profissionais angolanos às melhores oportunidades de trabalho em Luanda e todo o país.')
 @section('canonical_link', url('/sobre'))
+
+@section('head-scripts')
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [{
+    "@type": "Question",
+    "name": "O que é o Angola Emprego?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "O Angola Emprego é um site dedicado a anúncios de vagas de emprego em Angola. Nosso objetivo é conectar candidatos a oportunidades de trabalho e ajudar empresas a divulgar suas vagas de forma gratuita."
+    }
+  },{
+    "@type": "Question",
+    "name": "O Angola Emprego cobra para divulgar vagas?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Não, o Angola Emprego não cobra para dar emprego ou para publicar vagas. Nosso serviço é totalmente gratuito."
+    }
+  },{
+    "@type": "Question",
+    "name": "As vagas publicadas pertencem ao Angola Emprego?",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Não, somos apenas uma plataforma que divulga oportunidades oferecidas por empresas e recrutadores terceiros."
+    }
+  }]
+}
+</script>
+@endsection
 
 @section('content')
     <!-- Page Header -->

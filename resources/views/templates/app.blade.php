@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-AO">
 
 <head>
   <meta charset="utf-8">
@@ -17,7 +17,13 @@
   <link rel="icon" href="{{ asset('assets/img/favicon.png') }}">
   <link rel="apple-touch-icon" href="{{ asset('assets/img/apple-touch-icon.png') }}">
 
+  <!-- RSS Feed Autodiscovery -->
+  <link rel="alternate" type="application/rss+xml" title="Angola Emprego — Feed RSS" href="{{ url('/feed') }}" />
+
   <!-- Fonts -->
+  <link rel="dns-prefetch" href="//fonts.googleapis.com">
+  <link rel="dns-prefetch" href="//fonts.gstatic.com">
+  <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
   <link href="https://fonts.googleapis.com" rel="preconnect">
   <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
@@ -49,20 +55,28 @@
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="@yield('og_type', 'website')" />
   <meta property="og:title" content="@yield('title') - {{env('APP_NAME')}}" />
-  <meta property="og:url" content="@yield('canonical_link')" />
+  <meta property="og:url" content="@hasSection('canonical_link')@yield('canonical_link')@else{{ url()->current() }}@endif" />
   <meta property="og:description" content="@yield('description')" />
+  @hasSection('created_at')
   <meta property="article:published_time" content="@yield('created_at')" />
+  @endif
+  @hasSection('updated_at')
   <meta property="article:modified_time" content="@yield('updated_at')" />
-  <meta property="og:site_name" content="Angola Emprego - Notícias e Emprego" />
-  <meta property="og:image" content="@yield('url')" />
+  @endif
+  <meta property="og:site_name" content="Angola Emprego" />
+  <meta property="og:image" content="@hasSection('og_image')@yield('og_image')@else{{ asset('assets/img/og-default.png') }}@endif" />
   <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="700" />
-  <meta property="og:image:alt" content />
-  <meta property="og:locale" content="pt_PT" />
-  <meta name="author" content="Yuri Kiluanji" />
-  <meta name="twitter:text:title" content="@yield('title') - {{env('APP_NAME')}}" />
-  <meta name="twitter:image" content="@yield('url')" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="@yield('title') - Angola Emprego" />
+  <meta property="og:locale" content="pt_AO" />
+  <meta name="author" content="Angola Emprego" />
+
+  <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="@yield('title') - {{env('APP_NAME')}}" />
+  <meta name="twitter:description" content="@yield('description')" />
+  <meta name="twitter:image" content="@hasSection('og_image')@yield('og_image')@else{{ asset('assets/img/og-default.png') }}@endif" />
+  <meta name="twitter:image:alt" content="@yield('title') - Angola Emprego" />
 
   <script type="application/ld+json">
       {

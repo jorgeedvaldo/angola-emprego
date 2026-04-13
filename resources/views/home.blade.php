@@ -4,7 +4,40 @@
 @section('canonical_link', url('/'))
 
 @section('head-scripts')
-
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Angola Emprego — Vagas de Emprego, Notícias e Cursos",
+  "description": "Angola Emprego é o maior portal de emprego em Angola. Encontre vagas de trabalho, cursos gratuitos e notícias de carreira.",
+  "url": "{{ url('/') }}",
+  "inLanguage": "pt-AO",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "Angola Emprego",
+    "url": "{{ url('/') }}"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "Vagas de Emprego em Destaque",
+  "itemListOrder": "https://schema.org/ItemListOrderDescending",
+  "numberOfItems": {{ $jobs->count() }},
+  "itemListElement": [
+    @foreach($jobs as $index => $job)
+    {
+      "@type": "ListItem",
+      "position": {{ $index + 1 }},
+      "url": "{{ url('/vagas/' . $job->slug) }}",
+      "name": "{{ $job->title }} — {{ $job->company }}"
+    }@if(!$loop->last),@endif
+    @endforeach
+  ]
+}
+</script>
 @endsection
 
 @section('content')

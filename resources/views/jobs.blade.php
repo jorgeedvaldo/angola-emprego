@@ -1,10 +1,51 @@
 @extends('templates.app')
-@section('title', 'Vagas de Emprego')
-@section('description', 'Angola Emprego é o maior portal de emprego em Angola, comprometido em ajudar milhares de angolanos a encontrar as melhores oportunidades de trabalho diariamente')
+@section('title', 'Vagas de Emprego em Angola 2026')
+@section('description', 'Encontre as melhores vagas de emprego em Angola. Pesquise por cargo, empresa ou localização. Milhares de oportunidades em Luanda, Benguela, Huíla e todo o país.')
 @section('canonical_link', url('/vagas'))
 
 @section('head-scripts')
-
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "Vagas de Emprego em Angola",
+  "description": "Listagem completa de vagas de emprego em Angola.",
+  "url": "{{ url('/vagas') }}",
+  "inLanguage": "pt-AO",
+  "mainEntity": {
+    "@type": "ItemList",
+    "itemListOrder": "https://schema.org/ItemListOrderDescending",
+    "numberOfItems": {{ $jobs->total() }},
+    "itemListElement": [
+      @foreach($jobs as $index => $job)
+      {
+        "@type": "ListItem",
+        "position": {{ $index + 1 }},
+        "url": "{{ url('/vagas/' . $job->slug) }}",
+        "name": "{{ $job->title }}"
+      }@if(!$loop->last),@endif
+      @endforeach
+    ]
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+    "@type": "ListItem",
+    "position": 1,
+    "name": "Início",
+    "item": "{{ url('/') }}"
+  },{
+    "@type": "ListItem",
+    "position": 2,
+    "name": "Vagas de Emprego",
+    "item": "{{ url('/vagas') }}"
+  }]
+}
+</script>
 @endsection
 
 @section('content')

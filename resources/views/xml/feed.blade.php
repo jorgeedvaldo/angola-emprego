@@ -20,7 +20,7 @@
         <language>pt-PT</language>
         <sy:updatePeriod>hourly</sy:updatePeriod>
         <sy:updateFrequency>1</sy:updateFrequency>
-        <generator>https://wordpress.org/?v=6.4.2</generator>
+        <generator>Angola Emprego</generator>
 
         <image>
             <url>{{ asset('storage/images/logo-full.jpg') }}</url>

@@ -5,7 +5,7 @@
 @section('og_type', 'article')
 @section('created_at', $post->created_at->toIso8601String())
 @section('updated_at', $post->updated_at->toIso8601String())
-@section('url', asset('storage/' . $post->image))
+@section('og_image', asset('storage/' . $post->image))
 
 @section('head-scripts')
 <script type="application/ld+json">

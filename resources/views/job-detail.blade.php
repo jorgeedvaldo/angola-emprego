@@ -1,63 +1,64 @@
 @extends('templates.app')
 @section('title', $job->title)
-@section('description', strip_tags($job['description']))
+@section('description', Str::limit(strip_tags($job->description), 160))
 @section('canonical_link', url('/vagas/'.$job->slug))
 @section('og_type', 'article')
 @section('created_at', $job->created_at)
 @section('updated_at', $job->updated_at)
-@section('url', asset('storage/' . $job->image))
+@section('og_image', asset('storage/' . $job->image))
 
 @section('head-scripts')
 <script type="application/ld+json">
-    {
-  "@context":"http:\/\/schema.org\/",
-  "@type":"JobPosting",
-  "datePosted":"{{ date_format(new DateTime($job['created_at']), DATE_ATOM) }}",
-  "title":"{{$job['title']}}",
-  "description":"{{$job['description']}}",
-  "employmentType":["FULL_TIME"],
-  "hiringOrganization":{
-          "@type":"Organization",
-          "name":"{{$job['company']}}",
-          "logo":"{{asset('storage/' . $job['image'])}}"
-          },
-  "identifier":{
-          "@type":"PropertyValue",
-          "name":"{{$job['company']}}",
-          "value":"https:\/\/angolaemprego.com\/#identifier"
-          },
-  "jobLocation":[
-
-    {
-      "@type":"Place",
-      "address":"{{$job['province']}}"
-    },
-
-    {
-        "@type":"Place",
-        "address":
-                {
-                    "@type":"PostalAddress",
-                    "streetAddress":"Luanda",
-                    "addressLocality":"Luanda",
-                    "addressRegion":"Luanda",
-                    "postalCode":"Luanda",
-                    "addressCountry":"Luanda"
-                }
-    },
-    {
-        "@type":"Place",
-        "address":
-                {
-                    "@type":"PostalAddress",
-                    "streetAddress":"Angola",
-                    "addressLocality":"Angola",
-                    "addressRegion":"Angola",
-                    "postalCode":"Angola",
-                    "addressCountry":"Angola"
-                }
+{
+  "@context": "https://schema.org/",
+  "@type": "JobPosting",
+  "title": "{{ $job->title }}",
+  "description": "{{ Str::limit(strip_tags($job->description), 5000) }}",
+  "datePosted": "{{ $job->created_at->toIso8601String() }}",
+  "validThrough": "{{ $job->created_at->addMonths(2)->toIso8601String() }}",
+  "employmentType": ["FULL_TIME"],
+  "hiringOrganization": {
+    "@type": "Organization",
+    "name": "{{ $job->company }}",
+    "logo": "{{ asset('storage/' . $job->image) }}",
+    "sameAs": "{{ url('/vagas?q=' . urlencode($job->company)) }}"
+  },
+  "jobLocation": {
+    "@type": "Place",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "{{ $job->location ?? $job->province ?? 'Luanda' }}",
+      "addressRegion": "{{ $job->province ?? $job->location ?? 'Luanda' }}",
+      "addressCountry": "AO"
     }
-]
+  },
+  "identifier": {
+    "@type": "PropertyValue",
+    "name": "{{ $job->company }}",
+    "value": "{{ $job->slug }}"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+    "@type": "ListItem",
+    "position": 1,
+    "name": "Início",
+    "item": "{{ url('/') }}"
+  },{
+    "@type": "ListItem",
+    "position": 2,
+    "name": "Vagas",
+    "item": "{{ url('/vagas') }}"
+  },{
+    "@type": "ListItem",
+    "position": 3,
+    "name": "{{ $job->title }}",
+    "item": "{{ url('/vagas/' . $job->slug) }}"
+  }]
 }
 </script>
 @endsection

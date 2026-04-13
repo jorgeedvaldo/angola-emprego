@@ -4,7 +4,48 @@
 @section('canonical_link', url('/noticias'))
 
 @section('head-scripts')
-
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "Notícias de Angola — Emprego, Carreira e Actualidades",
+  "description": "Fique atualizado com as últimas notícias de Angola sobre emprego, carreira, concursos públicos e oportunidades.",
+  "url": "{{ url('/noticias') }}",
+  "inLanguage": "pt-AO",
+  "mainEntity": {
+    "@type": "ItemList",
+    "itemListOrder": "https://schema.org/ItemListOrderDescending",
+    "numberOfItems": {{ $posts->total() }},
+    "itemListElement": [
+      @foreach($posts as $index => $post)
+      {
+        "@type": "ListItem",
+        "position": {{ $index + 1 }},
+        "url": "{{ url('/noticias/' . $post->slug) }}",
+        "name": "{{ $post->title }}"
+      }@if(!$loop->last),@endif
+      @endforeach
+    ]
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+    "@type": "ListItem",
+    "position": 1,
+    "name": "Início",
+    "item": "{{ url('/') }}"
+  },{
+    "@type": "ListItem",
+    "position": 2,
+    "name": "Notícias",
+    "item": "{{ url('/noticias') }}"
+  }]
+}
+</script>
 @endsection
 
 @section('content')

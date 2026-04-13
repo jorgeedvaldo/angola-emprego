@@ -91,5 +91,11 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/cursos', [CourseController::class, 'index'])->name('courses.index');
 Route::get('/certificado/validar/{user}/{course}', [CourseController::class, 'verifyCertificate'])->name('certificates.verify');
 Route::get('/cursos/{slug}', [CourseController::class, 'show'])->name('courses.show');
+// [CSMJ] Rota estática para resultados do concurso público CSMJ 2026 — REMOVER QUANDO NECESSÁRIO
+Route::get('/noticias/resultados-concurso-csmj-2026', function () {
+    $categories = \App\Models\Category::all();
+    return view('postresultado', compact('categories'));
+})->name('post.resultado.csmj');
+
 Route::get('/noticias/{slug}', [BlogController::class, 'getBySlug']);
 Route::get('/{slug}', [BlogController::class, 'getBySlug']);

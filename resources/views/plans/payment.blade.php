@@ -25,7 +25,7 @@
                 <!-- iFrame Container -->
                 <div class="flex-grow-1 w-100" style="height: 700px; min-height: 60vh;">
                      <iframe 
-                        src="https://pagamentonline.emis.co.ao/online-payment-gateway/webframe/frame?token={{ $token }}"
+                        src="https://pagamentonline.emis.co.ao/online-payment-gateway/webframe/frame?token={{ $payment_reference }}"
                         class="w-100 h-100 border-0"
                         allowfullscreen
                     ></iframe>

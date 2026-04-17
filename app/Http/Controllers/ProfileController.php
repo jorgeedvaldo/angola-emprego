@@ -202,7 +202,7 @@ class ProfileController extends Controller
     {
         $plan = $request->query('plan');
         $payment_type = env('PAYMENT_GATEWAY_METHOD', 'reference');
-        $validPlans = ['weekly', 'monthly', 'quarterly', 'yearly'];
+        $validPlans = ['10_days'];
 
         if (!in_array($plan, $validPlans)) {
             return redirect()->route('plans.index');
@@ -230,7 +230,7 @@ class ProfileController extends Controller
     public function subscribe(Request $request)
     {
         $request->validate([
-            'plan' => 'required|string|in:weekly,monthly,quarterly,yearly',
+            'plan' => 'required|string|in:10_days',
         ]);
 
         $user = Auth::user();
@@ -244,19 +244,6 @@ class ProfileController extends Controller
         if ($user->subscription_status === 'active' && $user->subscription_end && \Carbon\Carbon::parse($user->subscription_end)->isFuture()) {
              return redirect()->route('profile.show')->with('info', 'Já possui uma subscrição ativa.');
         }
-        
-        $planIds = [
-            'weekly' => '856ed35c-7b33-4e98-9352-954d22bc56a2',
-            'monthly' => '2dc13ec4-5a1d-4ddf-a5f0-aa5324e29c39',
-            'quarterly' => '40074bfc-54a0-4429-97ba-30955cc5cce3',
-            'yearly' => '22850349-da68-4fe2-a453-3d6884c5df16',
-        ];
-
-        $offerId = $planIds[$request->plan] ?? null;
-
-        if (!$offerId) {
-             return redirect()->route('plans.index')->with('error', 'Plano inválido.');
-        }
 
         // Create initial subscription request
         $subscriptionRequest = \App\Models\SubscriptionRequest::create([
@@ -265,50 +252,46 @@ class ProfileController extends Controller
             'status' => 'pending',
         ]);
 
-        // Call Kuenha API
+        // Call Kubeta API
         try {
             $payload = [
-                "offerId" => $offerId,
-                "bumps" => [],
-                "payMethod" => "GPO_MCX",
-                "buyerId" => env('KUENHA_BUYER_ID'),
-                "trackingParams" => [
-                    "src" => null,
-                    "sck" => null,
-                    "utm_source" => null,
-                    "utm_campaign" => null,
-                    "utm_medium" => null,
-                    "utm_content" => null,
-                    "utm_term" => null
-                ]
+                "id_lead" => 73863, // Lead fixa conforme instrução
+                "id_payment_method" => 1
             ];
 
             $response = \Illuminate\Support\Facades\Http::withoutVerifying()
                 ->timeout(60)
                 ->withBody(json_encode($payload), 'application/json')
-                ->post(env('KUENHA_API_URL'));
+                ->post('https://api.kubeta.ao/product/16745/payment/express');
 
             if ($response->successful()) {
                 $data = $response->json();
-                $saleId = $data['id']; // This is the token/sale_id
                 
-                // Update subscription request with sale_id
-                $subscriptionRequest->update(['sale_id' => $saleId]);
-                $user->update(['subscription_status' => 'pending']);
+                // Get the payment_reference from the response
+                if (isset($data['payment']['payment_reference'])) {
+                    $paymentReference = $data['payment']['payment_reference'];
+                    
+                    // Update subscription request with sale_id
+                    $subscriptionRequest->update(['sale_id' => $paymentReference]);
+                    $user->update(['subscription_status' => 'pending']);
 
-                return view('plans.payment', [
-                    'token' => $saleId,
-                    'subscriptionRequestId' => $subscriptionRequest->id
-                ]);
+                    return view('plans.payment', [
+                        'payment_reference' => $paymentReference,
+                        'subscriptionRequestId' => $subscriptionRequest->id
+                    ]);
+                } else {
+                    \Illuminate\Support\Facades\Log::error('Kubeta Response Missing Payment Reference', ['response' => $data]);
+                    return redirect()->route('plans.index')->with('error', 'Resposta inválida da API de pagamentos.');
+                }
 
             } else {
-                 \Illuminate\Support\Facades\Log::error('Kuenha Payment API Failed', ['status' => $response->status(), 'body' => $response->body()]);
+                 \Illuminate\Support\Facades\Log::error('Kubeta Payment API Failed', ['status' => $response->status(), 'body' => $response->body()]);
                  // Dump body to see the error
                  return redirect()->route('plans.index')->with('error', 'Erro API (' . $response->status() . '): ' . $response->body());
             }
 
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Kuenha Payment Error: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::error('Kubeta Payment Error: ' . $e->getMessage());
             return redirect()->route('plans.index')->with('error', 'Erro Sistema: ' . $e->getMessage());
         }
     }

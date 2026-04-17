@@ -57,6 +57,7 @@ class UserResource extends Resource
                         Forms\Components\Select::make('subscription_plan')
                             ->label('Plano')
                             ->options([
+                                '10_days' => '10 Dias',
                                 'weekly' => 'Semanal',
                                 'monthly' => 'Mensal',
                                 'quarterly' => 'Trimestral',

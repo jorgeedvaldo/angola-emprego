@@ -201,7 +201,6 @@ class ProfileController extends Controller
     public function confirm(Request $request)
     {
         $plan = $request->query('plan');
-        $payment_type = env('PAYMENT_GATEWAY_METHOD', 'reference');
         $validPlans = ['10_days'];
 
         if (!in_array($plan, $validPlans)) {
@@ -218,7 +217,7 @@ class ProfileController extends Controller
 
         $canSubscribe = $hasCv && $hasCategories && !$isSubscriptionActive;
 
-        return view('plans.confirm', compact('plan', 'hasCv', 'hasCategories', 'canSubscribe', 'isSubscriptionActive', 'payment_type'));
+        return view('plans.confirm', compact('plan', 'hasCv', 'hasCategories', 'canSubscribe', 'isSubscriptionActive'));
     }
 
     /**

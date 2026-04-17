@@ -21,6 +21,7 @@ class SubscriptionRequest extends Model
         static::updated(function ($request) {
             if ($request->isDirty('status') && $request->status === 'approved') {
                 $duration = match ($request->plan) {
+                    '10_days' => 10,
                     'weekly' => 7,
                     'monthly' => 30,
                     'quarterly' => 90,

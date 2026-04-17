@@ -12,7 +12,13 @@
                         <h4 class="mb-0 fw-bold"><i class="bi bi-shield-check me-2"></i>Verificação de Requisitos</h4>
                     </div>
                     <div class="card-body p-4">
-                        <h5 class="mb-4">Para subscrever ao plano <span class="badge bg-primary">{{ ucfirst($plan) }}</span>, precisamos validar alguns dados:</h5>
+                        @php
+                            $planLabel = match($plan) {
+                                '10_days' => '10 Dias Premium',
+                                default => ucfirst($plan),
+                            };
+                        @endphp
+                        <h5 class="mb-4">Para subscrever ao plano <span class="badge bg-primary">{{ $planLabel }}</span>, precisamos validar alguns dados:</h5>
 
                         <ul class="list-group list-group-flush mb-4">
                             <!-- CV Check -->
@@ -75,11 +81,11 @@
                                 </div>
                             </div>
                             
-                            <form action="{{ $payment_type === 'reference' ? route('plans.subscribereference') : route('plans.subscribe') }}" method="POST">
+                            <form action="{{ route('plans.subscribe') }}" method="POST">
                                 @csrf
                                 <input type="hidden" name="plan" value="{{ $plan }}">
                                 <button type="submit" class="btn btn-primary w-100 btn-lg rounded-pill fw-bold shadow-sm">
-                                    {{ $payment_type === 'reference' ? 'Gerar Referência' : 'Confirmar Pedido' }} <i class="bi bi-arrow-right ms-2"></i>
+                                    Confirmar Pedido <i class="bi bi-arrow-right ms-2"></i>
                                 </button>
                             </form>
                         @else
@@ -104,3 +110,4 @@
     </div>
 </section>
 @endsection
+

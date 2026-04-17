@@ -47,6 +47,7 @@ class SubscriptionRequestResource extends Resource
                 Tables\Columns\TextColumn::make('plan')
                     ->label('Plano')
                     ->formatStateUsing(fn (string $state): string => match ($state) {
+                        '10_days' => '10 Dias',
                         'weekly' => 'Semanal',
                         'monthly' => 'Mensal',
                         'quarterly' => 'Trimestral',

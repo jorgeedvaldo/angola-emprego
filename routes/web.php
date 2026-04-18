@@ -61,11 +61,17 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/perfil/cv/{id}/primary', [App\Http\Controllers\ProfileController::class, 'setPrimaryCv'])->name('profile.cv.primary');
     Route::delete('/perfil/cv/{id}', [App\Http\Controllers\ProfileController::class, 'deleteCv'])->name('profile.cv.delete');
     Route::get('/vagas-sugeridas', [App\Http\Controllers\ProfileController::class, 'potentialJobs'])->name('jobs.potential');
-    Route::get('/planos', [App\Http\Controllers\ProfileController::class, 'plans'])->name('plans.index');
-    Route::get('/planos/confirmar', [App\Http\Controllers\ProfileController::class, 'confirm'])->name('plans.confirm');
-    Route::post('/planos/subscrever', [App\Http\Controllers\ProfileController::class, 'subscribe'])->name('plans.subscribe');
-    Route::post('/planos/subscrever-referencia', [App\Http\Controllers\ProfileController::class, 'subscribeReference'])->name('plans.subscribereference');
-    Route::get('/planos/status/{id}', [App\Http\Controllers\ProfileController::class, 'checkStatus'])->name('subscription.check_status');
+    
+    // ════════════════════════════════════════════════════════════════════
+    // [DESACTIVADO TEMPORARIAMENTE] Rotas de Pagamento / Subscrição
+    // Para reactivar: descomentar as linhas abaixo e em api.php
+    // Ver AGENT.md secção 13 para instruções completas
+    // ════════════════════════════════════════════════════════════════════
+    // Route::get('/planos', [App\Http\Controllers\ProfileController::class, 'plans'])->name('plans.index');
+    // Route::get('/planos/confirmar', [App\Http\Controllers\ProfileController::class, 'confirm'])->name('plans.confirm');
+    // Route::post('/planos/subscrever', [App\Http\Controllers\ProfileController::class, 'subscribe'])->name('plans.subscribe');
+    // Route::post('/planos/subscrever-referencia', [App\Http\Controllers\ProfileController::class, 'subscribeReference'])->name('plans.subscribereference');
+    // Route::get('/planos/status/{id}', [App\Http\Controllers\ProfileController::class, 'checkStatus'])->name('subscription.check_status');
 
     // Profile Extended Sections
     Route::put('/perfil/bio', [App\Http\Controllers\ProfileController::class, 'updateBio'])->name('profile.bio.update');
@@ -84,8 +90,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/cursos/{slug}/{lessonSlug}', [CourseController::class, 'attend'])->name('courses.attend');
     Route::post('/cursos/{slug}/{lessonSlug}/complete', [CourseController::class, 'completeLesson'])->name('courses.complete');
 
-    // Payment Confirmation
-    Route::get('/pagamento/sucesso', [App\Http\Controllers\PaymentController::class, 'success'])->name('payment.success');
+    // [DESACTIVADO] Payment Confirmation
+    // Route::get('/pagamento/sucesso', [App\Http\Controllers\PaymentController::class, 'success'])->name('payment.success');
 });
 
 Route::get('/cursos', [CourseController::class, 'index'])->name('courses.index');

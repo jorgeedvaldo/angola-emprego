@@ -27,4 +27,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::match(['get', 'post'], '/pagamento/callback', [App\Http\Controllers\Api\PaymentCallbackController::class, 'handle']);
+// [DESACTIVADO TEMPORARIAMENTE] Callback de pagamento — ver AGENT.md secção 13
+// Route::match(['get', 'post'], '/pagamento/callback', [App\Http\Controllers\Api\PaymentCallbackController::class, 'handle']);

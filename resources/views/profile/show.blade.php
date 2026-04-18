@@ -559,50 +559,6 @@
                     </div>
                 </div>
 
-                {{-- Subscription Card --}}
-                <div class="mgmt-card mb-4">
-                    <div class="mgmt-card-body">
-                        <h6 class="fw-bold mb-3"><i class="bi bi-rocket-takeoff me-2 text-primary"></i>Subscrição</h6>
-                        @if(Auth::user()->hasActiveSubscription())
-                            <div class="subscription-status active">
-                                <div class="subscription-status-icon bg-success">
-                                    <i class="bi bi-check-lg text-white"></i>
-                                </div>
-                                <div>
-                                    <span class="fw-bold text-success">Activa</span>
-                                    <span class="d-block small text-muted">{{ ucfirst(Auth::user()->subscription_plan) }}</span>
-                                </div>
-                            </div>
-                            <p class="text-muted small mt-2 mb-0">
-                                Válida até {{ Auth::user()->subscription_end->format('d/m/Y') }}
-                            </p>
-                        @elseif(Auth::user()->subscription_status === 'pending')
-                            <div class="subscription-status pending">
-                                <div class="subscription-status-icon bg-warning">
-                                    <i class="bi bi-hourglass-split text-white"></i>
-                                </div>
-                                <div>
-                                    <span class="fw-bold text-warning">Pendente</span>
-                                    <span class="d-block small text-muted">Em análise</span>
-                                </div>
-                            </div>
-                        @else
-                            <div class="subscription-status inactive">
-                                <div class="subscription-status-icon bg-secondary">
-                                    <i class="bi bi-x-lg text-white"></i>
-                                </div>
-                                <div>
-                                    <span class="fw-bold text-secondary">Inactiva</span>
-                                    <span class="d-block small text-muted">Sem plano activo</span>
-                                </div>
-                            </div>
-                            <a href="{{ route('plans.index') }}" class="btn btn-primary btn-sm rounded-pill w-100 mt-3">
-                                <i class="bi bi-lightning-charge-fill me-1"></i> Ver Planos
-                            </a>
-                        @endif
-                    </div>
-                </div>
-
                 {{-- Completed Courses --}}
                 @if($user->completed_courses->count() > 0)
                 <div class="mgmt-card mb-4">

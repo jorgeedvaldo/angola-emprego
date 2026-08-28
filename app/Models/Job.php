@@ -7,9 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Cache;
 
+use App\Models\Concerns\GeneratesCoverAndThumbnail;
+
 class Job extends Model
 {
-    use HasFactory;
+    use HasFactory, GeneratesCoverAndThumbnail;
 
     protected $fillable = [
         'title', 'slug', 'company', 'location', 'description', 'email_or_link', 'image'
@@ -21,12 +23,19 @@ class Job extends Model
 
         static::created(function ($job) {
             $job->slug = $job->generateSlug($job->title, $job->id);
+            $job->generateCoverIfMissing('images/jobs', 'VAGA');
             $job->save();
+
+            $job->generateThumb($job->image);
 
             SocialMediaJob::create([
                 'job_id' => $job->id,
                 'post_status' => 0,
             ]);
+        });
+
+        static::updated(function ($job) {
+            $job->generateThumb($job->image);
         });
 
         static::saved(function ($job) {

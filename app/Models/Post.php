@@ -7,11 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Cache;
 
-use Intervention\Image\ImageManager;
-use Intervention\Image\Drivers\Gd\Driver;
+use App\Models\Concerns\GeneratesCoverAndThumbnail;
+
 class Post extends Model
 {
-    use HasFactory;
+    use HasFactory, GeneratesCoverAndThumbnail;
 
     protected $fillable = [
         'title', 'slug', 'description', 'image'
@@ -23,6 +23,7 @@ class Post extends Model
 
         static::created(function ($post) {
             $post->slug = $post->generateSlug($post->title, $post->id);
+            $post->generateCoverIfMissing('images/posts', 'ARTIGO');
             $post->save();
 
             $post->generateThumb($post->image);
@@ -50,21 +51,6 @@ class Post extends Model
             $slug = $slug . '-' . $id;
         }
         return $slug;
-    }
-
-    private function generateThumb($url)
-    {
-        // create image manager with desired driver
-        $manager = new ImageManager(new Driver());
-
-        // read image from file system
-        $image = $manager->read('storage/' . $url);
-
-        // resize image proportionally to 300px width
-        $image->cover(500, 300);
-
-        // save modified image in new format
-        $image->save('storage/thumb/' . $url);
     }
 
     public static function getCachedLatest()

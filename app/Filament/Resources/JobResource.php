@@ -32,9 +32,9 @@ class JobResource extends Resource
                     Forms\Components\RichEditor::make('description')->required(),
                     Forms\Components\TextInput::make('email_or_link')->required(),
                     Forms\Components\FileUpload::make('image')
+                        ->label('Imagem (gerada automaticamente se vazia)')
                         ->directory('images/jobs')
-                        ->image()
-                        ->default('images/jobs/default.png'),
+                        ->image(),
                     Forms\Components\MultiSelect::make('categories')
                         ->relationship('categories','name'),
                 ])

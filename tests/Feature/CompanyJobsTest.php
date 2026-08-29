@@ -137,6 +137,7 @@ class CompanyJobsTest extends TestCase
         $careersPage
             ->assertDontSee('Angola Emprego')
             ->assertDontSee('assets/img/logo.svg')
+            ->assertDontSee('assets/img/favicon.png')
             ->assertDontSee(route('courses.index'))
             ->assertSee('Carreiras')
             ->assertSee('company-nav')

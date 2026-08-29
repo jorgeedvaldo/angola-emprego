@@ -13,7 +13,7 @@
 
   <meta name="robots" content="follow, index, max-snippet:-1, max-image-preview:large" />
 
-  <link rel="icon" href="{{ $company->logo_url ?: asset('assets/img/favicon.png') }}">
+  <link rel="icon" href="{{ $company->faviconUrl() }}">
 
   <link href="https://fonts.googleapis.com" rel="preconnect">
   <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>

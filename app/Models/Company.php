@@ -60,6 +60,27 @@ class Company extends Model
         return url('/company/' . $this->slug);
     }
 
+    /**
+     * Companies without a logo still get their own favicon so the careers page
+     * never falls back to the marketplace branding.
+     */
+    public function faviconUrl(): string
+    {
+        if ($this->logo) {
+            return $this->logo_url;
+        }
+
+        $initial = strtoupper(mb_substr($this->name, 0, 1));
+
+        $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">'
+            . '<rect width="64" height="64" rx="14" fill="#2557a7"/>'
+            . '<text x="50%" y="50%" dy=".35em" text-anchor="middle" fill="#ffffff"'
+            . ' font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="bold">'
+            . e($initial) . '</text></svg>';
+
+        return 'data:image/svg+xml;base64,' . base64_encode($svg);
+    }
+
     public static function generateUniqueSlug(string $name, ?int $ignoreId = null): string
     {
         $base = Str::slug($name);

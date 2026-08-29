@@ -7,6 +7,9 @@
 <div class="auth-wrapper d-flex align-items-center justify-content-center" style="min-height: 80vh; background-color: #f3f2f1;">
     <div class="card shadow-sm border-0" style="width: 100%; max-width: 450px; border-radius: 12px;">
         <div class="card-body p-5">
+            @if(session('status'))
+                <div class="alert alert-success">{{ session('status') }}</div>
+            @endif
             <div class="text-center mb-5">
                 <img src="{{ asset('assets/img/logo.svg') }}" alt="Angola Emprego" height="40" class="mb-3">
                 <h4 class="fw-bold text-dark">Entrar</h4>
@@ -42,6 +45,10 @@
                     @error('password')
                         <small class="text-danger">{{ $message }}</small>
                     @enderror
+                </div>
+
+                <div class="text-end mb-3">
+                    <a href="{{ route('password.request') }}" class="small text-decoration-none fw-semibold">Esqueceu a senha?</a>
                 </div>
 
                 <div class="d-grid gap-2 mb-4">

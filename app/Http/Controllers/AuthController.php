@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Services\MailerooService;
 
 class AuthController extends Controller
 {
@@ -21,7 +22,7 @@ class AuthController extends Controller
         return view('auth.register-company');
     }
 
-    public function registerCompany(\Illuminate\Http\Request $request)
+    public function registerCompany(\Illuminate\Http\Request $request, MailerooService $maileroo)
     {
         $validated = $request->validate([
             'company_name' => 'required|string|max:255',
@@ -79,7 +80,12 @@ class AuthController extends Controller
 
         \Illuminate\Support\Facades\Auth::login($user);
 
-        return redirect()->route('company.dashboard')->with('success', 'Empresa registada com sucesso. Complete o perfil e publique a primeira vaga.');
+        $maileroo->sendCompanyVerification($user);
+
+        return redirect()->route('company.dashboard')->with(
+            'success',
+            'Empresa registada. Confirme o email e aguarde a aprovação da equipa Angola Emprego.'
+        );
     }
 
     public function login(Request $request)

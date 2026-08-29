@@ -28,6 +28,8 @@ class CompanyFactory extends Factory
             'phone' => fake()->numerify('9########'),
             'theme_color' => '#2557A7',
             'max_attachments' => 1,
+            'approval_status' => 'approved',
+            'approved_at' => now(),
         ];
     }
 }

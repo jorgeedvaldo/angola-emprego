@@ -33,6 +33,19 @@ class CompanyResource extends Resource
                     ->searchable()
                     ->required()
                     ->label('Conta'),
+                Forms\Components\Select::make('approval_status')
+                    ->label('Estado da aprovação')
+                    ->options([
+                        'pending' => 'Pendente',
+                        'approved' => 'Aprovada',
+                        'rejected' => 'Não aprovada',
+                    ])
+                    ->default('pending')
+                    ->required(),
+                Forms\Components\Textarea::make('approval_notes')
+                    ->label('Notas da aprovação')
+                    ->helperText('Estas notas são apresentadas à empresa quando o cadastro não é aprovado.')
+                    ->rows(3),
                 Forms\Components\TextInput::make('name')->required()->label('Nome'),
                 Forms\Components\TextInput::make('slug')->required()->unique(ignoreRecord: true),
                 Forms\Components\TextInput::make('headline')
@@ -74,11 +87,35 @@ class CompanyResource extends Resource
             ->columns([
                 Tables\Columns\ImageColumn::make('logo')->label('Logo'),
                 Tables\Columns\TextColumn::make('name')->searchable()->sortable()->label('Nome'),
+                Tables\Columns\BadgeColumn::make('approval_status')
+                    ->label('Aprovação')
+                    ->enum([
+                        'pending' => 'Pendente',
+                        'approved' => 'Aprovada',
+                        'rejected' => 'Não aprovada',
+                    ])
+                    ->colors([
+                        'warning' => 'pending',
+                        'success' => 'approved',
+                        'danger' => 'rejected',
+                    ]),
+                Tables\Columns\BooleanColumn::make('user.email_verified_at')
+                    ->label('Email confirmado')
+                    ->getStateUsing(fn ($record) => (bool) $record->user?->email_verified_at),
                 Tables\Columns\TextColumn::make('slug')
                     ->url(fn ($record) => url('/company/' . $record->slug))
                     ->openUrlInNewTab(),
                 Tables\Columns\TextColumn::make('user.email')->label('Conta'),
                 Tables\Columns\TextColumn::make('jobs_count')->counts('jobs')->label('Vagas'),
+            ])
+            ->filters([
+                Tables\Filters\SelectFilter::make('approval_status')
+                    ->label('Aprovação')
+                    ->options([
+                        'pending' => 'Pendente',
+                        'approved' => 'Aprovada',
+                        'rejected' => 'Não aprovada',
+                    ]),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

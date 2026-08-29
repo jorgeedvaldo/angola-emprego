@@ -27,13 +27,33 @@ class Company extends Model
         'facebook_url',
         'instagram_url',
         'max_attachments',
+        'approval_status',
+        'approval_notes',
+        'approved_at',
+        'approved_by',
     ];
 
     public const MAX_ATTACHMENTS_LIMIT = 10;
 
     protected $casts = [
         'max_attachments' => 'integer',
+        'approved_at' => 'datetime',
     ];
+
+    protected static function booted(): void
+    {
+        static::saving(function (Company $company) {
+            if ($company->isDirty('approval_status')) {
+                if ($company->approval_status === 'approved') {
+                    $company->approved_at = $company->approved_at ?: now();
+                    $company->approved_by = $company->approved_by ?: auth()->id();
+                } else {
+                    $company->approved_at = null;
+                    $company->approved_by = null;
+                }
+            }
+        });
+    }
 
     public function allowedAttachmentCount(): int
     {
@@ -42,9 +62,24 @@ class Company extends Model
         return max(1, min(self::MAX_ATTACHMENTS_LIMIT, $count));
     }
 
+    public function isApproved(): bool
+    {
+        return $this->approval_status === 'approved';
+    }
+
+    public function isPublic(): bool
+    {
+        return $this->isApproved() && (bool) $this->user?->hasVerifiedEmail();
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function approver()
+    {
+        return $this->belongsTo(User::class, 'approved_by');
     }
 
     public function jobs()

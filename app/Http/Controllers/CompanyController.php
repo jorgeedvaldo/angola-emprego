@@ -15,7 +15,9 @@ class CompanyController extends Controller
 {
     public function index()
     {
-        $companies = Company::withCount('jobs')
+        $companies = Company::where('approval_status', 'approved')
+            ->whereHas('user', fn ($query) => $query->whereNotNull('email_verified_at'))
+            ->withCount('jobs')
             ->orderBy('name')
             ->paginate(18);
 
@@ -24,7 +26,10 @@ class CompanyController extends Controller
 
     public function show(string $slug)
     {
-        $company = Company::where('slug', $slug)->firstOrFail();
+        $company = Company::where('slug', $slug)
+            ->where('approval_status', 'approved')
+            ->whereHas('user', fn ($query) => $query->whereNotNull('email_verified_at'))
+            ->firstOrFail();
         $jobs = $company->jobs()->orderByDesc('id')->paginate(10);
 
         return view('companies.show', compact('company', 'jobs'));
@@ -32,7 +37,10 @@ class CompanyController extends Controller
 
     public function showJob(string $slug, string $jobSlug)
     {
-        $company = Company::where('slug', $slug)->firstOrFail();
+        $company = Company::where('slug', $slug)
+            ->where('approval_status', 'approved')
+            ->whereHas('user', fn ($query) => $query->whereNotNull('email_verified_at'))
+            ->firstOrFail();
         $job = $company->jobs()->where('slug', $jobSlug)->firstOrFail();
 
         return view('companies.job', compact('company', 'job'));

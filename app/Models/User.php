@@ -11,7 +11,7 @@ use Illuminate\Support\Str;
 
 use Filament\Models\Contracts\FilamentUser;
 
-class User extends Authenticatable implements FilamentUser
+class User extends Authenticatable implements FilamentUser, MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable;
 

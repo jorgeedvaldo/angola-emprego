@@ -8,11 +8,21 @@
         <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
             <div>
                 <h1 class="fw-bold mb-1">Painel da Empresa</h1>
-                <p class="text-muted mb-0">Página pública: <a href="{{ url('/company/' . $company->slug) }}">{{ url('/company/' . $company->slug) }}</a></p>
+                @if($company->isPublic())
+                    <p class="text-muted mb-0">Página pública: <a href="{{ url('/company/' . $company->slug) }}">{{ url('/company/' . $company->slug) }}</a></p>
+                @else
+                    <p class="text-muted mb-0">A página ficará pública depois da confirmação do email e aprovação do cadastro.</p>
+                @endif
             </div>
-            <a href="{{ route('company.jobs.create') }}" class="btn btn-primary fw-bold" style="background-color: #2557a7; border-color: #2557a7;">
-                <i class="bi bi-plus-lg me-1"></i> Publicar vaga
-            </a>
+            @if($company->isPublic())
+                <a href="{{ route('company.jobs.create') }}" class="btn btn-primary fw-bold" style="background-color: #2557a7; border-color: #2557a7;">
+                    <i class="bi bi-plus-lg me-1"></i> Publicar vaga
+                </a>
+            @else
+                <button class="btn btn-secondary fw-bold" disabled title="Confirme o email e aguarde aprovação">
+                    <i class="bi bi-lock me-1"></i> Publicar vaga
+                </button>
+            @endif
         </div>
     </div>
 </div>
@@ -21,6 +31,33 @@
     <div class="container">
         @if(session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
+        @if(session('error'))
+            <div class="alert alert-danger">{{ session('error') }}</div>
+        @endif
+
+        @if(!auth()->user()->hasVerifiedEmail())
+            <div class="alert alert-warning d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+                <div>
+                    <strong>Confirme o email da empresa.</strong>
+                    Enviámos uma ligação para {{ auth()->user()->email }}.
+                </div>
+                <form method="POST" action="{{ route('verification.send') }}">
+                    @csrf
+                    <button type="submit" class="btn btn-sm btn-outline-dark text-nowrap">Reenviar email</button>
+                </form>
+            </div>
+        @endif
+
+        @if($company->approval_status === 'pending')
+            <div class="alert alert-info">
+                <strong>Cadastro em análise.</strong> A página e a publicação de vagas serão activadas após aprovação no painel administrativo.
+            </div>
+        @elseif($company->approval_status === 'rejected')
+            <div class="alert alert-danger">
+                <strong>Cadastro não aprovado.</strong>
+                {{ $company->approval_notes ?: 'Actualize os dados da empresa e contacte a equipa Angola Emprego.' }}
+            </div>
         @endif
 
         <div class="row g-4 mb-4">
@@ -43,8 +80,16 @@
             <div class="col-md-4">
                 <div class="card border-0 shadow-sm" style="border-radius: 12px;">
                     <div class="card-body">
-                        <div class="text-muted small">URL</div>
-                        <div class="fw-bold">/company/{{ $company->slug }}</div>
+                        <div class="text-muted small">Estado do cadastro</div>
+                        <div class="fw-bold">
+                            @if($company->approval_status === 'approved')
+                                <span class="text-success">Aprovado</span>
+                            @elseif($company->approval_status === 'rejected')
+                                <span class="text-danger">Não aprovado</span>
+                            @else
+                                <span class="text-warning">Em análise</span>
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>

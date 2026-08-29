@@ -360,7 +360,7 @@
               </li>
               @if(Auth::user()->isCompany())
               <li><a class="dropdown-item py-2" href="{{route('company.dashboard')}}"><i class="bi bi-building me-2"></i> Painel Empresa</a></li>
-              @if(Auth::user()->company)
+              @if(Auth::user()->company?->isPublic())
               <li><a class="dropdown-item py-2" href="{{ url('/company/' . Auth::user()->company->slug) }}"><i class="bi bi-box-arrow-up-right me-2"></i> Ver página</a></li>
               @endif
               @else

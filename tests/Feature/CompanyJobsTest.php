@@ -32,11 +32,18 @@ class CompanyJobsTest extends TestCase
         $this->assertDatabaseHas('companies', [
             'slug' => 'minha-empresa',
             'name' => 'Minha Empresa',
+            'approval_status' => 'pending',
         ]);
         $this->assertDatabaseHas('users', [
             'email' => 'empresa@example.com',
             'account_type' => 'company',
         ]);
+
+        $this->get('/company/minha-empresa')->assertNotFound();
+
+        $company = Company::where('slug', 'minha-empresa')->firstOrFail();
+        $company->user->markEmailAsVerified();
+        $company->update(['approval_status' => 'approved']);
 
         $this->get('/company/minha-empresa')
             ->assertOk()

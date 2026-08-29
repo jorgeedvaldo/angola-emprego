@@ -33,6 +33,7 @@ Route::get('/sobre', [AboutController::class, 'index'])->name('sobre');
 Route::get('/vagas', [JobController::class, 'index'])->name('vagas');
 Route::get('/empresas', [CompanyController::class, 'index'])->name('companies.index');
 Route::get('/company/{slug}', [CompanyController::class, 'show'])->name('companies.show')->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*');
+Route::get('/company/{slug}/vagas/{jobSlug}', [CompanyController::class, 'showJob'])->name('companies.job')->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*');
 Route::post('/vagas/{slug}/candidatar', [JobApplicationController::class, 'store'])->name('jobs.apply')->middleware('throttle:10,1');
 Route::get('/blog', [BlogController::class, 'index']);
 Route::get('/noticias', [BlogController::class, 'index']);

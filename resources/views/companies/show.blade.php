@@ -1,19 +1,15 @@
-@extends('templates.app')
-@section('title', $company->name)
-@section('description', Str::limit(strip_tags($company->headline ?: $company->description ?: $company->name . ' — vagas de emprego no Angola Emprego'), 160))
+@extends('templates.company')
+@section('title', 'Carreiras')
+@section('description', Str::limit(strip_tags($company->headline ?: $company->description ?: 'Vagas abertas na ' . $company->name), 160))
 @section('canonical_link', url('/company/' . $company->slug))
-@if($company->logo)
-@section('og_image', $company->logo_url)
-@endif
 
 @section('content')
 <section class="company-careers-hero">
     <div class="container py-4 py-lg-5">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb company-breadcrumb mb-4">
-                <li class="breadcrumb-item"><a href="{{ url('/') }}">Início</a></li>
-                <li class="breadcrumb-item"><a href="{{ route('companies.index') }}">Empresas</a></li>
-                <li class="breadcrumb-item active" aria-current="page">{{ $company->name }}</li>
+                <li class="breadcrumb-item"><a href="{{ route('companies.show', $company->slug) }}">{{ $company->name }}</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Carreiras</li>
             </ol>
         </nav>
 
@@ -114,7 +110,7 @@
         </div>
 
         @forelse($jobs as $job)
-            <a href="{{ url('/vagas/' . $job->slug) }}" class="company-job-card">
+            <a href="{{ route('companies.job', [$company->slug, $job->slug]) }}" class="company-job-card">
                 <div>
                     <h5 class="fw-bold mb-2">{{ $job->title }}</h5>
                     <div class="company-job-meta">

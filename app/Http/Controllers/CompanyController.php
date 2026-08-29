@@ -30,6 +30,14 @@ class CompanyController extends Controller
         return view('companies.show', compact('company', 'jobs'));
     }
 
+    public function showJob(string $slug, string $jobSlug)
+    {
+        $company = Company::where('slug', $slug)->firstOrFail();
+        $job = $company->jobs()->where('slug', $jobSlug)->firstOrFail();
+
+        return view('companies.job', compact('company', 'job'));
+    }
+
     public function dashboard()
     {
         $company = Auth::user()->company;

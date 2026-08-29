@@ -107,8 +107,6 @@ class CompanyJobsTest extends TestCase
 
         $this->get('/company/minha-empresa')
             ->assertOk()
-            ->assertSee('Início')
-            ->assertSee('Empresas')
             ->assertSee('Construa o futuro connosco')
             ->assertSee('Sobre a Minha Empresa')
             ->assertSee('Somos uma empresa angolana focada em tecnologia e pessoas.')
@@ -116,6 +114,56 @@ class CompanyJobsTest extends TestCase
             ->assertSee('https://www.linkedin.com/company/minha-empresa', false)
             ->assertSee('https://www.facebook.com/minhaempresa', false)
             ->assertSee('https://www.instagram.com/minhaempresa', false);
+    }
+
+    public function test_public_company_pages_drop_the_marketplace_chrome()
+    {
+        $company = Company::factory()->create([
+            'name' => 'Minha Empresa',
+            'slug' => 'minha-empresa',
+            'headline' => 'Construa o futuro connosco',
+            'linkedin_url' => 'https://www.linkedin.com/company/minha-empresa',
+            'instagram_url' => 'https://www.instagram.com/minhaempresa',
+        ]);
+
+        $job = Job::factory()->create([
+            'company_id' => $company->id,
+            'company' => $company->name,
+            'title' => 'Engenheiro de Software',
+        ]);
+
+        $careersPage = $this->get(route('companies.show', $company->slug))->assertOk();
+
+        $careersPage
+            ->assertDontSee('Angola Emprego')
+            ->assertDontSee('assets/img/logo.svg')
+            ->assertDontSee(route('courses.index'))
+            ->assertSee('Carreiras')
+            ->assertSee('company-nav')
+            ->assertSee('https://www.linkedin.com/company/minha-empresa', false)
+            ->assertSee(route('companies.job', [$company->slug, $job->slug]), false);
+
+        $this->get(route('companies.job', [$company->slug, $job->slug]))
+            ->assertOk()
+            ->assertDontSee('Angola Emprego')
+            ->assertSee('Engenheiro de Software')
+            ->assertSee('Enviar candidatura')
+            ->assertSee('Assunto')
+            ->assertSee($company->name);
+    }
+
+    public function test_company_job_page_is_scoped_to_its_own_company()
+    {
+        $company = Company::factory()->create(['slug' => 'minha-empresa']);
+        $otherCompany = Company::factory()->create(['slug' => 'outra-empresa']);
+
+        $job = Job::factory()->create([
+            'company_id' => $otherCompany->id,
+            'company' => $otherCompany->name,
+        ]);
+
+        $this->get(route('companies.job', ['minha-empresa', $job->slug]))
+            ->assertNotFound();
     }
 
     public function test_candidate_can_apply_with_subject_message_and_cv()

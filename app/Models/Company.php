@@ -17,6 +17,8 @@ class Company extends Model
         'headline',
         'description',
         'logo',
+        'cover_image',
+        'theme_color',
         'website',
         'location',
         'email',
@@ -55,6 +57,18 @@ class Company extends Model
         return $this->logo ? asset('storage/' . $this->logo) : null;
     }
 
+    public function getCoverImageUrlAttribute(): ?string
+    {
+        return $this->cover_image ? asset('storage/' . $this->cover_image) : null;
+    }
+
+    public function getThemeColorAttribute(?string $value): string
+    {
+        return $value && preg_match('/^#[0-9A-Fa-f]{6}$/', $value)
+            ? strtoupper($value)
+            : '#2557A7';
+    }
+
     public function getPublicUrlAttribute(): string
     {
         return url('/company/' . $this->slug);
@@ -73,7 +87,7 @@ class Company extends Model
         $initial = strtoupper(mb_substr($this->name, 0, 1));
 
         $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">'
-            . '<rect width="64" height="64" rx="14" fill="#2557a7"/>'
+            . '<rect width="64" height="64" rx="14" fill="' . $this->theme_color . '"/>'
             . '<text x="50%" y="50%" dy=".35em" text-anchor="middle" fill="#ffffff"'
             . ' font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="bold">'
             . e($initial) . '</text></svg>';

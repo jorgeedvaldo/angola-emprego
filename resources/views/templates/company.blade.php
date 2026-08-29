@@ -38,6 +38,10 @@
   @yield('head-scripts')
 
   <style>
+    :root {
+      --company-primary: {{ $company->theme_color }};
+    }
+
     body {
       font-family: 'Open Sans', system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
       color: #2d2d2d;
@@ -81,7 +85,7 @@
     .company-nav-logo span {
       font-weight: 800;
       font-size: 1.2rem;
-      color: #2557a7;
+      color: var(--company-primary);
     }
 
     .company-nav-name {
@@ -106,15 +110,15 @@
       height: 38px;
       border-radius: 50%;
       border: 1px solid #dfe5ee;
-      color: #2557a7;
+      color: var(--company-primary);
       font-size: 1rem;
       text-decoration: none;
       transition: .2s ease;
     }
 
     .company-nav-social:hover {
-      background: #2557a7;
-      border-color: #2557a7;
+      background: var(--company-primary);
+      border-color: var(--company-primary);
       color: #fff;
       transform: translateY(-2px);
     }
@@ -122,7 +126,7 @@
     .company-nav-cta {
       font-weight: 700;
       font-size: .9rem;
-      color: #2557a7;
+      color: var(--company-primary);
       border: 1px solid #cadaf1;
       border-radius: 50px;
       padding: 8px 18px;

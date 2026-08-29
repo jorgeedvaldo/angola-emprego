@@ -32,8 +32,14 @@ class AuthController extends Controller
             'password' => 'required|string|min:8|confirmed',
             'location' => 'nullable|string|max:255',
             'website' => 'nullable|url|max:255',
+            'theme_color' => ['nullable', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
         ], [
             'slug.regex' => 'O URL da página deve conter apenas letras minúsculas, números e hífens.',
+            'theme_color.regex' => 'Seleccione uma cor válida.',
+            'logo.max' => 'O logótipo não pode ultrapassar 2 MB.',
+            'cover_image.max' => 'A foto de capa não pode ultrapassar 5 MB.',
         ]);
 
         $user = \App\Models\User::create([
@@ -51,6 +57,13 @@ class AuthController extends Controller
         $slugSource = $validated['slug'] ?? $validated['company_name'];
         $slug = \App\Models\Company::generateUniqueSlug($slugSource);
 
+        $logo = $request->hasFile('logo')
+            ? $request->file('logo')->store('images/companies/logos', 'public')
+            : null;
+        $coverImage = $request->hasFile('cover_image')
+            ? $request->file('cover_image')->store('images/companies/covers', 'public')
+            : null;
+
         \App\Models\Company::create([
             'user_id' => $user->id,
             'name' => $validated['company_name'],
@@ -59,6 +72,9 @@ class AuthController extends Controller
             'phone' => $validated['mobile'],
             'location' => $validated['location'] ?? null,
             'website' => $validated['website'] ?? null,
+            'theme_color' => strtoupper($validated['theme_color'] ?? '#2557A7'),
+            'logo' => $logo,
+            'cover_image' => $coverImage,
         ]);
 
         \Illuminate\Support\Facades\Auth::login($user);

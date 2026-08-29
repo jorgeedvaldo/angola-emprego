@@ -32,7 +32,7 @@
 @endsection
 
 @section('content')
-<section class="company-job-hero">
+<section class="company-job-hero" @if($company->cover_image) style="background-image: linear-gradient(90deg, rgba(8, 22, 43, .9) 0%, rgba(8, 22, 43, .68) 100%), url('{{ $company->cover_image_url }}');" @endif>
     <div class="container py-4 py-lg-5">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb company-breadcrumb mb-4">
@@ -121,7 +121,7 @@
                                 @error('attachments.*')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                             </div>
                             <div class="col-12">
-                                <button type="submit" class="btn btn-primary fw-bold px-4" style="background-color: #2557a7; border-color: #2557a7;">
+                                <button type="submit" class="btn btn-primary fw-bold px-4" style="background-color: var(--company-primary); border-color: var(--company-primary);">
                                     <i class="bi bi-send me-1"></i> Enviar candidatura
                                 </button>
                             </div>
@@ -148,7 +148,10 @@
 <style>
     .company-job-hero {
         color: #fff;
-        background: linear-gradient(135deg, #173c78 0%, #2557a7 55%, #3575ce 100%);
+        background-color: var(--company-primary);
+        background-image: linear-gradient(135deg, rgba(8, 22, 43, .42) 0%, transparent 70%);
+        background-size: cover;
+        background-position: center;
     }
     .company-breadcrumb a { color: rgba(255,255,255,.78); text-decoration: none; }
     .company-breadcrumb .active { color: #fff; }

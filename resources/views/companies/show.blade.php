@@ -4,7 +4,7 @@
 @section('canonical_link', url('/company/' . $company->slug))
 
 @section('content')
-<section class="company-careers-hero">
+<section class="company-careers-hero" @if($company->cover_image) style="background-image: linear-gradient(90deg, rgba(8, 22, 43, .88) 0%, rgba(8, 22, 43, .72) 55%, rgba(8, 22, 43, .48) 100%), url('{{ $company->cover_image_url }}');" @endif>
     <div class="container py-4 py-lg-5">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb company-breadcrumb mb-4">
@@ -135,7 +135,10 @@
 <style>
     .company-careers-hero {
         color: #fff;
-        background: linear-gradient(135deg, #173c78 0%, #2557a7 55%, #3575ce 100%);
+        background-color: var(--company-primary);
+        background-image: linear-gradient(135deg, rgba(8, 22, 43, .42) 0%, transparent 65%, rgba(255,255,255,.14) 100%);
+        background-size: cover;
+        background-position: center;
         position: relative;
         overflow: hidden;
     }
@@ -166,7 +169,7 @@
         overflow: hidden;
     }
     .company-logo-wrap img { width: 100%; height: 100%; object-fit: contain; padding: 12px; }
-    .company-logo-wrap span { color: #2557a7; font-size: 2.4rem; font-weight: 800; }
+    .company-logo-wrap span { color: var(--company-primary); font-size: 2.4rem; font-weight: 800; }
     .company-eyebrow, .company-section-label {
         text-transform: uppercase;
         letter-spacing: .12em;
@@ -174,7 +177,7 @@
         font-weight: 800;
     }
     .company-eyebrow { color: #cde0ff; }
-    .company-section-label { color: #2557a7; }
+    .company-section-label { color: var(--company-primary); }
     .company-meta { color: rgba(255,255,255,.82); font-size: .95rem; }
     .company-meta span, .company-job-meta span { display: inline-flex; align-items: center; gap: .4rem; }
     .company-about { color: #505967; font-size: 1.06rem; line-height: 1.85; white-space: normal; }
@@ -193,7 +196,7 @@
         padding: .55rem 0;
         word-break: break-word;
     }
-    .company-contact-link:hover { color: #2557a7; }
+    .company-contact-link:hover { color: var(--company-primary); }
     .company-social-link {
         width: 42px;
         height: 42px;
@@ -201,13 +204,13 @@
         align-items: center;
         justify-content: center;
         border-radius: 50%;
-        color: #2557a7;
+        color: var(--company-primary);
         background: #fff;
         border: 1px solid #dce3ed;
         font-size: 1.1rem;
         transition: .2s ease;
     }
-    .company-social-link:hover { color: #fff; background: #2557a7; transform: translateY(-2px); }
+    .company-social-link:hover { color: #fff; background: var(--company-primary); transform: translateY(-2px); }
     .company-jobs-section { background: #f5f7fa; }
     .company-job-card {
         display: flex;
@@ -224,7 +227,7 @@
         transition: .2s ease;
     }
     .company-job-card:hover {
-        color: #2557a7;
+        color: var(--company-primary);
         border-color: #aac4ec;
         box-shadow: 0 10px 28px rgba(37,87,167,.09);
         transform: translateY(-2px);

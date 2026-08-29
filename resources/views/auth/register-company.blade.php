@@ -13,7 +13,7 @@
                 <p class="text-muted small mb-0">Crie a página da empresa e publique as suas vagas.</p>
             </div>
 
-            <form method="POST" action="{{ route('register.company') }}">
+            <form method="POST" action="{{ route('register.company') }}" enctype="multipart/form-data">
                 @csrf
 
                 <div class="form-floating mb-3">
@@ -68,6 +68,36 @@
                     @error('website')
                         <small class="text-danger">{{ $message }}</small>
                     @enderror
+                </div>
+
+                <div class="card bg-light border mb-3">
+                    <div class="card-body">
+                        <h6 class="fw-bold mb-3">Identidade visual da página</h6>
+
+                        <div class="mb-3">
+                            <label for="theme_color" class="form-label fw-semibold">Cor do tema</label>
+                            <div class="d-flex align-items-center gap-3">
+                                <input type="color" class="form-control form-control-color @error('theme_color') is-invalid @enderror" id="theme_color" name="theme_color" value="{{ old('theme_color', '#2557A7') }}" title="Escolher cor do tema">
+                                <span class="small text-muted">Será aplicada no cabeçalho, botões e destaques da careers page.</span>
+                            </div>
+                            @error('theme_color')<div class="text-danger small">{{ $message }}</div>@enderror
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="logo" class="form-label fw-semibold">Logótipo</label>
+                                <input type="file" class="form-control @error('logo') is-invalid @enderror" id="logo" name="logo" accept="image/jpeg,image/png,image/webp">
+                                <small class="text-muted">PNG, JPG ou WebP; até 2 MB.</small>
+                                @error('logo')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
+                            <div class="col-md-6">
+                                <label for="cover_image" class="form-label fw-semibold">Foto de capa</label>
+                                <input type="file" class="form-control @error('cover_image') is-invalid @enderror" id="cover_image" name="cover_image" accept="image/jpeg,image/png,image/webp">
+                                <small class="text-muted">Imagem horizontal; até 5 MB.</small>
+                                @error('cover_image')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-floating mb-3">

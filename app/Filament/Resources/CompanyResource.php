@@ -46,6 +46,10 @@ class CompanyResource extends Resource
                 Forms\Components\TextInput::make('linkedin_url')->url()->label('LinkedIn'),
                 Forms\Components\TextInput::make('facebook_url')->url()->label('Facebook'),
                 Forms\Components\TextInput::make('instagram_url')->url()->label('Instagram'),
+                Forms\Components\ColorPicker::make('theme_color')
+                    ->default('#2557A7')
+                    ->required()
+                    ->label('Cor do tema'),
                 Forms\Components\TextInput::make('max_attachments')
                     ->numeric()
                     ->minValue(1)
@@ -54,9 +58,13 @@ class CompanyResource extends Resource
                     ->required()
                     ->label('Máximo de anexos por candidatura'),
                 Forms\Components\FileUpload::make('logo')
-                    ->directory('images/companies')
+                    ->directory('images/companies/logos')
                     ->image()
                     ->label('Logótipo'),
+                Forms\Components\FileUpload::make('cover_image')
+                    ->directory('images/companies/covers')
+                    ->image()
+                    ->label('Foto de capa'),
             ]);
     }
 

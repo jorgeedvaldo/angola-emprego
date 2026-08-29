@@ -70,10 +70,14 @@ class CompanyController extends Controller
             'facebook_url' => 'nullable|url|max:255',
             'instagram_url' => 'nullable|url|max:255',
             'max_attachments' => 'required|integer|min:1|max:' . Company::MAX_ATTACHMENTS_LIMIT,
+            'theme_color' => ['nullable', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
         ], [
             'slug.regex' => 'O URL da página deve conter apenas letras minúsculas, números e hífens.',
             'slug.unique' => 'Este URL já está a ser usado por outra empresa.',
+            'theme_color.regex' => 'Seleccione uma cor válida.',
+            'cover_image.max' => 'A foto de capa não pode ultrapassar 5 MB.',
         ]);
 
         if ($request->hasFile('logo')) {
@@ -83,6 +87,21 @@ class CompanyController extends Controller
             $validated['logo'] = $request->file('logo')->store('images/companies', 'public');
         } else {
             unset($validated['logo']);
+        }
+
+        if ($request->hasFile('cover_image')) {
+            if ($company->cover_image) {
+                Storage::disk('public')->delete($company->cover_image);
+            }
+            $validated['cover_image'] = $request->file('cover_image')->store('images/companies/covers', 'public');
+        } else {
+            unset($validated['cover_image']);
+        }
+
+        if (!empty($validated['theme_color'])) {
+            $validated['theme_color'] = strtoupper($validated['theme_color']);
+        } else {
+            unset($validated['theme_color']);
         }
 
         $company->update($validated);

@@ -43,6 +43,65 @@ class CompanyJobsTest extends TestCase
             ->assertSee('Minha Empresa');
     }
 
+    public function test_company_can_choose_theme_logo_and_cover_during_registration()
+    {
+        Storage::fake('public');
+
+        $this->get(route('register.company'))
+            ->assertOk()
+            ->assertSee('Cor do tema')
+            ->assertSee('Logótipo')
+            ->assertSee('Foto de capa');
+
+        $this->post(route('register.company'), [
+            'company_name' => 'Empresa Verde',
+            'slug' => 'empresa-verde',
+            'name' => 'Ana Silva',
+            'mobile' => '923000001',
+            'email' => 'verde@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+            'theme_color' => '#169B62',
+            'logo' => UploadedFile::fake()->image('logo.png', 300, 300),
+            'cover_image' => UploadedFile::fake()->image('capa.jpg', 1600, 600),
+        ])->assertRedirect(route('company.dashboard'));
+
+        $company = Company::where('slug', 'empresa-verde')->firstOrFail();
+
+        $this->assertSame('#169B62', $company->theme_color);
+        Storage::disk('public')->assertExists($company->logo);
+        Storage::disk('public')->assertExists($company->cover_image);
+    }
+
+    public function test_company_can_update_theme_logo_and_cover()
+    {
+        Storage::fake('public');
+
+        $company = Company::factory()->create();
+
+        $this->actingAs($company->user)
+            ->put(route('company.update'), [
+                'name' => $company->name,
+                'slug' => $company->slug,
+                'max_attachments' => 1,
+                'theme_color' => '#C13B5A',
+                'logo' => UploadedFile::fake()->image('novo-logo.webp', 300, 300),
+                'cover_image' => UploadedFile::fake()->image('nova-capa.webp', 1600, 600),
+            ])
+            ->assertRedirect();
+
+        $company->refresh();
+
+        $this->assertSame('#C13B5A', $company->theme_color);
+        Storage::disk('public')->assertExists($company->logo);
+        Storage::disk('public')->assertExists($company->cover_image);
+
+        $this->get(route('companies.show', $company->slug))
+            ->assertOk()
+            ->assertSee('--company-primary: #C13B5A', false)
+            ->assertSee($company->cover_image_url, false);
+    }
+
     public function test_company_can_publish_a_job()
     {
         $company = Company::factory()->create([

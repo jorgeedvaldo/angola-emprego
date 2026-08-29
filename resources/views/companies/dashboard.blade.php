@@ -136,12 +136,37 @@
                                 @error('max_attachments')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                             </div>
 
+                            <div class="border-top pt-3 mt-4">
+                                <h6 class="fw-bold mb-3">Identidade visual</h6>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Cor do tema</label>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <input type="color" name="theme_color" class="form-control form-control-color @error('theme_color') is-invalid @enderror" value="{{ old('theme_color', $company->theme_color) }}" title="Escolher cor do tema">
+                                        <span class="small text-muted">{{ $company->theme_color }}</span>
+                                    </div>
+                                    @error('theme_color')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                                </div>
+                            </div>
+
                             <div class="mb-3">
                                 <label class="form-label fw-semibold">Logótipo</label>
                                 @if($company->logo)
                                     <div class="mb-2"><img src="{{ $company->logo_url }}" alt="" style="max-height: 64px;"></div>
                                 @endif
                                 <input type="file" name="logo" class="form-control" accept="image/*">
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Foto de capa</label>
+                                @if($company->cover_image)
+                                    <div class="mb-2">
+                                        <img src="{{ $company->cover_image_url }}" alt="Capa actual" class="img-fluid rounded border" style="max-height: 120px; width: 100%; object-fit: cover;">
+                                    </div>
+                                @endif
+                                <input type="file" name="cover_image" class="form-control @error('cover_image') is-invalid @enderror" accept="image/jpeg,image/png,image/webp">
+                                <small class="text-muted">Recomendado: imagem horizontal com pelo menos 1600×600 px. Máximo 5 MB.</small>
+                                @error('cover_image')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
 
                             <button type="submit" class="btn btn-primary fw-bold w-100" style="background-color: #2557a7; border-color: #2557a7;">Guardar página</button>

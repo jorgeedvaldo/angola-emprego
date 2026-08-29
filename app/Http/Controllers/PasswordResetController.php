@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Services\MailerooService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
@@ -49,20 +50,31 @@ class PasswordResetController extends Controller
             'password' => 'required|string|min:8|confirmed',
         ]);
 
+        $resetUser = null;
+
         $status = Password::broker()->reset(
             $validated,
-            function (User $user, string $password) {
+            function (User $user, string $password) use (&$resetUser) {
                 $user->forceFill([
                     'password' => Hash::make($password),
                     'remember_token' => Str::random(60),
                 ])->save();
+
+                $resetUser = $user;
             }
         );
 
-        if ($status !== Password::PASSWORD_RESET) {
+        if ($status !== Password::PASSWORD_RESET || !$resetUser) {
             return back()->withErrors(['email' => __($status)]);
         }
 
-        return redirect()->route('login')->with('status', 'Senha redefinida. Já pode entrar.');
+        Auth::login($resetUser);
+        $request->session()->regenerate();
+
+        $destination = $resetUser->isCompany()
+            ? route('company.dashboard')
+            : route('home');
+
+        return redirect($destination)->with('status', 'Senha redefinida. Já está autenticado.');
     }
 }

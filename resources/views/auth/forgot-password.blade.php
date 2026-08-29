@@ -10,7 +10,7 @@
             <div class="text-center mb-4">
                 <img src="{{ asset('assets/img/logo.svg') }}" alt="Angola Emprego" height="40" class="mb-3">
                 <h4 class="fw-bold text-dark">Recuperar senha</h4>
-                <p class="text-muted small">Enviaremos uma ligação segura para o seu email através do Maileroo.</p>
+                <p class="text-muted small">Candidatos e empresas podem recuperar a senha com o email da conta. Enviaremos uma ligação segura.</p>
             </div>
 
             @if(session('status'))
@@ -20,7 +20,7 @@
             <form method="POST" action="{{ route('password.email') }}">
                 @csrf
                 <div class="form-floating mb-4">
-                    <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" placeholder="nome@empresa.com" value="{{ old('email') }}" required autofocus>
+                    <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" placeholder="nome@exemplo.com" value="{{ old('email') }}" required autofocus>
                     <label for="email">Email</label>
                     @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>

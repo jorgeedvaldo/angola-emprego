@@ -80,6 +80,7 @@ class MailerooService
                     'tags' => [
                         'type' => $tag,
                         'user_id' => (string) $user->id,
+                        'account_type' => $user->account_type ?? 'candidate',
                     ],
                 ]);
 

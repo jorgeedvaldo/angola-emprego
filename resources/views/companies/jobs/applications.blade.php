@@ -25,9 +25,19 @@
                     </div>
                     <p class="fw-semibold mb-1">Assunto: {{ $application->subject }}</p>
                     <p class="mb-3">{{ $application->message }}</p>
-                    <a href="{{ route('company.applications.download', $application) }}" class="btn btn-sm btn-outline-primary">
-                        <i class="bi bi-download me-1"></i> Descarregar CV ({{ $application->attachment_name }})
-                    </a>
+                    <div class="d-flex flex-wrap gap-2">
+                        @foreach($application->attachmentList() as $file)
+                            @if($file->id)
+                                <a href="{{ route('company.attachments.download', $file) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-download me-1"></i> {{ $file->original_name ?: 'Anexo' }}
+                                </a>
+                            @else
+                                <a href="{{ route('company.applications.download', $application) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-download me-1"></i> {{ $file->original_name ?: 'Anexo' }}
+                                </a>
+                            @endif
+                        @endforeach
+                    </div>
                 </div>
             </div>
         @empty

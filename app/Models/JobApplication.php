@@ -31,4 +31,29 @@ class JobApplication extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function files()
+    {
+        return $this->hasMany(JobApplicationAttachment::class);
+    }
+
+    public function attachmentList()
+    {
+        $files = $this->relationLoaded('files') ? $this->files : $this->files()->get();
+
+        if ($files->isNotEmpty()) {
+            return $files;
+        }
+
+        if ($this->attachment_path) {
+            return collect([
+                new JobApplicationAttachment([
+                    'path' => $this->attachment_path,
+                    'original_name' => $this->attachment_name,
+                ]),
+            ]);
+        }
+
+        return collect();
+    }
 }

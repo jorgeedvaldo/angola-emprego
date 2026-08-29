@@ -96,6 +96,7 @@ class CompanyJobsTest extends TestCase
             'subject' => 'Candidatura a Analista de RH',
             'message' => 'Gostaria de me candidatar a esta vaga.',
             'attachment' => $file,
+            'attachments' => [$file],
         ])->assertRedirect();
 
         $this->assertDatabaseHas('job_applications', [
@@ -106,6 +107,7 @@ class CompanyJobsTest extends TestCase
 
         $application = JobApplication::first();
         Storage::disk('local')->assertExists($application->attachment_path);
+        $this->assertDatabaseCount('job_application_attachments', 1);
 
         $this->actingAs($company->user)
             ->get(route('company.jobs.applications', $job))
@@ -135,5 +137,76 @@ class CompanyJobsTest extends TestCase
             ->assertOk()
             ->assertDontSee('Enviar candidatura')
             ->assertSee('mailto:rh@empresa.ao');
+    }
+
+    public function test_company_can_set_max_attachments_and_candidates_must_respect_it()
+    {
+        Storage::fake('local');
+
+        $company = Company::factory()->create([
+            'slug' => 'minha-empresa',
+            'max_attachments' => 1,
+        ]);
+
+        $this->actingAs($company->user)
+            ->put(route('company.update'), [
+                'name' => $company->name,
+                'slug' => $company->slug,
+                'max_attachments' => 3,
+            ])
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('companies', [
+            'id' => $company->id,
+            'max_attachments' => 3,
+        ]);
+
+        $job = Job::factory()->create([
+            'company_id' => $company->id,
+            'company' => $company->name,
+        ]);
+
+        $this->get('/vagas/' . $job->slug)
+            ->assertOk()
+            ->assertSee('até')
+            ->assertSee('3');
+
+        $tooMany = [
+            UploadedFile::fake()->create('cv.pdf', 80, 'application/pdf'),
+            UploadedFile::fake()->create('certificado.pdf', 80, 'application/pdf'),
+            UploadedFile::fake()->create('carta.pdf', 80, 'application/pdf'),
+            UploadedFile::fake()->create('extra.pdf', 80, 'application/pdf'),
+        ];
+
+        $this->post(route('jobs.apply', $job->slug), [
+            'name' => 'João Candidato',
+            'email' => 'joao2@example.com',
+            'subject' => 'Candidatura',
+            'message' => 'Segue o meu CV e documentos.',
+            'attachments' => $tooMany,
+        ])->assertSessionHasErrors('attachments');
+
+        $allowed = [
+            UploadedFile::fake()->create('cv.pdf', 80, 'application/pdf'),
+            UploadedFile::fake()->create('certificado.pdf', 80, 'application/pdf'),
+            UploadedFile::fake()->create('carta.pdf', 80, 'application/pdf'),
+        ];
+
+        $this->post(route('jobs.apply', $job->slug), [
+            'name' => 'João Candidato',
+            'email' => 'joao2@example.com',
+            'subject' => 'Candidatura',
+            'message' => 'Segue o meu CV e documentos.',
+            'attachments' => $allowed,
+        ])->assertRedirect();
+
+        $this->assertDatabaseCount('job_application_attachments', 3);
+
+        $this->actingAs($company->user)
+            ->get(route('company.jobs.applications', $job))
+            ->assertOk()
+            ->assertSee('cv.pdf')
+            ->assertSee('certificado.pdf')
+            ->assertSee('carta.pdf');
     }
 }

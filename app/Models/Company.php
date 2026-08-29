@@ -20,7 +20,21 @@ class Company extends Model
         'location',
         'email',
         'phone',
+        'max_attachments',
     ];
+
+    public const MAX_ATTACHMENTS_LIMIT = 10;
+
+    protected $casts = [
+        'max_attachments' => 'integer',
+    ];
+
+    public function allowedAttachmentCount(): int
+    {
+        $count = (int) ($this->max_attachments ?: 1);
+
+        return max(1, min(self::MAX_ATTACHMENTS_LIMIT, $count));
+    }
 
     public function user()
     {

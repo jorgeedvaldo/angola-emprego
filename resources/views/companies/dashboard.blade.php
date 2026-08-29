@@ -100,6 +100,13 @@
                             </div>
 
                             <div class="mb-3">
+                                <label class="form-label fw-semibold">Anexos por candidatura</label>
+                                <input type="number" name="max_attachments" class="form-control @error('max_attachments') is-invalid @enderror" min="1" max="{{ \App\Models\Company::MAX_ATTACHMENTS_LIMIT }}" value="{{ old('max_attachments', $company->max_attachments ?? 1) }}" required>
+                                <small class="text-muted">Quantos ficheiros o candidato pode enviar (CV, certificados, etc.). Máximo {{ \App\Models\Company::MAX_ATTACHMENTS_LIMIT }}.</small>
+                                @error('max_attachments')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                            </div>
+
+                            <div class="mb-3">
                                 <label class="form-label fw-semibold">Logótipo</label>
                                 @if($company->logo)
                                     <div class="mb-2"><img src="{{ $company->logo_url }}" alt="" style="max-height: 64px;"></div>

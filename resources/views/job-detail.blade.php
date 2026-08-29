@@ -133,9 +133,16 @@
           </div>
 
           @if($job->acceptsOnlineApplications())
+          @php
+            $maxAttachments = $job->companyRecord?->allowedAttachmentCount() ?? 1;
+          @endphp
           <div id="candidatura" class="bg-white p-4 rounded-3 shadow-sm border mb-4">
             <h4 class="fw-bold mb-3 border-bottom pb-2">Enviar candidatura</h4>
-            <p class="text-muted small">Preencha o assunto, a mensagem e anexe o seu CV (PDF, DOC ou DOCX, até 5 MB).</p>
+            <p class="text-muted small">
+              Preencha o assunto, a mensagem e anexe até <strong>{{ $maxAttachments }}</strong>
+              {{ $maxAttachments === 1 ? 'ficheiro' : 'ficheiros' }}
+              (PDF, DOC ou DOCX, até 5 MB cada).
+            </p>
 
             @if(session('success'))
               <div class="alert alert-success">{{ session('success') }}</div>
@@ -172,9 +179,19 @@
                   @error('message')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
                 <div class="col-12">
-                  <label class="form-label fw-semibold">Anexo (CV)</label>
-                  <input type="file" name="attachment" class="form-control @error('attachment') is-invalid @enderror" accept=".pdf,.doc,.docx,application/pdf" required>
-                  @error('attachment')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                  <label class="form-label fw-semibold">Anexos</label>
+                  @for($i = 0; $i < $maxAttachments; $i++)
+                    <input type="file"
+                      name="attachments[]"
+                      class="form-control mb-2 @error('attachments') is-invalid @enderror @error('attachments.'.$i) is-invalid @enderror"
+                      accept=".pdf,.doc,.docx,application/pdf"
+                      @if($i === 0) required @endif>
+                    <small class="text-muted d-block mb-2">
+                      {{ $i === 0 ? 'Obrigatório (CV)' : 'Opcional (certificado, carta, etc.)' }}
+                    </small>
+                  @endfor
+                  @error('attachments')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                  @error('attachments.*')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
                 </div>
                 <div class="col-12">
                   <button type="submit" class="btn btn-primary fw-bold" style="background-color: #2557a7; border-color: #2557a7;">

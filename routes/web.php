@@ -72,6 +72,7 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/vagas/{job}', [CompanyController::class, 'destroyJob'])->name('jobs.destroy');
         Route::get('/vagas/{job}/candidaturas', [CompanyController::class, 'applications'])->name('jobs.applications');
         Route::get('/candidaturas/{application}/cv', [CompanyController::class, 'downloadApplicationAttachment'])->name('applications.download');
+        Route::get('/anexos/{attachment}', [CompanyController::class, 'downloadAttachment'])->name('attachments.download');
     });
 
     // Profile & Recommendations

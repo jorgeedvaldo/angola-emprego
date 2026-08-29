@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Company;
 use App\Models\Job;
+use App\Models\JobApplication;
+use App\Models\JobApplicationAttachment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -55,6 +57,7 @@ class CompanyController extends Controller
             'website' => 'nullable|url|max:255',
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:20',
+            'max_attachments' => 'required|integer|min:1|max:' . Company::MAX_ATTACHMENTS_LIMIT,
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ], [
             'slug.regex' => 'O URL da página deve conter apenas letras minúsculas, números e hífens.',
@@ -163,23 +166,39 @@ class CompanyController extends Controller
     {
         $this->authorizeJob($job);
         $company = Auth::user()->company;
-        $applications = $job->applications()->orderByDesc('id')->paginate(20);
+        $applications = $job->applications()->with('files')->orderByDesc('id')->paginate(20);
 
         return view('companies.jobs.applications', compact('company', 'job', 'applications'));
     }
 
-    public function downloadApplicationAttachment(\App\Models\JobApplication $application)
+    public function downloadApplicationAttachment(JobApplication $application)
     {
         $job = $application->job;
         $this->authorizeJob($job);
 
-        if (!Storage::disk('local')->exists($application->attachment_path)) {
+        $file = $application->files()->first();
+        $path = $file?->path ?? $application->attachment_path;
+        $downloadName = $file?->original_name ?: ($application->attachment_name ?: basename((string) $path));
+
+        if (!$path || !Storage::disk('local')->exists($path)) {
             abort(404);
         }
 
-        $downloadName = $application->attachment_name ?: basename($application->attachment_path);
+        return Storage::disk('local')->download($path, $downloadName);
+    }
 
-        return Storage::disk('local')->download($application->attachment_path, $downloadName);
+    public function downloadAttachment(JobApplicationAttachment $attachment)
+    {
+        $job = $attachment->application->job;
+        $this->authorizeJob($job);
+
+        if (!Storage::disk('local')->exists($attachment->path)) {
+            abort(404);
+        }
+
+        $downloadName = $attachment->original_name ?: basename($attachment->path);
+
+        return Storage::disk('local')->download($attachment->path, $downloadName);
     }
 
     private function authorizeJob(Job $job): void

@@ -26,6 +26,7 @@ class CompanyFactory extends Factory
             'location' => 'Luanda',
             'email' => fake()->companyEmail(),
             'phone' => fake()->numerify('9########'),
+            'max_attachments' => 1,
         ];
     }
 }

@@ -40,6 +40,13 @@ class CompanyResource extends Resource
                 Forms\Components\TextInput::make('website')->url()->label('Website'),
                 Forms\Components\TextInput::make('email')->email(),
                 Forms\Components\TextInput::make('phone')->label('Telefone'),
+                Forms\Components\TextInput::make('max_attachments')
+                    ->numeric()
+                    ->minValue(1)
+                    ->maxValue(10)
+                    ->default(1)
+                    ->required()
+                    ->label('Máximo de anexos por candidatura'),
                 Forms\Components\FileUpload::make('logo')
                     ->directory('images/companies')
                     ->image()

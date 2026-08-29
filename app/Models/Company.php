@@ -14,12 +14,16 @@ class Company extends Model
         'user_id',
         'name',
         'slug',
+        'headline',
         'description',
         'logo',
         'website',
         'location',
         'email',
         'phone',
+        'linkedin_url',
+        'facebook_url',
+        'instagram_url',
         'max_attachments',
     ];
 

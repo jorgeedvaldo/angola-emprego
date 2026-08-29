@@ -35,11 +35,17 @@ class CompanyResource extends Resource
                     ->label('Conta'),
                 Forms\Components\TextInput::make('name')->required()->label('Nome'),
                 Forms\Components\TextInput::make('slug')->required()->unique(ignoreRecord: true),
-                Forms\Components\Textarea::make('description')->label('Descrição')->rows(5),
+                Forms\Components\TextInput::make('headline')
+                    ->maxLength(180)
+                    ->label('Headline'),
+                Forms\Components\Textarea::make('description')->label('Sobre a empresa')->rows(5),
                 Forms\Components\TextInput::make('location')->label('Localização'),
                 Forms\Components\TextInput::make('website')->url()->label('Website'),
                 Forms\Components\TextInput::make('email')->email(),
                 Forms\Components\TextInput::make('phone')->label('Telefone'),
+                Forms\Components\TextInput::make('linkedin_url')->url()->label('LinkedIn'),
+                Forms\Components\TextInput::make('facebook_url')->url()->label('Facebook'),
+                Forms\Components\TextInput::make('instagram_url')->url()->label('Instagram'),
                 Forms\Components\TextInput::make('max_attachments')
                     ->numeric()
                     ->minValue(1)

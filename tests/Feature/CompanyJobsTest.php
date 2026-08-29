@@ -76,6 +76,48 @@ class CompanyJobsTest extends TestCase
             ->assertSee('Assunto');
     }
 
+    public function test_company_can_configure_a_public_careers_page()
+    {
+        $company = Company::factory()->create([
+            'name' => 'Minha Empresa',
+            'slug' => 'minha-empresa',
+            'max_attachments' => 1,
+        ]);
+
+        $this->actingAs($company->user)
+            ->put(route('company.update'), [
+                'name' => 'Minha Empresa',
+                'slug' => 'minha-empresa',
+                'headline' => 'Construa o futuro connosco',
+                'description' => 'Somos uma empresa angolana focada em tecnologia e pessoas.',
+                'location' => 'Luanda',
+                'website' => 'https://example.com',
+                'linkedin_url' => 'https://www.linkedin.com/company/minha-empresa',
+                'facebook_url' => 'https://www.facebook.com/minhaempresa',
+                'instagram_url' => 'https://www.instagram.com/minhaempresa',
+                'max_attachments' => 2,
+            ])
+            ->assertRedirect();
+
+        Job::factory()->create([
+            'company_id' => $company->id,
+            'company' => $company->name,
+            'title' => 'Engenheiro de Software',
+        ]);
+
+        $this->get('/company/minha-empresa')
+            ->assertOk()
+            ->assertSee('Início')
+            ->assertSee('Empresas')
+            ->assertSee('Construa o futuro connosco')
+            ->assertSee('Sobre a Minha Empresa')
+            ->assertSee('Somos uma empresa angolana focada em tecnologia e pessoas.')
+            ->assertSee('Engenheiro de Software')
+            ->assertSee('https://www.linkedin.com/company/minha-empresa', false)
+            ->assertSee('https://www.facebook.com/minhaempresa', false)
+            ->assertSee('https://www.instagram.com/minhaempresa', false);
+    }
+
     public function test_candidate_can_apply_with_subject_message_and_cv()
     {
         Storage::fake('local');

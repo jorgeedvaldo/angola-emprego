@@ -75,7 +75,14 @@
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label fw-semibold">Descrição</label>
+                                <label class="form-label fw-semibold">Headline</label>
+                                <input type="text" name="headline" class="form-control @error('headline') is-invalid @enderror" maxlength="180" value="{{ old('headline', $company->headline) }}" placeholder="Ex.: Estamos a construir o futuro de Angola">
+                                <small class="text-muted">Frase principal apresentada no cabeçalho da careers page.</small>
+                                @error('headline')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Sobre a empresa</label>
                                 <textarea name="description" rows="5" class="form-control">{{ old('description', $company->description) }}</textarea>
                             </div>
 
@@ -97,6 +104,29 @@
                             <div class="mb-3">
                                 <label class="form-label fw-semibold">Telefone</label>
                                 <input type="text" name="phone" class="form-control" value="{{ old('phone', $company->phone) }}">
+                            </div>
+
+                            <div class="border-top pt-3 mt-4 mb-3">
+                                <h6 class="fw-bold mb-1">Redes sociais</h6>
+                                <p class="small text-muted mb-3">Adicione os links completos dos perfis da empresa.</p>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold"><i class="bi bi-linkedin me-1"></i> LinkedIn</label>
+                                    <input type="url" name="linkedin_url" class="form-control @error('linkedin_url') is-invalid @enderror" value="{{ old('linkedin_url', $company->linkedin_url) }}" placeholder="https://www.linkedin.com/company/...">
+                                    @error('linkedin_url')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold"><i class="bi bi-facebook me-1"></i> Facebook</label>
+                                    <input type="url" name="facebook_url" class="form-control @error('facebook_url') is-invalid @enderror" value="{{ old('facebook_url', $company->facebook_url) }}" placeholder="https://www.facebook.com/...">
+                                    @error('facebook_url')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold"><i class="bi bi-instagram me-1"></i> Instagram</label>
+                                    <input type="url" name="instagram_url" class="form-control @error('instagram_url') is-invalid @enderror" value="{{ old('instagram_url', $company->instagram_url) }}" placeholder="https://www.instagram.com/...">
+                                    @error('instagram_url')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                </div>
                             </div>
 
                             <div class="mb-3">

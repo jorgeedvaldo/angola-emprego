@@ -291,6 +291,8 @@
               Início</a></li>
           <li><a href="{{url('/vagas')}}" class="{{ Request::is('vagas*') ? 'active' : '' }}"><i
                 class="bi bi-briefcase"></i> Vagas</a></li>
+          <li><a href="{{route('companies.index')}}" class="{{ Request::is('empresas') || Request::is('company*') ? 'active' : '' }}"><i
+                class="bi bi-building"></i> Empresas</a></li>
           <li><a href="{{route('courses.index')}}" class="{{ Request::is('cursos*') ? 'active' : '' }}"><i
                 class="bi bi-journal-bookmark"></i> Cursos</a></li>
           <li><a href="{{url('/noticias')}}"
@@ -301,10 +303,15 @@
           @guest
             <li class="d-xl-none"><a href="{{route('login')}}"><i class="bi bi-box-arrow-in-right"></i> Entrar</a></li>
             <li class="d-xl-none"><a href="{{route('register')}}"><i class="bi bi-person-plus"></i> Criar Conta</a></li>
+            <li class="d-xl-none"><a href="{{route('register.company')}}"><i class="bi bi-building-add"></i> Sou empresa</a></li>
           @else
+            @if(Auth::user()->isCompany())
+            <li class="d-xl-none"><a href="{{route('company.dashboard')}}"><i class="bi bi-building"></i> Painel Empresa</a></li>
+            @else
             <li class="d-xl-none"><a href="{{route('profile.show')}}"><i class="bi bi-person"></i> Meu Perfil</a></li>
             <li class="d-xl-none"><a href="{{route('jobs.potential')}}"><i class="bi bi-stars"></i> Vagas Sugeridas</a>
             </li>
+            @endif
             <li class="d-xl-none">
               <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
                 class="text-danger">
@@ -318,13 +325,22 @@
       <div class="header-actions">
         @guest
           <a href="{{route('login')}}" class="btn-login d-none d-md-block">Entrar</a>
+          <a href="{{route('register.company')}}" class="btn-create-cv d-none d-lg-flex" title="Para empresas">
+            <i class="bi bi-building"></i> Sou empresa
+          </a>
           <a href="{{route('register')}}" class="btn-create-cv">
             <i class="bi bi-person-plus"></i> Criar Conta
           </a>
         @else
+          @if(Auth::user()->isCompany())
+          <a href="{{route('company.dashboard')}}" class="btn-create-cv d-none d-md-flex" title="Painel da empresa">
+            <i class="bi bi-building"></i> Painel Empresa
+          </a>
+          @else
           <a href="{{route('profile.show')}}" class="btn-create-cv d-none d-md-flex" title="Ver Perfil">
             <i class="bi bi-person-badge"></i> Meu Perfil
           </a>
+          @endif
 
           <div class="dropdown">
             <a href="#" class="d-flex align-items-center text-decoration-none" id="dropdownUser1"
@@ -342,10 +358,17 @@
                 <div class="fw-bold text-dark">{{ Auth::user()->name }}</div>
                 <div class="text-muted small">{{ Auth::user()->email }}</div>
               </li>
+              @if(Auth::user()->isCompany())
+              <li><a class="dropdown-item py-2" href="{{route('company.dashboard')}}"><i class="bi bi-building me-2"></i> Painel Empresa</a></li>
+              @if(Auth::user()->company)
+              <li><a class="dropdown-item py-2" href="{{ url('/company/' . Auth::user()->company->slug) }}"><i class="bi bi-box-arrow-up-right me-2"></i> Ver página</a></li>
+              @endif
+              @else
               <li><a class="dropdown-item py-2" href="{{route('profile.show')}}"><i class="bi bi-person me-2"></i> Meu
                   Perfil</a></li>
               <li><a class="dropdown-item py-2" href="{{route('jobs.potential')}}"><i class="bi bi-stars me-2"></i> Vagas
                   Sugeridas</a></li>
+              @endif
               <li>
                 <hr class="dropdown-divider">
               </li>
@@ -395,6 +418,7 @@
             <li><a href="{{url('/')}}" class="text-decoration-none text-muted">Início</a></li>
             <li><a href="{{url('/sobre')}}" class="text-decoration-none text-muted">Sobre</a></li>
             <li><a href="{{url('/vagas')}}" class="text-decoration-none text-muted">Vagas</a></li>
+            <li><a href="{{route('companies.index')}}" class="text-decoration-none text-muted">Empresas</a></li>
             <li><a href="{{route('courses.index')}}" class="text-decoration-none text-muted">Cursos</a></li>
             <li><a href="{{url('/noticias')}}" class="text-decoration-none text-muted">Notícias</a></li>
           </ul>
@@ -407,8 +431,12 @@
               <li><a href="{{route('register')}}" class="text-decoration-none text-muted">Criar Conta</a></li>
               <li><a href="{{route('login')}}" class="text-decoration-none text-muted">Entrar</a></li>
             @else
-              <li><a href="{{route('profile.show')}}" class="text-decoration-none text-muted">Meu Perfil</a></li>
-              <li><a href="{{route('jobs.potential')}}" class="text-decoration-none text-muted">Vagas Sugeridas</a></li>
+              @if(Auth::user()->isCompany())
+                <li><a href="{{route('company.dashboard')}}" class="text-decoration-none text-muted">Painel Empresa</a></li>
+              @else
+                <li><a href="{{route('profile.show')}}" class="text-decoration-none text-muted">Meu Perfil</a></li>
+                <li><a href="{{route('jobs.potential')}}" class="text-decoration-none text-muted">Vagas Sugeridas</a></li>
+              @endif
             @endguest
           </ul>
         </div>

@@ -42,6 +42,7 @@ class User extends Authenticatable implements FilamentUser
         'google_id',
         'avatar',
         'bio',
+        'account_type',
     ];
 
     /**
@@ -93,6 +94,16 @@ class User extends Authenticatable implements FilamentUser
     public function categories()
     {
         return $this->belongsToMany(Category::class, 'category_user')->withTimestamps();
+    }
+
+    public function isCompany(): bool
+    {
+        return $this->account_type === 'company';
+    }
+
+    public function company()
+    {
+        return $this->hasOne(Company::class);
     }
 
     public function cvs()

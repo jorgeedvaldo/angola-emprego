@@ -24,6 +24,10 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
 
+        if ($user->isCompany()) {
+            return redirect()->route('company.dashboard');
+        }
+
         // Ensure user has a username (for users created before the migration)
         if (empty($user->username)) {
             $user->update([

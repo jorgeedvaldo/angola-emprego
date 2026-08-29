@@ -26,6 +26,11 @@ class JobResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Grid::make(1)->schema([
+                    Forms\Components\Select::make('company_id')
+                        ->label('Empresa (página)')
+                        ->relationship('companyRecord', 'name')
+                        ->searchable()
+                        ->nullable(),
                     Forms\Components\TextInput::make('title')->required(),
                     Forms\Components\TextInput::make('company')->required(),
                     Forms\Components\TextInput::make('location')->required(),
@@ -51,6 +56,12 @@ class JobResource extends Resource
                 Tables\Columns\TextColumn::make('title')
                     ->searchable()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('company')
+                    ->searchable()
+                    ->label('Empresa'),
+                Tables\Columns\TextColumn::make('companyRecord.slug')
+                    ->label('Página')
+                    ->url(fn ($record) => $record->companyRecord ? url('/company/' . $record->companyRecord->slug) : null),
             ])
             ->filters([
                 //

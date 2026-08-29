@@ -43,6 +43,19 @@
 	</url>
     @endforeach
 
+    <!-- Companies -->
+    @foreach ($companies as $company)
+    <url>
+        <loc>{{ url('/company/' . $company->slug) }}</loc>
+        <lastmod>{{ date_format(new DateTime($company->updated_at), DATE_ATOM) }}</lastmod>
+        @if($company->logo)
+        <image:image>
+            <image:loc>{{ asset('storage/' . $company->logo) }}</image:loc>
+        </image:image>
+        @endif
+    </url>
+    @endforeach
+
     <!-- Categories -->
     @foreach ($categories as $category)
     <url>

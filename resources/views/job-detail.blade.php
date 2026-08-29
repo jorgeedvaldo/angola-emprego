@@ -21,7 +21,7 @@
       "@type": "Organization",
       "name": "{{ $job->company }}",
       "logo": "{{ asset('storage/' . $job->image) }}",
-      "sameAs": "{{ url('/vagas?q=' . urlencode($job->company)) }}"
+      "sameAs": "{{ $job->companyRecord ? url('/company/' . $job->companyRecord->slug) : url('/vagas?q=' . urlencode($job->company)) }}"
     },
     "jobLocation": {
       "@type": "Place",
@@ -84,13 +84,21 @@
           <div class="col-lg-7">
             <h1 class="fw-bold text-dark mb-2">{{$job->title}}</h1>
             <div class="d-flex flex-wrap gap-3 text-muted mb-3">
-              <span><i class="bi bi-building me-1"></i> {{$job->company}}</span>
+              @if($job->companyRecord)
+                <span><i class="bi bi-building me-1"></i> <a href="{{ url('/company/' . $job->companyRecord->slug) }}" class="text-decoration-none">{{ $job->company }}</a></span>
+              @else
+                <span><i class="bi bi-building me-1"></i> {{$job->company}}</span>
+              @endif
               <span><i class="bi bi-geo-alt me-1"></i> {{$job->location ?? 'Angola'}}</span>
               <span><i class="bi bi-clock me-1"></i> {{ date_format(new DateTime($job['created_at']), 'd/m/Y') }}</span>
             </div>
           </div>
           <div class="col-lg-3 text-lg-end">
-            @if(filter_var($job->email_or_link, FILTER_VALIDATE_EMAIL))
+            @if($job->acceptsOnlineApplications())
+              <a href="#candidatura" class="btn btn-primary fw-bold py-2 px-4 rounded-pill">
+                <i class="bi bi-send-fill me-2"></i> Candidatar-se
+              </a>
+            @elseif(filter_var($job->email_or_link, FILTER_VALIDATE_EMAIL))
               <a href="mailto:{{ $job->email_or_link }}" class="btn btn-primary fw-bold py-2 px-4 rounded-pill">
                 <i class="bi bi-envelope-fill me-2"></i> Candidatar-se
               </a>
@@ -123,6 +131,60 @@
               {!!$job->description!!}
             </div>
           </div>
+
+          @if($job->acceptsOnlineApplications())
+          <div id="candidatura" class="bg-white p-4 rounded-3 shadow-sm border mb-4">
+            <h4 class="fw-bold mb-3 border-bottom pb-2">Enviar candidatura</h4>
+            <p class="text-muted small">Preencha o assunto, a mensagem e anexe o seu CV (PDF, DOC ou DOCX, até 5 MB).</p>
+
+            @if(session('success'))
+              <div class="alert alert-success">{{ session('success') }}</div>
+            @endif
+            @if(session('error'))
+              <div class="alert alert-danger">{{ session('error') }}</div>
+            @endif
+
+            <form method="POST" action="{{ route('jobs.apply', $job->slug) }}" enctype="multipart/form-data">
+              @csrf
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold">Nome</label>
+                  <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name', auth()->user()->name ?? '') }}" required>
+                  @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold">Email</label>
+                  <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email', auth()->user()->email ?? '') }}" required>
+                  @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold">Telefone</label>
+                  <input type="text" name="phone" class="form-control" value="{{ old('phone', auth()->user()->mobile ?? '') }}">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold">Assunto</label>
+                  <input type="text" name="subject" class="form-control @error('subject') is-invalid @enderror" value="{{ old('subject', 'Candidatura — ' . $job->title) }}" required>
+                  @error('subject')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                </div>
+                <div class="col-12">
+                  <label class="form-label fw-semibold">Mensagem</label>
+                  <textarea name="message" rows="5" class="form-control @error('message') is-invalid @enderror" required>{{ old('message') }}</textarea>
+                  @error('message')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                </div>
+                <div class="col-12">
+                  <label class="form-label fw-semibold">Anexo (CV)</label>
+                  <input type="file" name="attachment" class="form-control @error('attachment') is-invalid @enderror" accept=".pdf,.doc,.docx,application/pdf" required>
+                  @error('attachment')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                </div>
+                <div class="col-12">
+                  <button type="submit" class="btn btn-primary fw-bold" style="background-color: #2557a7; border-color: #2557a7;">
+                    <i class="bi bi-send me-1"></i> Enviar candidatura
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+          @endif
 
           <!-- Botões de compartilhamento -->
           <div class="bg-light p-3 rounded-3 mb-4 border">

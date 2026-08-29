@@ -53,7 +53,8 @@
                 </div>
 
                 <div class="text-center">
-                    <p class="small text-muted mb-0">Novo no Angola Emprego? <a href="{{ route('register') }}" class="text-decoration-none fw-bold" style="color: #2557a7;">Criar conta</a></p>
+                    <p class="small text-muted mb-1">Novo no Angola Emprego? <a href="{{ route('register') }}" class="text-decoration-none fw-bold" style="color: #2557a7;">Criar conta</a></p>
+                    <p class="small text-muted mb-0">É uma empresa? <a href="{{ route('register.company') }}" class="text-decoration-none fw-bold" style="color: #2557a7;">Registar empresa</a></p>
                 </div>
             </form>
         </div>

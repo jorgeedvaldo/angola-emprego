@@ -21,6 +21,9 @@ class GoogleController extends Controller
 
             if($finduser){
                 \Illuminate\Support\Facades\Auth::login($finduser);
+                if ($finduser->isCompany()) {
+                    return redirect()->intended(route('company.dashboard'));
+                }
                 return redirect()->intended('/');
             }else{
                 // Check if user with email exists to avoid duplicates
@@ -32,6 +35,9 @@ class GoogleController extends Controller
                         'avatar' => $googleUser->avatar
                     ]);
                     \Illuminate\Support\Facades\Auth::login($user);
+                    if ($user->isCompany()) {
+                        return redirect()->intended(route('company.dashboard'));
+                    }
                 } else {
                     $newUser = \App\Models\User::create([
                         'name' => $googleUser->name,

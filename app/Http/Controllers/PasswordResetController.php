@@ -75,6 +75,6 @@ class PasswordResetController extends Controller
             ? route('company.dashboard')
             : route('home');
 
-        return redirect($destination)->with('status', 'Senha redefinida. Já está autenticado.');
+        return redirect($destination)->with('success', 'Senha redefinida. Já está autenticado.');
     }
 }

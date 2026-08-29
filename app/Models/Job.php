@@ -14,7 +14,7 @@ class Job extends Model
     use HasFactory, GeneratesCoverAndThumbnail;
 
     protected $fillable = [
-        'title', 'slug', 'company', 'location', 'description', 'email_or_link', 'image'
+        'title', 'slug', 'company', 'location', 'description', 'email_or_link', 'image', 'company_id'
     ];
 
 	protected static function boot()
@@ -28,10 +28,12 @@ class Job extends Model
 
             $job->generateThumb($job->image);
 
-            SocialMediaJob::create([
-                'job_id' => $job->id,
-                'post_status' => 0,
-            ]);
+            if (\Illuminate\Support\Facades\Schema::hasTable('social_media_jobs')) {
+                SocialMediaJob::create([
+                    'job_id' => $job->id,
+                    'post_status' => 0,
+                ]);
+            }
         });
 
         static::updated(function ($job) {
@@ -64,11 +66,39 @@ class Job extends Model
         return $this->belongsToMany('App\Models\Category', 'category_jobs');
     }
 
+    public function companyRecord()
+    {
+        return $this->belongsTo(Company::class, 'company_id');
+    }
+
+    public function applications()
+    {
+        return $this->hasMany(JobApplication::class);
+    }
+
+    public function acceptsOnlineApplications(): bool
+    {
+        return !empty($this->company_id);
+    }
+
+    public function scopePubliclyVisible($query)
+    {
+        return $query->where(function ($visibilityQuery) {
+            $visibilityQuery
+                ->whereNull('company_id')
+                ->orWhereHas('companyRecord', function ($companyQuery) {
+                    $companyQuery
+                        ->where('approval_status', 'approved')
+                        ->whereHas('user', fn ($userQuery) => $userQuery->whereNotNull('email_verified_at'));
+                });
+        });
+    }
+
     public static function getCachedLatest()
     {
         // 1440 minutes = 24 hours
         return Cache::remember('latest_jobs_50', 1440, function () {
-            return self::orderByRaw('id DESC')->limit(50)->get();
+            return self::publiclyVisible()->with('companyRecord')->orderByRaw('id DESC')->limit(50)->get();
         });
     }
 }

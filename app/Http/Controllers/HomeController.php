@@ -21,16 +21,17 @@ class HomeController extends Controller
     public function siteMapGenerator()
     {
         $staticPages = [
-            '/', '/sobre', '/vagas', '/noticias', '/cursos',
+            '/', '/sobre', '/vagas', '/noticias', '/cursos', '/empresas',
             '/noticias/resultados-concurso-csmj-2026'
         ];
 
-        $jobs = Job::orderByRaw('id DESC')->paginate(12500);
+        $jobs = Job::publiclyVisible()->orderByRaw('id DESC')->paginate(12500);
 		$posts = Post::orderByRaw('id DESC')->paginate(12500);
         $categories = Category::getCachedAll();
         $courses = \App\Models\Course::orderBy('id', 'desc')->get();
+        $companies = \App\Models\Company::orderBy('name')->get();
 
-        return response()->view('xml.sitemap', compact('jobs', 'posts', 'categories', 'staticPages', 'courses'))
+        return response()->view('xml.sitemap', compact('jobs', 'posts', 'categories', 'staticPages', 'courses', 'companies'))
             ->header('Content-Type', 'text/xml');
     }
 

@@ -6,6 +6,10 @@ use App\Http\Controllers\AboutController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\JobController;
+use App\Http\Controllers\JobApplicationController;
+use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\EmailVerificationController;
+use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\ToolsController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseController;
@@ -29,6 +33,10 @@ Route::get('/linkstorage', function () {
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/sobre', [AboutController::class, 'index'])->name('sobre');
 Route::get('/vagas', [JobController::class, 'index'])->name('vagas');
+Route::get('/empresas', [CompanyController::class, 'index'])->name('companies.index');
+Route::get('/company/{slug}', [CompanyController::class, 'show'])->name('companies.show')->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*');
+Route::get('/company/{slug}/vagas/{jobSlug}', [CompanyController::class, 'showJob'])->name('companies.job')->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*');
+Route::post('/vagas/{slug}/candidatar', [JobApplicationController::class, 'store'])->name('jobs.apply')->middleware('throttle:10,1');
 Route::get('/blog', [BlogController::class, 'index']);
 Route::get('/noticias', [BlogController::class, 'index']);
 Route::get('/atm-com-dinheiro', [ToolsController::class, 'index']);
@@ -46,6 +54,12 @@ Route::middleware(['guest'])->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
+    Route::get('/registar-empresa', [AuthController::class, 'showCompanyRegisterForm'])->name('register.company');
+    Route::post('/registar-empresa', [AuthController::class, 'registerCompany']);
+    Route::get('/esqueci-a-senha', [PasswordResetController::class, 'requestForm'])->name('password.request');
+    Route::post('/esqueci-a-senha', [PasswordResetController::class, 'sendResetLink'])->name('password.email');
+    Route::get('/redefinir-senha/{token}', [PasswordResetController::class, 'resetForm'])->name('password.reset');
+    Route::post('/redefinir-senha', [PasswordResetController::class, 'reset'])->name('password.update');
 
     // Google Auth
     Route::get('auth/google', [App\Http\Controllers\Auth\GoogleController::class, 'redirectToGoogle'])->name('auth.google');
@@ -54,6 +68,27 @@ Route::middleware(['guest'])->group(function () {
 
 Route::middleware(['auth'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::get('/email/verificar/{id}/{hash}', [EmailVerificationController::class, 'verify'])
+        ->middleware(['signed', 'throttle:6,1'])
+        ->name('verification.verify');
+    Route::post('/email/reenviar', [EmailVerificationController::class, 'resend'])
+        ->middleware('throttle:3,1')
+        ->name('verification.send');
+
+    Route::middleware(['company'])->prefix('empresa')->name('company.')->group(function () {
+        Route::get('/', [CompanyController::class, 'dashboard'])->name('dashboard');
+        Route::put('/', [CompanyController::class, 'update'])->name('update');
+        Route::middleware('company.approved')->group(function () {
+            Route::get('/vagas/criar', [CompanyController::class, 'createJob'])->name('jobs.create');
+            Route::post('/vagas', [CompanyController::class, 'storeJob'])->name('jobs.store');
+            Route::get('/vagas/{job}/editar', [CompanyController::class, 'editJob'])->name('jobs.edit');
+            Route::put('/vagas/{job}', [CompanyController::class, 'updateJob'])->name('jobs.update');
+            Route::delete('/vagas/{job}', [CompanyController::class, 'destroyJob'])->name('jobs.destroy');
+        });
+        Route::get('/vagas/{job}/candidaturas', [CompanyController::class, 'applications'])->name('jobs.applications');
+        Route::get('/candidaturas/{application}/cv', [CompanyController::class, 'downloadApplicationAttachment'])->name('applications.download');
+        Route::get('/anexos/{attachment}', [CompanyController::class, 'downloadAttachment'])->name('attachments.download');
+    });
 
     // Profile & Recommendations
     Route::get('/perfil', [App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');

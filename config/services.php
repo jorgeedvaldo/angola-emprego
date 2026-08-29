@@ -37,4 +37,11 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URL'),
     ],
 
+    'maileroo' => [
+        'api_key' => env('MAILEROO_API_KEY'),
+        'endpoint' => env('MAILEROO_ENDPOINT', 'https://smtp.maileroo.com/api/v2/emails'),
+        'from_address' => env('MAILEROO_FROM_ADDRESS', env('MAIL_FROM_ADDRESS')),
+        'from_name' => env('MAILEROO_FROM_NAME', env('MAIL_FROM_NAME', 'Angola Emprego')),
+    ],
+
 ];

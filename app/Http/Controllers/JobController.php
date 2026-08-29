@@ -12,7 +12,7 @@ class JobController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Job::query();
+        $query = Job::publiclyVisible();
 
         if ($request->filled('q')) {
             $search = $request->input('q');
@@ -43,7 +43,7 @@ class JobController extends Controller
             $currentItems = $cachedJobs->slice(0, $perPage);
             // We use a simple count query for total, or just a large number if we want to avoid it.
             // For accurate pagination links, we need real count.
-            $total = Job::count(); 
+            $total = Job::publiclyVisible()->count();
             
             $jobs = new LengthAwarePaginator(
                 $currentItems, 
@@ -53,7 +53,7 @@ class JobController extends Controller
                 ['path' => $request->url(), 'query' => $request->query()]
             );
         } else {
-             $jobs = $query->orderByRaw('id DESC')->paginate(15);
+             $jobs = $query->with('companyRecord')->orderByRaw('id DESC')->paginate(15);
         }
         
         $jobs->appends($request->all());
@@ -61,7 +61,7 @@ class JobController extends Controller
         // Sidebar Data
         $categories = Category::getCachedWithJobs();
         // Top 15 companies by job count
-        $topCompanies = Job::select('company', \DB::raw('count(*) as total'))
+        $topCompanies = Job::publiclyVisible()->select('company', \DB::raw('count(*) as total'))
                             ->groupBy('company')
                             ->orderByDesc('total')
                             ->limit(15)
@@ -75,7 +75,7 @@ class JobController extends Controller
         try
         {
             $job = Cache::remember('job_' . $slug, 1440, function () use ($slug) {
-                return Job::with('categories')->where('slug', $slug)->firstOrFail();
+                return Job::publiclyVisible()->with(['categories', 'companyRecord'])->where('slug', $slug)->firstOrFail();
             });
 
             $categories = Category::getCachedAll();

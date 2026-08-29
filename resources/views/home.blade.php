@@ -41,6 +41,11 @@
 @endsection
 
 @section('content')
+    @if(session('success'))
+        <div class="container pt-4">
+            <div class="alert alert-success mb-0">{{ session('success') }}</div>
+        </div>
+    @endif
     <!-- Hero Section -->
     <section id="hero" class="hero section d-flex align-items-center"
         style="min-height: 60vh; background: linear-gradient(135deg, #f3f2f1 0%, #ffffff 100%);">

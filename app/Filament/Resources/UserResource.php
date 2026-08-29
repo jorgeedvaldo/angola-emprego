@@ -40,6 +40,14 @@ class UserResource extends Resource
                     ->required()
                     ->label('É Administrador?')
                     ->helperText('Habilite para dar acesso ao painel administrativo.'),
+                Forms\Components\Select::make('account_type')
+                    ->label('Tipo de conta')
+                    ->options([
+                        'candidate' => 'Candidato',
+                        'company' => 'Empresa',
+                    ])
+                    ->default('candidate')
+                    ->required(),
                 
                 Forms\Components\Section::make('Documentos')
                     ->schema([
@@ -94,6 +102,16 @@ class UserResource extends Resource
                     ])
                     ->sortable(),
                 Tables\Columns\BooleanColumn::make('is_admin')->sortable()->label('Admin'),
+                Tables\Columns\BadgeColumn::make('account_type')
+                    ->label('Tipo')
+                    ->enum([
+                        'candidate' => 'Candidato',
+                        'company' => 'Empresa',
+                    ])
+                    ->colors([
+                        'primary' => 'candidate',
+                        'success' => 'company',
+                    ]),
                 Tables\Columns\TextColumn::make('created_at')->dateTime()->label('Criado em'),
             ])
             ->filters([

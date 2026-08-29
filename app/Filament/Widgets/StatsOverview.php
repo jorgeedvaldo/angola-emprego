@@ -4,6 +4,7 @@ namespace App\Filament\Widgets;
 
 use App\Models\Job;
 use App\Models\Post;
+use App\Models\Company;
 use App\Models\SubscriptionRequest;
 use App\Models\User;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
@@ -18,6 +19,14 @@ class StatsOverview extends BaseWidget
                 ->description('Total registered users')
                 ->descriptionIcon('heroicon-s-users')
                 ->color('primary'),
+            Card::make('Empresas cadastradas', Company::count())
+                ->description(Company::where('approval_status', 'pending')->count() . ' aguardam aprovação')
+                ->descriptionIcon('heroicon-s-office-building')
+                ->color('primary'),
+            Card::make('Empresas aprovadas', Company::where('approval_status', 'approved')->count())
+                ->description('Perfis autorizados')
+                ->descriptionIcon('heroicon-s-check-circle')
+                ->color('success'),
             Card::make('Subscription Requests', SubscriptionRequest::count())
                 ->description('Total subscription requests')
                 ->descriptionIcon('heroicon-s-ticket')

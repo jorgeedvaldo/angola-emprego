@@ -104,7 +104,9 @@
                 </div>
 
                 <div class="text-center">
-                    <p class="small text-muted mb-0">Já tem uma conta? <a href="{{ route('login') }}" class="text-decoration-none fw-bold" style="color: #2557a7;">Entrar</a></p>
+                    <p class="small text-muted mb-1">Já tem uma conta? <a href="{{ route('login') }}" class="text-decoration-none fw-bold" style="color: #2557a7;">Entrar</a></p>
+                    <p class="small text-muted mb-1">Esqueceu a senha? <a href="{{ route('password.request') }}" class="text-decoration-none fw-bold" style="color: #2557a7;">Recuperar acesso</a></p>
+                    <p class="small text-muted mb-0">É uma empresa? <a href="{{ route('register.company') }}" class="text-decoration-none fw-bold" style="color: #2557a7;">Criar página da empresa</a></p>
                 </div>
             </form>
         </div>

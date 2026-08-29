@@ -127,7 +127,7 @@
       font-weight: 700;
       font-size: .9rem;
       color: var(--company-primary);
-      border: 1px solid #cadaf1;
+      border: 1px solid color-mix(in srgb, var(--company-primary) 35%, white);
       border-radius: 50px;
       padding: 8px 18px;
       text-decoration: none;
@@ -135,8 +135,8 @@
     }
 
     .company-nav-cta:hover {
-      background: #eef4fd;
-      color: #1c4585;
+      background: color-mix(in srgb, var(--company-primary) 10%, white);
+      color: var(--company-primary);
     }
 
     .company-footer {

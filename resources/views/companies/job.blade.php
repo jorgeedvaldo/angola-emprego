@@ -164,6 +164,7 @@
         border-radius: 16px;
         padding: 1.75rem;
     }
+    .company-panel a:not(.btn) { color: var(--company-primary); }
     .company-job-description { color: #505967; font-size: 1.04rem; line-height: 1.8; }
     .company-job-description h1,
     .company-job-description h2,

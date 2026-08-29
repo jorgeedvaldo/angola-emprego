@@ -228,7 +228,7 @@
     }
     .company-job-card:hover {
         color: var(--company-primary);
-        border-color: #aac4ec;
+        border-color: var(--company-primary);
         box-shadow: 0 10px 28px rgba(37,87,167,.09);
         transform: translateY(-2px);
     }
@@ -241,8 +241,8 @@
         align-items: center;
         justify-content: center;
         border-radius: 50%;
-        background: #eef4fd;
-        color: #2557a7;
+        background: color-mix(in srgb, var(--company-primary) 12%, white);
+        color: var(--company-primary);
     }
     .company-empty-jobs { background: #fff; border: 1px dashed #cad2df; border-radius: 16px; padding: 3.5rem 1rem; color: #8a94a3; }
     @media (max-width: 575.98px) {

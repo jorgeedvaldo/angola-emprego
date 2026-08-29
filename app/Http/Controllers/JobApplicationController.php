@@ -22,7 +22,11 @@ class JobApplicationController extends Controller
         $maxFiles = $job->companyRecord->allowedAttachmentCount();
 
         $uploaded = collect($request->file('attachments', []))
-            ->filter(fn ($file) => $file instanceof UploadedFile && $file->isValid())
+            ->filter(function ($file) {
+                return $file instanceof UploadedFile
+                    && $file->isValid()
+                    && $file->getSize() > 0;
+            })
             ->values();
 
         $request->files->set('attachments', $uploaded->all());
@@ -34,7 +38,20 @@ class JobApplicationController extends Controller
             'subject' => 'required|string|max:255',
             'message' => 'required|string|max:5000',
             'attachments' => 'required|array|min:1|max:' . $maxFiles,
-            'attachments.*' => 'file|mimes:pdf,doc,docx|max:5120',
+            'attachments.*' => [
+                'file',
+                'max:5120',
+                function ($attribute, $value, $fail) {
+                    if (!$value instanceof UploadedFile) {
+                        $fail('Cada anexo deve ser um ficheiro.');
+                        return;
+                    }
+                    $ext = strtolower($value->getClientOriginalExtension());
+                    if (!in_array($ext, ['pdf', 'doc', 'docx'], true)) {
+                        $fail('Cada anexo deve ser PDF, DOC ou DOCX.');
+                    }
+                },
+            ],
         ], [
             'attachments.required' => 'Anexe pelo menos um ficheiro (CV).',
             'attachments.min' => 'Anexe pelo menos um ficheiro (CV).',

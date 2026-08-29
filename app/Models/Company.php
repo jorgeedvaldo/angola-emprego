@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class Company extends Model
@@ -44,6 +45,9 @@ class Company extends Model
     {
         static::saving(function (Company $company) {
             if ($company->isDirty('approval_status')) {
+                Cache::forget('latest_jobs_50');
+                Cache::forget('categories_with_jobs');
+
                 if ($company->approval_status === 'approved') {
                     $company->approved_at = $company->approved_at ?: now();
                     $company->approved_by = $company->approved_by ?: auth()->id();

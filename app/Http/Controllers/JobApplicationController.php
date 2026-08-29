@@ -13,7 +13,7 @@ class JobApplicationController extends Controller
 {
     public function store(Request $request, string $slug)
     {
-        $job = Job::with('companyRecord')->where('slug', $slug)->firstOrFail();
+        $job = Job::publiclyVisible()->with('companyRecord')->where('slug', $slug)->firstOrFail();
 
         if (!$job->acceptsOnlineApplications() || !$job->companyRecord) {
             return back()->with('error', 'Esta vaga não aceita candidaturas por esta página.');

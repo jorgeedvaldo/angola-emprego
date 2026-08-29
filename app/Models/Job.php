@@ -81,11 +81,24 @@ class Job extends Model
         return !empty($this->company_id);
     }
 
+    public function scopePubliclyVisible($query)
+    {
+        return $query->where(function ($visibilityQuery) {
+            $visibilityQuery
+                ->whereNull('company_id')
+                ->orWhereHas('companyRecord', function ($companyQuery) {
+                    $companyQuery
+                        ->where('approval_status', 'approved')
+                        ->whereHas('user', fn ($userQuery) => $userQuery->whereNotNull('email_verified_at'));
+                });
+        });
+    }
+
     public static function getCachedLatest()
     {
         // 1440 minutes = 24 hours
         return Cache::remember('latest_jobs_50', 1440, function () {
-            return self::with('companyRecord')->orderByRaw('id DESC')->limit(50)->get();
+            return self::publiclyVisible()->with('companyRecord')->orderByRaw('id DESC')->limit(50)->get();
         });
     }
 }

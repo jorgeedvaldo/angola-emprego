@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Company;
+use App\Models\Job;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -88,6 +89,23 @@ class CompanyAccessTest extends TestCase
             ->get(route('company.jobs.create'))
             ->assertRedirect(route('company.dashboard'))
             ->assertSessionHas('error');
+    }
+
+    public function test_existing_jobs_are_hidden_when_company_is_not_approved()
+    {
+        $company = Company::factory()->create([
+            'approval_status' => 'pending',
+            'approved_at' => null,
+        ]);
+        $job = Job::factory()->create([
+            'company_id' => $company->id,
+            'company' => $company->name,
+            'title' => 'Vaga ainda privada',
+        ]);
+
+        $this->get('/vagas')->assertDontSee('Vaga ainda privada');
+        $this->get('/vagas/' . $job->slug)->assertNotFound();
+        $this->post(route('jobs.apply', $job->slug), [])->assertNotFound();
     }
 
     public function test_unverified_approved_company_is_not_public_and_cannot_publish()

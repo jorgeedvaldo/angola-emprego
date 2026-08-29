@@ -25,7 +25,7 @@ class HomeController extends Controller
             '/noticias/resultados-concurso-csmj-2026'
         ];
 
-        $jobs = Job::orderByRaw('id DESC')->paginate(12500);
+        $jobs = Job::publiclyVisible()->orderByRaw('id DESC')->paginate(12500);
 		$posts = Post::orderByRaw('id DESC')->paginate(12500);
         $categories = Category::getCachedAll();
         $courses = \App\Models\Course::orderBy('id', 'desc')->get();

@@ -242,7 +242,7 @@ class CompanyController extends Controller
 
     private function authorizeJob(Job $job): void
     {
-        if ($job->company_id !== Auth::user()->company->id) {
+        if ((int) $job->company_id !== (int) Auth::user()->company->id) {
             abort(403);
         }
     }

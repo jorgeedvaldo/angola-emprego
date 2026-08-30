@@ -7,6 +7,7 @@ use App\Models\Company;
 use App\Models\Job;
 use App\Models\JobApplication;
 use App\Models\JobApplicationAttachment;
+use App\Support\HtmlSanitizer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -143,7 +144,7 @@ class CompanyController extends Controller
         $job = Job::create([
             'title' => $validated['title'],
             'location' => $validated['location'],
-            'description' => $validated['description'],
+            'description' => HtmlSanitizer::clean($validated['description']),
             'email_or_link' => $validated['email_or_link'] ?? $company->email ?? Auth::user()->email,
             'company' => $company->name,
             'company_id' => $company->id,
@@ -183,7 +184,7 @@ class CompanyController extends Controller
         $job->update([
             'title' => $validated['title'],
             'location' => $validated['location'],
-            'description' => $validated['description'],
+            'description' => HtmlSanitizer::clean($validated['description']),
             'email_or_link' => $validated['email_or_link'] ?? $job->email_or_link,
             'company' => Auth::user()->company->name,
         ]);

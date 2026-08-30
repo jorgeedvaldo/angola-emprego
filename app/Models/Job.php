@@ -14,7 +14,13 @@ class Job extends Model
     use HasFactory, GeneratesCoverAndThumbnail;
 
     protected $fillable = [
-        'title', 'slug', 'company', 'location', 'description', 'email_or_link', 'image', 'company_id'
+        'title', 'slug', 'company', 'location', 'description', 'email_or_link', 'image', 'company_id',
+        'description_vector', 'description_vector_generated_at',
+    ];
+
+    protected $casts = [
+        'description_vector' => 'array',
+        'description_vector_generated_at' => 'datetime',
     ];
 
 	protected static function boot()

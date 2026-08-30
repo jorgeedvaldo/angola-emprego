@@ -20,6 +20,14 @@ class JobApplication extends Model
         'attachment_path',
         'attachment_name',
         'status',
+        'cv_text',
+        'cv_vector',
+        'cv_analyzed_at',
+    ];
+
+    protected $casts = [
+        'cv_vector' => 'array',
+        'cv_analyzed_at' => 'datetime',
     ];
 
     public function job()

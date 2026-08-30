@@ -16,9 +16,23 @@
 
 <div class="mb-3">
     <label class="form-label fw-semibold">Descrição</label>
-    <textarea name="description" rows="10" class="form-control @error('description') is-invalid @enderror" required>{{ old('description', $job->description ?? '') }}</textarea>
-    @error('description')<div class="invalid-feedback">{{ $message }}</div>@enderror
+    <input type="hidden" id="description-input" name="description" value="{{ old('description', $job->description ?? '') }}">
+    <trix-editor input="description-input" class="trix-content form-control @error('description') is-invalid @enderror" style="min-height: 220px;"></trix-editor>
+    @error('description')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
 </div>
+
+@once
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/trix@2.1.0/dist/trix.css">
+    <script src="https://cdn.jsdelivr.net/npm/trix@2.1.0/dist/trix.umd.min.js"></script>
+    <style>
+        trix-toolbar .trix-button-group--file-tools { display: none; }
+    </style>
+    <script>
+        document.addEventListener('trix-file-accept', function (event) {
+            event.preventDefault();
+        });
+    </script>
+@endonce
 
 <div class="mb-3">
     <label class="form-label fw-semibold">Email ou link de candidatura (opcional)</label>

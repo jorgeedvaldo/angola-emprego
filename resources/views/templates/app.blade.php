@@ -6,6 +6,7 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title>@yield('title') - {{env('APP_NAME')}}</title>
   <meta name="description" content="@yield('description')" />
+  <meta name="csrf-token" content="{{ csrf_token() }}">
 
   @hasSection('canonical_link')
     <link rel="canonical" href="@yield('canonical_link')" />

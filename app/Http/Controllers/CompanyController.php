@@ -8,6 +8,7 @@ use App\Models\Job;
 use App\Models\JobApplication;
 use App\Models\JobApplicationAttachment;
 use App\Support\HtmlSanitizer;
+use App\Support\VectorSimilarity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -181,12 +182,16 @@ class CompanyController extends Controller
             'categories.*' => 'exists:categories,id',
         ]);
 
+        $cleanDescription = HtmlSanitizer::clean($validated['description']);
+
         $job->update([
             'title' => $validated['title'],
             'location' => $validated['location'],
-            'description' => HtmlSanitizer::clean($validated['description']),
+            'description' => $cleanDescription,
             'email_or_link' => $validated['email_or_link'] ?? $job->email_or_link,
             'company' => Auth::user()->company->name,
+            'description_vector' => $cleanDescription === $job->getOriginal('description') ? $job->description_vector : null,
+            'description_vector_generated_at' => $cleanDescription === $job->getOriginal('description') ? $job->description_vector_generated_at : null,
         ]);
 
         $job->categories()->sync($validated['categories'] ?? []);
@@ -206,9 +211,57 @@ class CompanyController extends Controller
     {
         $this->authorizeJob($job);
         $company = Auth::user()->company;
-        $applications = $job->applications()->with('files')->orderByDesc('id')->paginate(20);
 
-        return view('companies.jobs.applications', compact('company', 'job', 'applications'));
+        $applications = $job->applications()->with('files')->orderByDesc('id')->get()
+            ->map(function (JobApplication $application) use ($job) {
+                $application->match_score = ($job->description_vector && $application->cv_vector)
+                    ? VectorSimilarity::cosine($job->description_vector, $application->cv_vector)
+                    : null;
+
+                return $application;
+            })
+            ->sortByDesc(fn (JobApplication $application) => $application->match_score ?? -2)
+            ->values();
+
+        $jobDescriptionText = trim(strip_tags($job->description));
+
+        return view('companies.jobs.applications', compact('company', 'job', 'applications', 'jobDescriptionText'));
+    }
+
+    public function storeJobVector(Request $request, Job $job)
+    {
+        $this->authorizeJob($job);
+
+        $validated = $request->validate([
+            'vector' => ['required', 'array', 'size:' . VectorSimilarity::DIMENSIONS],
+            'vector.*' => 'numeric',
+        ]);
+
+        $job->update([
+            'description_vector' => $validated['vector'],
+            'description_vector_generated_at' => now(),
+        ]);
+
+        return response()->json(['ok' => true]);
+    }
+
+    public function storeApplicationVector(Request $request, JobApplication $application)
+    {
+        $this->authorizeJob($application->job);
+
+        $validated = $request->validate([
+            'text' => ['required', 'string', 'max:20000'],
+            'vector' => ['required', 'array', 'size:' . VectorSimilarity::DIMENSIONS],
+            'vector.*' => 'numeric',
+        ]);
+
+        $application->update([
+            'cv_text' => $validated['text'],
+            'cv_vector' => $validated['vector'],
+            'cv_analyzed_at' => now(),
+        ]);
+
+        return response()->json(['ok' => true]);
     }
 
     public function downloadApplicationAttachment(JobApplication $application)

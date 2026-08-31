@@ -59,15 +59,21 @@
                     <p class="mb-3">{{ $application->message }}</p>
                     <div class="d-flex flex-wrap gap-2">
                         @foreach($application->attachmentList() as $file)
-                            @if($file->id)
-                                <a href="{{ route('company.attachments.download', $file) }}" class="btn btn-sm btn-outline-primary">
-                                    <i class="bi bi-download me-1"></i> {{ $file->original_name ?: 'Anexo' }}
-                                </a>
-                            @else
-                                <a href="{{ route('company.applications.download', $application) }}" class="btn btn-sm btn-outline-primary">
-                                    <i class="bi bi-download me-1"></i> {{ $file->original_name ?: 'Anexo' }}
-                                </a>
+                            @php
+                                $downloadUrl = $file->id
+                                    ? route('company.attachments.download', $file)
+                                    : route('company.applications.download', $application);
+                                $isPdf = Str::endsWith(strtolower($file->original_name ?: ''), '.pdf');
+                            @endphp
+                            @if($isPdf)
+                                <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#cv-viewer-modal"
+                                    data-cv-preview-url="{{ $downloadUrl }}" data-cv-preview-name="{{ $application->name }} — {{ $file->original_name ?: 'CV' }}">
+                                    <i class="bi bi-eye me-1"></i> Ver CV
+                                </button>
                             @endif
+                            <a href="{{ $downloadUrl }}" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-download me-1"></i> {{ $file->original_name ?: 'Anexo' }}
+                            </a>
                         @endforeach
                     </div>
                 </div>
@@ -113,5 +119,24 @@
         };
     </script>
     <script src="{{ asset('assets/js/cv-analysis.js') }}"></script>
+
+    <div class="modal fade" id="cv-viewer-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cv-viewer-title">CV</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body bg-light" id="cv-viewer-body"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        window.CV_VIEWER_CONFIG = {
+            pdfJsUrl: '{{ asset('assets/vendor/pdfjs/pdf.min.js') }}',
+            pdfWorkerUrl: '{{ asset('assets/vendor/pdfjs/pdf.worker.min.js') }}',
+        };
+    </script>
+    <script src="{{ asset('assets/js/cv-viewer.js') }}"></script>
 @endif
 @endsection

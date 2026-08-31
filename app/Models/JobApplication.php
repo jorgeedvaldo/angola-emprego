@@ -22,6 +22,7 @@ class JobApplication extends Model
         'status',
         'cv_text',
         'cv_vector',
+        'cv_vector_model',
         'cv_analyzed_at',
     ];
 

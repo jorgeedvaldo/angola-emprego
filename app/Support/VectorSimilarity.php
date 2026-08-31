@@ -6,6 +6,11 @@ class VectorSimilarity
 {
     public const DIMENSIONS = 384;
 
+    // Must match MODEL_ID in public/assets/js/cv-analysis.js. Multilingual (covers
+    // Portuguese) — all-MiniLM-L6-v2 is English-only and scores unrelated PT text
+    // as artificially similar.
+    public const MODEL_ID = 'Xenova/paraphrase-multilingual-MiniLM-L12-v2';
+
     public static function cosine(array $a, array $b): ?float
     {
         if (count($a) !== count($b) || $a === []) {

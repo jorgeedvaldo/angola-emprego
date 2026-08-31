@@ -96,7 +96,7 @@
             return [
                 'id' => $application->id,
                 'name' => $application->name,
-                'hasVector' => (bool) $application->cv_vector,
+                'hasVector' => (bool) $application->has_current_vector,
                 'downloadUrl' => $file->id
                     ? route('company.attachments.download', $file)
                     : route('company.applications.download', $application),
@@ -111,7 +111,7 @@
             pdfWorkerUrl: '{{ asset('assets/vendor/pdfjs/pdf.worker.min.js') }}',
             tesseractUrl: '{{ asset('assets/vendor/tesseract/tesseract.min.js') }}',
             job: {
-                hasVector: {{ $job->description_vector ? 'true' : 'false' }},
+                hasVector: {{ $jobHasCurrentVector ? 'true' : 'false' }},
                 descriptionText: @json($jobDescriptionText),
                 vectorUrl: '{{ route('company.jobs.vector', $job) }}',
             },

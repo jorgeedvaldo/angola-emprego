@@ -183,6 +183,7 @@ class CompanyController extends Controller
         ]);
 
         $cleanDescription = HtmlSanitizer::clean($validated['description']);
+        $descriptionUnchanged = $cleanDescription === $job->getOriginal('description');
 
         $job->update([
             'title' => $validated['title'],
@@ -190,8 +191,9 @@ class CompanyController extends Controller
             'description' => $cleanDescription,
             'email_or_link' => $validated['email_or_link'] ?? $job->email_or_link,
             'company' => Auth::user()->company->name,
-            'description_vector' => $cleanDescription === $job->getOriginal('description') ? $job->description_vector : null,
-            'description_vector_generated_at' => $cleanDescription === $job->getOriginal('description') ? $job->description_vector_generated_at : null,
+            'description_vector' => $descriptionUnchanged ? $job->description_vector : null,
+            'description_vector_model' => $descriptionUnchanged ? $job->description_vector_model : null,
+            'description_vector_generated_at' => $descriptionUnchanged ? $job->description_vector_generated_at : null,
         ]);
 
         $job->categories()->sync($validated['categories'] ?? []);
@@ -212,11 +214,16 @@ class CompanyController extends Controller
         $this->authorizeJob($job);
         $company = Auth::user()->company;
 
+        $jobHasCurrentVector = (bool) $job->description_vector && $job->description_vector_model === VectorSimilarity::MODEL_ID;
+
         $applications = $job->applications()->with('files')->orderByDesc('id')->get()
-            ->map(function (JobApplication $application) use ($job) {
-                $application->match_score = ($job->description_vector && $application->cv_vector)
+            ->map(function (JobApplication $application) use ($job, $jobHasCurrentVector) {
+                $applicationHasCurrentVector = (bool) $application->cv_vector && $application->cv_vector_model === VectorSimilarity::MODEL_ID;
+
+                $application->match_score = ($jobHasCurrentVector && $applicationHasCurrentVector)
                     ? VectorSimilarity::cosine($job->description_vector, $application->cv_vector)
                     : null;
+                $application->has_current_vector = $applicationHasCurrentVector;
 
                 return $application;
             })
@@ -225,7 +232,7 @@ class CompanyController extends Controller
 
         $jobDescriptionText = trim(strip_tags($job->description));
 
-        return view('companies.jobs.applications', compact('company', 'job', 'applications', 'jobDescriptionText'));
+        return view('companies.jobs.applications', compact('company', 'job', 'applications', 'jobDescriptionText', 'jobHasCurrentVector'));
     }
 
     public function storeJobVector(Request $request, Job $job)
@@ -233,12 +240,18 @@ class CompanyController extends Controller
         $this->authorizeJob($job);
 
         $validated = $request->validate([
+            'model' => ['required', 'string'],
             'vector' => ['required', 'array', 'size:' . VectorSimilarity::DIMENSIONS],
             'vector.*' => 'numeric',
         ]);
 
+        if ($validated['model'] !== VectorSimilarity::MODEL_ID) {
+            return response()->json(['ok' => false, 'message' => 'Modelo desactualizado. Actualize a página.'], 409);
+        }
+
         $job->update([
             'description_vector' => $validated['vector'],
+            'description_vector_model' => $validated['model'],
             'description_vector_generated_at' => now(),
         ]);
 
@@ -251,13 +264,19 @@ class CompanyController extends Controller
 
         $validated = $request->validate([
             'text' => ['required', 'string', 'max:20000'],
+            'model' => ['required', 'string'],
             'vector' => ['required', 'array', 'size:' . VectorSimilarity::DIMENSIONS],
             'vector.*' => 'numeric',
         ]);
 
+        if ($validated['model'] !== VectorSimilarity::MODEL_ID) {
+            return response()->json(['ok' => false, 'message' => 'Modelo desactualizado. Actualize a página.'], 409);
+        }
+
         $application->update([
             'cv_text' => $validated['text'],
             'cv_vector' => $validated['vector'],
+            'cv_vector_model' => $validated['model'],
             'cv_analyzed_at' => now(),
         ]);
 

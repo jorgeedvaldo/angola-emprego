@@ -15,7 +15,7 @@ class Job extends Model
 
     protected $fillable = [
         'title', 'slug', 'company', 'location', 'description', 'email_or_link', 'image', 'company_id',
-        'description_vector', 'description_vector_generated_at',
+        'description_vector', 'description_vector_model', 'description_vector_generated_at',
     ];
 
     protected $casts = [

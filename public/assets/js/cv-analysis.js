@@ -1,5 +1,8 @@
 (function () {
-    const MODEL_ID = 'Xenova/all-MiniLM-L6-v2';
+    // Multilingual (covers Portuguese) — must match VectorSimilarity::MODEL_ID in
+    // app/Support/VectorSimilarity.php. all-MiniLM-L6-v2 is English-only and scores
+    // unrelated Portuguese text as artificially similar.
+    const MODEL_ID = 'Xenova/paraphrase-multilingual-MiniLM-L12-v2';
     const MIN_TEXT_LENGTH_BEFORE_OCR = 40;
     const MAX_TEXT_LENGTH = 8000;
     const OCR_LANGUAGE = 'por';
@@ -132,7 +135,7 @@
 
         statusEl.textContent = 'A gerar o vector da descrição da vaga…';
         const vector = await embed(config, config.job.descriptionText);
-        await postJson(config.job.vectorUrl, { vector });
+        await postJson(config.job.vectorUrl, { vector, model: MODEL_ID });
         config.job.hasVector = true;
     }
 
@@ -146,7 +149,7 @@
 
         statusEl.textContent = 'A calcular compatibilidade — ' + application.name + '…';
         const vector = await embed(config, text);
-        await postJson(application.vectorUrl, { text, vector });
+        await postJson(application.vectorUrl, { text, vector, model: MODEL_ID });
     }
 
     async function run(config, elements) {

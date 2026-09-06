@@ -44,4 +44,9 @@ return [
         'from_name' => env('MAILEROO_FROM_NAME', env('MAIL_FROM_NAME', 'Angola Emprego')),
     ],
 
+    'analisecv' => [
+        'url' => env('ANALISECV_URL'),
+        'api_key' => env('ANALISECV_API_KEY'),
+    ],
+
 ];

@@ -32,6 +32,7 @@ Route::get('/linkstorage', function () {
 });
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/sobre', [AboutController::class, 'index'])->name('sobre');
+Route::get('/analise-de-cv', [AboutController::class, 'cvAnalysis'])->name('cv-analysis.info');
 Route::get('/vagas', [JobController::class, 'index'])->name('vagas');
 Route::get('/empresas', [CompanyController::class, 'index'])->name('companies.index');
 Route::get('/company/{slug}', [CompanyController::class, 'show'])->name('companies.show')->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*');

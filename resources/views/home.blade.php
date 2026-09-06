@@ -96,75 +96,80 @@
 
     </section><!-- /Hero Section -->
 
-    <!-- ═══ [CSMJ PROMO] SECÇÃO RESULTADOS CONCURSO CSMJ 2026 — EXCLUIR MANUALMENTE QUANDO NECESSÁRIO ═══ -->
-    <section class="py-5 bg-white border-bottom" id="csmj-promo-section">
+    <!-- ═══ [CV IA PROMO] SECÇÃO ANÁLISE DE CV POR IA PARA EMPRESAS ═══ -->
+    <section class="py-5 bg-white border-bottom" id="cv-ai-promo-section">
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-lg-10">
-                    <div class="csmj-promo-card">
+                    <div class="cv-ai-promo-card">
                         <div class="row align-items-center g-0">
                             <div class="col-lg-7 p-4 p-lg-5">
                                 <div class="d-flex align-items-center gap-2 mb-3">
-                                    <span class="badge bg-danger rounded-pill px-3 py-2 fw-bold csmj-badge-pulse">
-                                        <i class="bi bi-megaphone-fill me-1"></i> NOVO
+                                    <span class="badge bg-danger rounded-pill px-3 py-2 fw-bold cv-ai-badge-pulse">
+                                        <i class="bi bi-stars me-1"></i> NOVO
                                     </span>
-                                    <span class="text-muted small">Publicado hoje</span>
+                                    <span class="text-muted small">Serviço gratuito para empresas</span>
                                 </div>
                                 <h2 class="fw-bold text-dark mb-3" style="line-height: 1.3;">
-                                    Resultados da Prova do Concurso do CSMJ
+                                    Análise de candidatos por inteligência artificial
                                 </h2>
                                 <p class="text-muted mb-4">
-                                    O Conselho Superior da Magistratura Judicial publicou a <strong>Lista Provisória de
-                                        Classificação Final</strong>.
-                                    Pesquise pelo seu nome e consulte o resultado da sua candidatura agora.
+                                    Cadastre a sua empresa, publique a vaga e deixe o nosso sistema ler os currículos
+                                    por si. Em poucos segundos, veja quais candidatos mais combinam com o que procura —
+                                    sem abrir um PDF de cada vez.
                                 </p>
                                 <div class="d-flex flex-wrap gap-3 mb-4">
                                     <div class="d-flex align-items-center gap-2">
-                                        <div class="csmj-stat-mini bg-primary bg-opacity-10 text-primary">
-                                            <i class="bi bi-people-fill"></i>
+                                        <div class="cv-ai-stat-mini bg-primary bg-opacity-10 text-primary">
+                                            <i class="bi bi-building"></i>
                                         </div>
                                         <div>
-                                            <div class="fw-bold small">+5.000</div>
-                                            <div class="text-muted" style="font-size:0.7rem;">Candidatos</div>
+                                            <div class="fw-bold small">Cadastro grátis</div>
+                                            <div class="text-muted" style="font-size:0.7rem;">Sem mensalidade</div>
                                         </div>
                                     </div>
                                     <div class="d-flex align-items-center gap-2">
-                                        <div class="csmj-stat-mini bg-success bg-opacity-10 text-success">
-                                            <i class="bi bi-briefcase-fill"></i>
+                                        <div class="cv-ai-stat-mini bg-success bg-opacity-10 text-success">
+                                            <i class="bi bi-file-earmark-text-fill"></i>
                                         </div>
                                         <div>
-                                            <div class="fw-bold small">2 Cargos</div>
-                                            <div class="text-muted" style="font-size:0.7rem;">Disponíveis</div>
+                                            <div class="fw-bold small">Leitura automática</div>
+                                            <div class="text-muted" style="font-size:0.7rem;">de cada currículo</div>
                                         </div>
                                     </div>
                                     <div class="d-flex align-items-center gap-2">
-                                        <div class="csmj-stat-mini bg-warning bg-opacity-10 text-warning">
-                                            <i class="bi bi-search"></i>
+                                        <div class="cv-ai-stat-mini bg-warning bg-opacity-10 text-warning">
+                                            <i class="bi bi-bar-chart-fill"></i>
                                         </div>
                                         <div>
-                                            <div class="fw-bold small">Pesquisa</div>
-                                            <div class="text-muted" style="font-size:0.7rem;">Instantânea</div>
+                                            <div class="fw-bold small">Ranking</div>
+                                            <div class="text-muted" style="font-size:0.7rem;">por compatibilidade</div>
                                         </div>
                                     </div>
                                 </div>
-                                <a href="{{ route('post.resultado.csmj') }}"
-                                    class="btn btn-primary btn-lg rounded-pill fw-bold px-4 shadow-sm">
-                                    <i class="bi bi-search me-2"></i> Consultar Resultados
-                                </a>
+                                <div class="d-flex flex-wrap gap-3 align-items-center">
+                                    <a href="{{ route('register.company') }}"
+                                        class="btn btn-primary btn-lg rounded-pill fw-bold px-4 shadow-sm">
+                                        <i class="bi bi-building-add me-2"></i> Cadastrar a minha empresa
+                                    </a>
+                                    <a href="{{ route('cv-analysis.info') }}" class="fw-bold text-decoration-none">
+                                        Ver como funciona <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                </div>
                             </div>
                             <div
-                                class="col-lg-5 d-none d-lg-flex align-items-center justify-content-center csmj-promo-visual">
-                                <div class="csmj-visual-icon">
-                                    <i class="bi bi-bank2"></i>
+                                class="col-lg-5 d-none d-lg-flex align-items-center justify-content-center cv-ai-promo-visual">
+                                <div class="cv-ai-visual-icon">
+                                    <i class="bi bi-robot"></i>
                                 </div>
-                                <div class="csmj-visual-badge badge-1">
-                                    <i class="bi bi-check-circle-fill text-success me-1"></i> Admitido
+                                <div class="cv-ai-visual-badge badge-1">
+                                    <i class="bi bi-check-circle-fill text-success me-1"></i> 92% compatível
                                 </div>
-                                <div class="csmj-visual-badge badge-2">
-                                    <i class="bi bi-bar-chart-fill text-primary me-1"></i> 17.9 pts
+                                <div class="cv-ai-visual-badge badge-2">
+                                    <i class="bi bi-file-earmark-check-fill text-primary me-1"></i> CV lido
                                 </div>
-                                <div class="csmj-visual-badge badge-3">
-                                    <i class="bi bi-person-fill text-info me-1"></i> Pesquisar
+                                <div class="cv-ai-visual-badge badge-3">
+                                    <i class="bi bi-list-ol text-info me-1"></i> Ranking pronto
                                 </div>
                             </div>
                         </div>
@@ -174,7 +179,7 @@
         </div>
 
         <style>
-            .csmj-promo-card {
+            .cv-ai-promo-card {
                 background: #fff;
                 border-radius: 16px;
                 border: 1px solid #e8e8e8;
@@ -183,11 +188,11 @@
                 transition: box-shadow 0.3s;
             }
 
-            .csmj-promo-card:hover {
+            .cv-ai-promo-card:hover {
                 box-shadow: 0 8px 40px rgba(37, 87, 167, 0.1);
             }
 
-            .csmj-stat-mini {
+            .cv-ai-stat-mini {
                 width: 36px;
                 height: 36px;
                 border-radius: 8px;
@@ -197,13 +202,13 @@
                 font-size: 0.9rem;
             }
 
-            .csmj-promo-visual {
+            .cv-ai-promo-visual {
                 position: relative;
                 min-height: 280px;
                 background: linear-gradient(135deg, #eef2ff 0%, #e8f0fe 100%);
             }
 
-            .csmj-visual-icon {
+            .cv-ai-visual-icon {
                 width: 100px;
                 height: 100px;
                 border-radius: 24px;
@@ -216,7 +221,7 @@
                 box-shadow: 0 8px 24px rgba(37, 87, 167, 0.3);
             }
 
-            .csmj-visual-badge {
+            .cv-ai-visual-badge {
                 position: absolute;
                 background: #fff;
                 border-radius: 50px;
@@ -224,28 +229,28 @@
                 font-size: 0.8rem;
                 font-weight: 600;
                 box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-                animation: csmj-float 3s ease-in-out infinite;
+                animation: cv-ai-float 3s ease-in-out infinite;
             }
 
-            .csmj-visual-badge.badge-1 {
+            .cv-ai-visual-badge.badge-1 {
                 top: 30px;
                 right: 30px;
                 animation-delay: 0s;
             }
 
-            .csmj-visual-badge.badge-2 {
+            .cv-ai-visual-badge.badge-2 {
                 bottom: 40px;
                 left: 20px;
                 animation-delay: 0.5s;
             }
 
-            .csmj-visual-badge.badge-3 {
+            .cv-ai-visual-badge.badge-3 {
                 top: 50%;
                 right: 15px;
                 animation-delay: 1s;
             }
 
-            @keyframes csmj-float {
+            @keyframes cv-ai-float {
 
                 0%,
                 100% {
@@ -257,11 +262,11 @@
                 }
             }
 
-            .csmj-badge-pulse {
-                animation: csmj-pulse 2s ease-in-out infinite;
+            .cv-ai-badge-pulse {
+                animation: cv-ai-pulse 2s ease-in-out infinite;
             }
 
-            @keyframes csmj-pulse {
+            @keyframes cv-ai-pulse {
 
                 0%,
                 100% {
@@ -274,7 +279,7 @@
             }
         </style>
     </section>
-    <!-- ═══ [/CSMJ PROMO] FIM DA SECÇÃO — EXCLUIR MANUALMENTE QUANDO NECESSÁRIO ═══ -->
+    <!-- ═══ [/CV IA PROMO] FIM DA SECÇÃO ═══ -->
 
     <!-- Features Section -->
     <section class="py-5" style="background-color: #fff;">

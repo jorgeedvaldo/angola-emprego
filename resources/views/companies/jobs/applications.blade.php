@@ -19,8 +19,8 @@
                     <div>
                         <h5 class="fw-bold mb-1">Análise de CVs por IA</h5>
                         <p class="text-muted small mb-0">
-                            Ordena automaticamente os candidatos pela compatibilidade com a descrição da vaga.
-                            Tudo é processado no seu navegador — os CVs não saem do seu computador durante a análise.
+                            Ordena automaticamente os candidatos pela compatibilidade com a descrição da vaga,
+                            usando o nosso serviço dedicado de análise de CVs.
                         </p>
                     </div>
                     <button id="cv-analysis-start" type="button" class="btn btn-primary fw-bold text-nowrap" style="background-color: #2557a7; border-color: #2557a7;">
@@ -91,29 +91,19 @@
         $applicationsForAnalysis = $applications->filter(function ($application) {
             return $application->attachmentList()->isNotEmpty();
         })->map(function ($application) {
-            $file = $application->attachmentList()->first();
-
             return [
                 'id' => $application->id,
                 'name' => $application->name,
-                'hasVector' => (bool) $application->cv_vector,
-                'downloadUrl' => $file->id
-                    ? route('company.attachments.download', $file)
-                    : route('company.applications.download', $application),
-                'vectorUrl' => route('company.applications.vector', $application),
+                'hasVector' => (bool) $application->has_current_vector,
+                'analyzeUrl' => route('company.applications.analyze', $application),
             ];
         })->values();
     @endphp
     <script>
         window.CV_ANALYSIS_CONFIG = {
-            transformersUrl: '{{ asset('assets/vendor/transformers/transformers.min.js') }}',
-            pdfJsUrl: '{{ asset('assets/vendor/pdfjs/pdf.min.js') }}',
-            pdfWorkerUrl: '{{ asset('assets/vendor/pdfjs/pdf.worker.min.js') }}',
-            tesseractUrl: '{{ asset('assets/vendor/tesseract/tesseract.min.js') }}',
             job: {
-                hasVector: {{ $job->description_vector ? 'true' : 'false' }},
-                descriptionText: @json($jobDescriptionText),
-                vectorUrl: '{{ route('company.jobs.vector', $job) }}',
+                hasVector: {{ $jobHasCurrentVector ? 'true' : 'false' }},
+                analyzeUrl: '{{ route('company.jobs.analyze', $job) }}',
             },
             applications: @json($applicationsForAnalysis),
         };

@@ -7,11 +7,13 @@ use App\Models\Company;
 use App\Models\Job;
 use App\Models\JobApplication;
 use App\Models\JobApplicationAttachment;
+use App\Services\CvAnalysisService;
 use App\Support\HtmlSanitizer;
 use App\Support\VectorSimilarity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class CompanyController extends Controller
 {
@@ -183,6 +185,7 @@ class CompanyController extends Controller
         ]);
 
         $cleanDescription = HtmlSanitizer::clean($validated['description']);
+        $descriptionUnchanged = $cleanDescription === $job->getOriginal('description');
 
         $job->update([
             'title' => $validated['title'],
@@ -190,8 +193,9 @@ class CompanyController extends Controller
             'description' => $cleanDescription,
             'email_or_link' => $validated['email_or_link'] ?? $job->email_or_link,
             'company' => Auth::user()->company->name,
-            'description_vector' => $cleanDescription === $job->getOriginal('description') ? $job->description_vector : null,
-            'description_vector_generated_at' => $cleanDescription === $job->getOriginal('description') ? $job->description_vector_generated_at : null,
+            'description_vector' => $descriptionUnchanged ? $job->description_vector : null,
+            'description_vector_model' => $descriptionUnchanged ? $job->description_vector_model : null,
+            'description_vector_generated_at' => $descriptionUnchanged ? $job->description_vector_generated_at : null,
         ]);
 
         $job->categories()->sync($validated['categories'] ?? []);
@@ -212,52 +216,79 @@ class CompanyController extends Controller
         $this->authorizeJob($job);
         $company = Auth::user()->company;
 
+        $jobHasCurrentVector = (bool) $job->description_vector && $job->description_vector_model === VectorSimilarity::MODEL_ID;
+
         $applications = $job->applications()->with('files')->orderByDesc('id')->get()
-            ->map(function (JobApplication $application) use ($job) {
-                $application->match_score = ($job->description_vector && $application->cv_vector)
+            ->map(function (JobApplication $application) use ($job, $jobHasCurrentVector) {
+                $applicationHasCurrentVector = (bool) $application->cv_vector && $application->cv_vector_model === VectorSimilarity::MODEL_ID;
+
+                $application->match_score = ($jobHasCurrentVector && $applicationHasCurrentVector)
                     ? VectorSimilarity::cosine($job->description_vector, $application->cv_vector)
                     : null;
+                $application->has_current_vector = $applicationHasCurrentVector;
 
                 return $application;
             })
             ->sortByDesc(fn (JobApplication $application) => $application->match_score ?? -2)
             ->values();
 
-        $jobDescriptionText = trim(strip_tags($job->description));
-
-        return view('companies.jobs.applications', compact('company', 'job', 'applications', 'jobDescriptionText'));
+        return view('companies.jobs.applications', compact('company', 'job', 'applications', 'jobHasCurrentVector'));
     }
 
-    public function storeJobVector(Request $request, Job $job)
+    public function analyzeJobDescription(Job $job, CvAnalysisService $analysis)
     {
         $this->authorizeJob($job);
 
-        $validated = $request->validate([
-            'vector' => ['required', 'array', 'size:' . VectorSimilarity::DIMENSIONS],
-            'vector.*' => 'numeric',
-        ]);
+        $result = $analysis->embed(trim(strip_tags($job->description)));
+
+        if (!$result) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Não foi possível contactar o serviço de análise de CVs. Tente novamente dentro de momentos.',
+            ], 502);
+        }
 
         $job->update([
-            'description_vector' => $validated['vector'],
+            'description_vector' => $result['vector'],
+            'description_vector_model' => $result['model'],
             'description_vector_generated_at' => now(),
         ]);
 
         return response()->json(['ok' => true]);
     }
 
-    public function storeApplicationVector(Request $request, JobApplication $application)
+    public function analyzeApplication(JobApplication $application, CvAnalysisService $analysis)
     {
         $this->authorizeJob($application->job);
 
-        $validated = $request->validate([
-            'text' => ['required', 'string', 'max:20000'],
-            'vector' => ['required', 'array', 'size:' . VectorSimilarity::DIMENSIONS],
-            'vector.*' => 'numeric',
-        ]);
+        // OCR on a scanned CV can take a while; the shared hosting default
+        // execution limit (often 30-60s) could otherwise cut this off before
+        // the analisecv-service responds.
+        set_time_limit(130);
+
+        $file = $application->attachmentList()->first();
+
+        if (!$file) {
+            return response()->json(['ok' => false, 'message' => 'Esta candidatura não tem CV anexado.'], 422);
+        }
+
+        if (!Str::endsWith(strtolower($file->original_name ?: ''), '.pdf')) {
+            return response()->json(['ok' => false, 'message' => 'Só é possível analisar CVs em PDF.'], 422);
+        }
+
+        $result = $analysis->analyzeCv('local', $file->path);
+
+        if (!$result) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Não foi possível analisar este CV. Tente novamente dentro de momentos.',
+            ], 502);
+        }
 
         $application->update([
-            'cv_text' => $validated['text'],
-            'cv_vector' => $validated['vector'],
+            'cv_text' => $result['text'],
+            'cv_vector' => $result['vector'],
+            'cv_vector_model' => $result['model'],
             'cv_analyzed_at' => now(),
         ]);
 

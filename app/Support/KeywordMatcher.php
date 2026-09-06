@@ -133,10 +133,15 @@ class KeywordMatcher
         ];
     }
 
+    private const SEMANTIC_WEIGHT = 0.8;
+    private const KEYWORD_WEIGHT = 0.2;
+
     /**
-     * Combines the semantic (embedding) score with the keyword score. Weighted evenly:
-     * the semantic score captures overall topical similarity, the keyword score catches
-     * literal requirement matches the embedding model under-weights across languages.
+     * Combines the semantic (embedding) score with the keyword score. LaBSE already
+     * closes most of the cross-lingual gap on its own, so the semantic score carries
+     * most of the weight (80%); the keyword score is a light 20% reinforcement that
+     * catches literal requirement matches (acronyms, certifications) without
+     * overriding what the embedding model already gets right.
      */
     public static function blend(?float $semanticScore, ?float $keywordScore): ?float
     {
@@ -152,7 +157,7 @@ class KeywordMatcher
             return $semanticScore;
         }
 
-        return (0.5 * $semanticScore) + (0.5 * $keywordScore);
+        return (self::SEMANTIC_WEIGHT * $semanticScore) + (self::KEYWORD_WEIGHT * $keywordScore);
     }
 
     /**

@@ -16,24 +16,55 @@ namespace App\Support;
  */
 class KeywordMatcher
 {
+    /**
+     * Compared against the accent-stripped, lowercased form of each token (see
+     * normalize()) — entries here must already be in that normalized form.
+     */
     private const STOPWORDS = [
         'a', 'o', 'as', 'os', 'de', 'da', 'do', 'das', 'dos', 'e', 'ou', 'em', 'no', 'na',
         'nos', 'nas', 'num', 'numa', 'para', 'por', 'com', 'sem', 'sob', 'sobre', 'entre',
         'ate', 'apos', 'ante', 'perante', 'um', 'uma', 'uns', 'umas', 'que', 'se', 'sua',
-        'seu', 'suas', 'seus', 'ao', 'aos', 'a', 'as', 'e', 'sao', 'ser', 'estar', 'tem',
+        'seu', 'suas', 'seus', 'ao', 'aos', 'sao', 'ser', 'estar', 'tem',
         'ter', 'como', 'mais', 'menos', 'muito', 'muita', 'muitos', 'muitas', 'pouco',
         'este', 'esta', 'estes', 'estas', 'esse', 'essa', 'esses', 'essas', 'isso', 'isto',
         'aquele', 'aquela', 'aqueles', 'aquelas', 'tambem', 'nao', 'sim', 'mas', 'porem',
         'quando', 'onde', 'qual', 'quais', 'cada', 'todo', 'toda', 'todos', 'todas',
         'outro', 'outra', 'outros', 'outras', 'pelo', 'pela', 'pelos', 'pelas', 'deste',
         'desta', 'destes', 'destas', 'nesse', 'nessa', 'nesses', 'nessas', 'neste', 'nesta',
-        'nestes', 'nestas', 'seja', 'sejam', 'ser', 'ficar', 'pode', 'podem', 'podera',
+        'nestes', 'nestas', 'seja', 'sejam', 'ficar', 'pode', 'podem', 'podera',
         'poderao', 'deve', 'devem', 'devera', 'deverao', 'the', 'and', 'or', 'for', 'with',
         'without', 'from', 'this', 'that', 'these', 'those', 'will', 'shall', 'must',
-        'have', 'has', 'are', 'is', 'be', 'been', 'being', 'anos', 'ano', 'vaga', 'empresa',
-        'trabalho', 'candidato', 'candidatos', 'candidatura', 'candidaturas', 'funcao',
-        'funcoes', 'area', 'sector', 'setor',
+        'have', 'has', 'are', 'is', 'be', 'been', 'being',
+        // Vocabulário genérico de recrutamento/RH: aparece em praticamente qualquer
+        // vaga e qualquer CV, independentemente da área — não distingue candidatos.
+        'anos', 'ano', 'vaga', 'vagas', 'empresa', 'empresas', 'trabalho', 'trabalhar',
+        'candidato', 'candidata', 'candidatos', 'candidatas', 'candidatura', 'candidaturas',
+        'funcao', 'funcoes', 'area', 'areas', 'sector', 'setor', 'requisitos', 'requisito',
+        'perfil', 'colaborador', 'colaboradores', 'colaboradora', 'colaboradoras', 'equipa',
+        'equipe', 'ambiente', 'oportunidade', 'oportunidades', 'local', 'localizacao',
+        'horario', 'horarios', 'salario', 'salarios', 'beneficios', 'remuneracao',
+        'disponibilidade', 'curriculo', 'envie', 'envio', 'enviar', 'contacto', 'contato',
+        'contactos', 'contatos', 'experiencia', 'experiencias', 'conhecimento',
+        'conhecimentos', 'procedimento', 'procedimentos', 'sistema', 'sistemas', 'formacao',
+        'comunicacao', 'classe', 'acordo', 'obrigatoria', 'obrigatorio', 'necessaria',
+        'necessario', 'desejavel', 'minima', 'minimo', 'maxima', 'maximo', 'vantagem',
+        'turnos', 'turno', 'disponivel', 'seguranca', 'informacoes', 'informacao',
+        'responsavel', 'responsaveis', 'apresentar', 'possuir', 'possui',
     ];
+
+    /**
+     * Acronyms that are administrative/generic (company structure, currency, common
+     * document formats) rather than domain requirements — high frequency, low signal.
+     */
+    private const ACRONYM_BLOCKLIST = [
+        'SA', 'LDA', 'RH', 'TI', 'CV', 'PDF', 'CEO', 'CFO', 'CTO', 'COO', 'ERP', 'CRM',
+        'KPI', 'ONG', 'IVA', 'INSS', 'USD', 'EUR', 'KZ', 'AO', 'ID', 'WWW', 'HTTP', 'HTTPS',
+    ];
+
+    private const ACRONYM_WEIGHT = 4;
+    private const PHRASE_WEIGHT = 3;
+    private const WORD_WEIGHT = 1;
+    private const MAX_WORDS = 12;
 
     /**
      * @return array<int, array{term: string, weight: int}>
@@ -45,20 +76,20 @@ class KeywordMatcher
         $keywords = [];
 
         foreach (self::extractAcronyms($text) as $term) {
-            $keywords[self::normalize($term)] = ['term' => $term, 'weight' => 2];
+            $keywords[self::normalize($term)] = ['term' => $term, 'weight' => self::ACRONYM_WEIGHT];
         }
 
         foreach (self::extractCapitalizedPhrases($text) as $term) {
             $key = self::normalize($term);
             if (!isset($keywords[$key])) {
-                $keywords[$key] = ['term' => $term, 'weight' => 2];
+                $keywords[$key] = ['term' => $term, 'weight' => self::PHRASE_WEIGHT];
             }
         }
 
         foreach (self::extractSignificantWords($text) as $term => $count) {
             $key = self::normalize($term);
             if (!isset($keywords[$key])) {
-                $keywords[$key] = ['term' => $term, 'weight' => 1];
+                $keywords[$key] = ['term' => $term, 'weight' => self::WORD_WEIGHT];
             }
         }
 
@@ -138,7 +169,14 @@ class KeywordMatcher
         $acronyms = [];
 
         foreach (array_unique($matches[0]) as $match) {
-            if (strlen(preg_replace('/[^A-Z]/', '', $match)) >= 2) {
+            if (in_array($match, self::ACRONYM_BLOCKLIST, true)) {
+                continue;
+            }
+
+            // Require 3+ letters: filters out short administrative abbreviations
+            // (SA, RH, TI, CV...) that slip past the blocklist under a different guise
+            // while still keeping domain acronyms like BOP, HSE, IADC, IWCF, ISO.
+            if (strlen(preg_replace('/[^A-Z]/', '', $match)) >= 3) {
                 $acronyms[] = $match;
             }
         }
@@ -167,14 +205,14 @@ class KeywordMatcher
      */
     private static function extractSignificantWords(string $text): array
     {
-        $normalized = mb_strtolower($text, 'UTF-8');
-
-        preg_match_all('/\p{L}[\p{L}\p{N}]{3,}/u', $normalized, $matches);
+        preg_match_all('/\p{L}[\p{L}\p{N}]{3,}/u', mb_strtolower($text, 'UTF-8'), $matches);
 
         $counts = [];
 
         foreach ($matches[0] as $word) {
-            if (in_array($word, self::STOPWORDS, true)) {
+            // Stopwords are matched on the accent-stripped form so "não"/"nao",
+            // "está"/"esta", "função"/"funcao" etc. are all correctly filtered.
+            if (in_array(self::normalize($word), self::STOPWORDS, true)) {
                 continue;
             }
 
@@ -183,7 +221,7 @@ class KeywordMatcher
 
         arsort($counts);
 
-        return array_slice($counts, 0, 25, true);
+        return array_slice($counts, 0, self::MAX_WORDS, true);
     }
 
     private static function normalize(string $text): string

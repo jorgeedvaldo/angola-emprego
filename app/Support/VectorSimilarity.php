@@ -4,12 +4,16 @@ namespace App\Support;
 
 class VectorSimilarity
 {
-    public const DIMENSIONS = 384;
+    public const DIMENSIONS = 768;
 
-    // Must match MODEL_ID in public/assets/js/cv-analysis.js. Multilingual (covers
-    // Portuguese) — all-MiniLM-L6-v2 is English-only and scores unrelated PT text
-    // as artificially similar.
-    public const MODEL_ID = 'Xenova/paraphrase-multilingual-MiniLM-L12-v2';
+    // Must match MODEL_ID in analisecv-service's config.js — vectors from different
+    // models aren't comparable. LaBSE (Language-Agnostic BERT Sentence Embeddings) is
+    // trained specifically to place same-meaning sentences close together regardless
+    // of language, which paraphrase-multilingual-MiniLM-L12-v2 (the previous model)
+    // did not do well enough: it still scored same-language pairs higher than
+    // cross-language pairs of equivalent meaning, distorting rankings whenever a job
+    // posting (Portuguese) was compared against a CV written in English.
+    public const MODEL_ID = 'Xenova/LaBSE';
 
     public static function cosine(array $a, array $b): ?float
     {

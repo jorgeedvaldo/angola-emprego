@@ -5,14 +5,20 @@ namespace App\Support;
 /**
  * Complements VectorSimilarity::cosine() with an explicit term-matching signal.
  *
- * The multilingual embedding model has a "cross-lingual gap": it scores same-language
- * pairs higher than cross-language pairs of equivalent meaning, even when the
- * cross-language pair is the better match (e.g. a Portuguese job posting vs. an
- * English CV that literally contains the required certification). Matching the job's
- * own acronyms/technical terms/frequent words directly against the CV text is
- * language-agnostic for anything spelled the same way in both languages (acronyms,
- * proper nouns, standards), which covers most of the terms that actually matter for
- * technical/industrial roles.
+ * Even a cross-lingual-aware embedding model (LaBSE) can under-weight a literal
+ * requirement match (an exact certification code, standard, or technical term) that
+ * appears identically in the job description and the CV. This class extracts a wide,
+ * weighted vocabulary from the job description — acronyms, technical phrases,
+ * multi-word bigrams, and significant single words, boosted when they fall inside a
+ * detected "Requisitos"-style section — and checks it against the CV text.
+ *
+ * The wider vocabulary (see MAX_WORDS) is deliberately balanced by three precision
+ * mechanisms so a bigger word pool doesn't dilute the signal the way a flat/unweighted
+ * pool would: (1) length-tiered weights, so longer/rarer words count for more than
+ * short filler; (2) a large, curated stopword list of generic recruiting vocabulary
+ * that says nothing about a specific candidate; (3) a requirements-section boost, so
+ * terms actually listed as a requirement outweigh terms merely mentioned in passing
+ * (company blurb, benefits, etc).
  */
 class KeywordMatcher
 {
@@ -50,6 +56,31 @@ class KeywordMatcher
         'necessario', 'desejavel', 'minima', 'minimo', 'maxima', 'maximo', 'vantagem',
         'turnos', 'turno', 'disponivel', 'seguranca', 'informacoes', 'informacao',
         'responsavel', 'responsaveis', 'apresentar', 'possuir', 'possui',
+        // Vocabulário genérico adicional (adjectivos/substantivos de "cultura de
+        // empresa" e processo de candidatura que aparecem em qualquer anúncio).
+        'profissional', 'profissionais', 'atividades', 'actividades', 'tarefas',
+        'responsabilidades', 'processo', 'selecao', 'seleccao', 'interessados',
+        'interessado', 'favor', 'obrigado', 'cumprimentos', 'atenciosamente', 'mercado',
+        'cliente', 'clientes', 'servico', 'servicos', 'qualidade', 'excelencia',
+        'compromisso', 'valores', 'missao', 'visao', 'cultura', 'flexibilidade',
+        'iniciativa', 'proatividade', 'dinamico', 'dinamica', 'dinamismo', 'motivado',
+        'motivada', 'motivacao', 'organizado', 'organizada', 'organizacao', 'rigor',
+        'etica', 'integridade', 'excelente', 'otimo', 'otima', 'boa', 'bom', 'forte',
+        'solido', 'solida', 'diversos', 'diversas', 'varios', 'varias', 'principais',
+        'principal', 'geral', 'gerais', 'importante', 'importantes', 'essencial',
+        'essenciais', 'fundamental', 'fundamentais', 'capacidade', 'capacidades',
+        'habilidade', 'habilidades', 'funcionario', 'funcionarios', 'empregador',
+        'emprego', 'empregos', 'interesse', 'apto', 'apta', 'aptos', 'aptas',
+        'idade', 'idades', 'sexo', 'genero', 'natural', 'residente', 'residencia',
+        'morada', 'nacionalidade',
+        // Qualificadores genéricos que costumam preceder um requisito real sem serem
+        // eles próprios o requisito ("experiência comprovada", "certificação válida").
+        'comprovada', 'comprovado', 'comprovadas', 'comprovados', 'reconhecida',
+        'reconhecido', 'reconhecidas', 'reconhecidos', 'valida', 'validas', 'validos',
+        'atualizada', 'atualizado', 'atualizadas', 'atualizados', 'actualizada',
+        'actualizado', 'actualizadas', 'actualizados', 'relevante', 'relevantes',
+        'adequada', 'adequado', 'adequadas', 'adequados', 'preferencialmente',
+        'preferencial',
     ];
 
     /**
@@ -61,43 +92,82 @@ class KeywordMatcher
         'KPI', 'ONG', 'IVA', 'INSS', 'USD', 'EUR', 'KZ', 'AO', 'ID', 'WWW', 'HTTP', 'HTTPS',
     ];
 
-    private const ACRONYM_WEIGHT = 4;
-    private const PHRASE_WEIGHT = 3;
-    private const WORD_WEIGHT = 1;
-    private const MAX_WORDS = 12;
+    /**
+     * Section headings that mark where a job description states its actual
+     * requirements — terms found after one of these (until the next heading below,
+     * or the end of the text) are boosted relative to the rest of the posting.
+     */
+    private const REQUIREMENT_HEADINGS = [
+        'requisitos', 'requisito', 'perfil pretendido', 'perfil do candidato', 'perfil',
+        'qualificacoes', 'qualificacao', 'competencias', 'competencia', 'conhecimentos',
+        'formacao exigida', 'experiencia necessaria', 'requirements', 'qualifications',
+        'skills', 'o que procuramos', 'habilidades', 'exigencias', 'exige-se',
+    ];
 
     /**
-     * @return array<int, array{term: string, weight: int}>
+     * Headings that typically follow the requirements section — used to cut off the
+     * boosted zone before generic boilerplate (benefits, how to apply) dilutes it.
+     */
+    private const SECTION_END_HEADINGS = [
+        'oferecemos', 'beneficios', 'como se candidatar', 'candidatura', 'enviar cv',
+        'contactos', 'sobre a empresa', 'sobre nos', 'o que oferecemos', 'salario',
+        'remuneracao', 'horario de trabalho', 'local de trabalho',
+    ];
+
+    private const ACRONYM_WEIGHT = 5.0;
+    private const PHRASE_WEIGHT = 4.0;
+    private const BIGRAM_WEIGHT = 3.0;
+    private const REQUIREMENTS_BOOST = 1.5;
+    private const MAX_WORDS = 40;
+    private const MAX_BIGRAMS = 20;
+
+    /**
+     * @return array<int, array{term: string, weight: float}>
      */
     public static function extractKeywords(string $text): array
     {
         $text = html_entity_decode(strip_tags($text), ENT_QUOTES, 'UTF-8');
+        $normalizedRequirements = self::normalize(self::extractRequirementsSection($text));
 
         $keywords = [];
 
+        $add = function (string $term, float $weight) use (&$keywords, $normalizedRequirements) {
+            $key = self::normalize($term);
+
+            if ($key === '') {
+                return;
+            }
+
+            if ($normalizedRequirements !== '' && str_contains($normalizedRequirements, $key)) {
+                $weight *= self::REQUIREMENTS_BOOST;
+            }
+
+            if (!isset($keywords[$key]) || $keywords[$key]['weight'] < $weight) {
+                $keywords[$key] = ['term' => $term, 'weight' => $weight];
+            }
+        };
+
         foreach (self::extractAcronyms($text) as $term) {
-            $keywords[self::normalize($term)] = ['term' => $term, 'weight' => self::ACRONYM_WEIGHT];
+            $add($term, self::ACRONYM_WEIGHT);
         }
 
         foreach (self::extractCapitalizedPhrases($text) as $term) {
-            $key = self::normalize($term);
-            if (!isset($keywords[$key])) {
-                $keywords[$key] = ['term' => $term, 'weight' => self::PHRASE_WEIGHT];
-            }
+            $add($term, self::PHRASE_WEIGHT);
+        }
+
+        foreach (self::extractContentBigrams($text) as $term) {
+            $add($term, self::BIGRAM_WEIGHT);
         }
 
         foreach (self::extractSignificantWords($text) as $term => $count) {
-            $key = self::normalize($term);
-            if (!isset($keywords[$key])) {
-                $keywords[$key] = ['term' => $term, 'weight' => self::WORD_WEIGHT];
-            }
+            $add($term, self::weightForWordLength(mb_strlen($term, 'UTF-8')));
         }
 
         return array_values($keywords);
     }
 
     /**
-     * @param array<int, array{term: string, weight: int}> $keywords
+     * @param array<int, array{term: string, weight: float}> $keywords
      * @return array{score: float, matched: array<int, string>, total: int}|null
      */
     public static function score(array $keywords, ?string $cvText): ?array
@@ -107,22 +177,31 @@ class KeywordMatcher
         }
 
         $normalizedCv = self::normalize($cvText);
+        $cvStems = self::tokenizeStems($cvText);
 
-        $totalWeight = 0;
-        $matchedWeight = 0;
+        $totalWeight = 0.0;
+        $matchedWeight = 0.0;
         $matched = [];
 
         foreach ($keywords as $keyword) {
             $totalWeight += $keyword['weight'];
-            $needle = self::normalize($keyword['term']);
+            $term = $keyword['term'];
 
-            if ($needle !== '' && str_contains($normalizedCv, $needle)) {
+            // Multi-word terms (phrases/bigrams) need adjacency, so they're checked as a
+            // literal substring; single words/acronyms are stemmed on both sides so a
+            // simple singular/plural mismatch ("certificação" vs "certificações") still
+            // counts as a match instead of silently missing.
+            $isMatch = str_contains($term, ' ')
+                ? str_contains($normalizedCv, self::normalize($term))
+                : isset($cvStems[self::stem(self::normalize($term))]);
+
+            if ($isMatch) {
                 $matchedWeight += $keyword['weight'];
-                $matched[] = $keyword['term'];
+                $matched[] = $term;
             }
         }
 
-        if ($totalWeight === 0) {
+        if ($totalWeight <= 0.0) {
             return null;
         }
 
@@ -133,10 +212,15 @@ class KeywordMatcher
         ];
     }
 
+    private const SEMANTIC_WEIGHT = 0.8;
+    private const KEYWORD_WEIGHT = 0.2;
+
     /**
-     * Combines the semantic (embedding) score with the keyword score. Weighted evenly:
-     * the semantic score captures overall topical similarity, the keyword score catches
-     * literal requirement matches the embedding model under-weights across languages.
+     * Combines the semantic (embedding) score with the keyword score. LaBSE already
+     * closes most of the cross-lingual gap on its own, so the semantic score carries
+     * most of the weight (80%); the keyword score is a light 20% reinforcement that
+     * catches literal requirement matches (acronyms, certifications) without
+     * overriding what the embedding model already gets right.
      */
     public static function blend(?float $semanticScore, ?float $keywordScore): ?float
     {
@@ -152,7 +236,7 @@ class KeywordMatcher
             return $semanticScore;
         }
 
-        return (0.5 * $semanticScore) + (0.5 * $keywordScore);
+        return (self::SEMANTIC_WEIGHT * $semanticScore) + (self::KEYWORD_WEIGHT * $keywordScore);
     }
 
     /**
@@ -198,6 +282,63 @@ class KeywordMatcher
     }
 
     /**
+     * Lowercase multi-word phrases where the content words are specific enough on
+     * their own (4+ letters, not a stopword) — catches domain phrases that aren't
+     * capitalized, which single-word extraction would break apart and Title Case
+     * extraction would never see. Handles both direct adjacency ("controlo poço")
+     * and the very common Portuguese "noun + preposition + noun" pattern with a
+     * single connector word in between ("controlo DE poço", "trabalho EM altura"),
+     * since requiring strict adjacency would silently miss almost every such phrase.
+     *
+     * @return array<int, string>
+     */
+    private static function extractContentBigrams(string $text): array
+    {
+        // Unlike the other extractors, this needs every word — including short
+        // connectors ("de", "em", "ao"...) — so adjacency in $words matches adjacency
+        // in the real sentence; dropping short words here would silently collapse
+        // "controlo DE poço" into "controlo poço" and lose the connector entirely.
+        preg_match_all('/\p{L}[\p{L}\p{N}]*/u', mb_strtolower($text, 'UTF-8'), $matches);
+        $words = $matches[0];
+        $count = count($words);
+
+        $phrases = [];
+
+        for ($i = 0; $i < $count - 1; $i++) {
+            $a = $words[$i];
+
+            if (mb_strlen($a, 'UTF-8') < 4 || in_array(self::normalize($a), self::STOPWORDS, true)) {
+                continue;
+            }
+
+            $b = $words[$i + 1];
+            $bIsStopword = in_array(self::normalize($b), self::STOPWORDS, true);
+
+            if (!$bIsStopword && mb_strlen($b, 'UTF-8') >= 4) {
+                self::addPhraseCandidate($phrases, $a . ' ' . $b);
+                continue;
+            }
+
+            if ($bIsStopword && $i + 2 < $count) {
+                $c = $words[$i + 2];
+
+                if (mb_strlen($c, 'UTF-8') >= 4 && !in_array(self::normalize($c), self::STOPWORDS, true)) {
+                    self::addPhraseCandidate($phrases, $a . ' ' . $b . ' ' . $c);
+                }
+            }
+        }
+
+        return array_slice($phrases, 0, self::MAX_BIGRAMS);
+    }
+
+    private static function addPhraseCandidate(array &$phrases, string $phrase): void
+    {
+        if (!in_array($phrase, $phrases, true)) {
+            $phrases[] = $phrase;
+        }
+    }
+
+    /**
      * Frequent, non-trivial words from the description — a language-agnostic proxy
      * for "what this posting keeps talking about" when no acronyms/phrases apply.
      *
@@ -222,6 +363,104 @@ class KeywordMatcher
         arsort($counts);
 
         return array_slice($counts, 0, self::MAX_WORDS, true);
+    }
+
+    /**
+     * Longer words tend to be more specific/technical in Portuguese ("perfuração",
+     * "hidráulico", "certificação" vs "boa", "área", "vaga") — a cheap proxy for
+     * term specificity without a real corpus to compute document frequency from.
+     */
+    private static function weightForWordLength(int $length): float
+    {
+        if ($length >= 8) {
+            return 3.0;
+        }
+
+        if ($length >= 6) {
+            return 2.0;
+        }
+
+        return 1.0;
+    }
+
+    /**
+     * Finds the text between the first requirements-style heading and the next
+     * section-ending heading (or the end of the text) — an approximation of "the part
+     * of this posting that actually lists requirements" versus company blurb/benefits.
+     * Character-based (mb_*) throughout so offsets found in the lowercased copy stay
+     * valid when used to slice the original (accented) text.
+     */
+    private static function extractRequirementsSection(string $text): string
+    {
+        $lower = mb_strtolower($text, 'UTF-8');
+
+        $start = null;
+
+        foreach (self::REQUIREMENT_HEADINGS as $heading) {
+            $pos = mb_stripos($lower, $heading, 0, 'UTF-8');
+
+            if ($pos !== false && ($start === null || $pos < $start)) {
+                $start = $pos;
+            }
+        }
+
+        if ($start === null) {
+            return '';
+        }
+
+        $end = mb_strlen($text, 'UTF-8');
+
+        foreach (self::SECTION_END_HEADINGS as $heading) {
+            $pos = mb_stripos($lower, $heading, $start + 1, 'UTF-8');
+
+            if ($pos !== false && $pos < $end) {
+                $end = $pos;
+            }
+        }
+
+        return mb_substr($text, $start, $end - $start, 'UTF-8');
+    }
+
+    /**
+     * @return array<string, true> set of stemmed, normalized words found in the text
+     */
+    private static function tokenizeStems(string $text): array
+    {
+        preg_match_all('/\p{L}[\p{L}\p{N}]{2,}/u', mb_strtolower($text, 'UTF-8'), $matches);
+
+        $stems = [];
+
+        foreach ($matches[0] as $word) {
+            $stems[self::stem(self::normalize($word))] = true;
+        }
+
+        return $stems;
+    }
+
+    /**
+     * Lightweight Portuguese stemming for the common plural/suffix mismatches that
+     * would otherwise make an exact-substring keyword check miss an obvious match
+     * (e.g. the job says "certificação", the CV says "certificações"). Deliberately
+     * narrow (only applied to already-normalized, accent-stripped words of some
+     * minimum length) to avoid mangling short words/acronyms into false matches.
+     */
+    private static function stem(string $normalized): string
+    {
+        $length = mb_strlen($normalized, 'UTF-8');
+
+        // "-ções" → "-ção" (accent-stripped: "coes" → "cao"), e.g.
+        // certificacoes -> certificacao, qualificacoes -> qualificacao.
+        if ($length >= 5 && str_ends_with($normalized, 'coes')) {
+            return mb_substr($normalized, 0, -4, 'UTF-8') . 'cao';
+        }
+
+        // Generic plural stripping for longer words only, to avoid mangling short
+        // words/acronyms (e.g. "BOP", "gás") into unrelated stems.
+        if ($length >= 5 && str_ends_with($normalized, 's') && !str_ends_with($normalized, 'ss')) {
+            return mb_substr($normalized, 0, -1, 'UTF-8');
+        }
+
+        return $normalized;
     }
 
     private static function normalize(string $text): string

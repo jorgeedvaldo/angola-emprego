@@ -218,23 +218,21 @@ class CompanyController extends Controller
         $company = Auth::user()->company;
 
         $jobHasCurrentVector = (bool) $job->description_vector && $job->description_vector_model === VectorSimilarity::MODEL_ID;
-
-        // TEMP (teste A/B): KeywordMatcher desligado para avaliar o LaBSE sozinho.
-        // Para reactivar o blend 50/50 com palavras-chave, repor as duas linhas abaixo
-        // e voltar a usar KeywordMatcher::blend()/::score() em vez de $semanticScore.
-        // $jobKeywords = KeywordMatcher::extractKeywords($job->description);
+        $jobKeywords = KeywordMatcher::extractKeywords($job->description);
 
         $applications = $job->applications()->with('files')->orderByDesc('id')->get()
-            ->map(function (JobApplication $application) use ($job, $jobHasCurrentVector) {
+            ->map(function (JobApplication $application) use ($job, $jobHasCurrentVector, $jobKeywords) {
                 $applicationHasCurrentVector = (bool) $application->cv_vector && $application->cv_vector_model === VectorSimilarity::MODEL_ID;
 
                 $semanticScore = ($jobHasCurrentVector && $applicationHasCurrentVector)
                     ? VectorSimilarity::cosine($job->description_vector, $application->cv_vector)
                     : null;
 
-                $application->match_score = $semanticScore;
+                $keywordResult = KeywordMatcher::score($jobKeywords, $application->cv_text);
+
+                $application->match_score = KeywordMatcher::blend($semanticScore, $keywordResult['score'] ?? null);
                 $application->has_current_vector = $applicationHasCurrentVector;
-                $application->matched_keywords = [];
+                $application->matched_keywords = $keywordResult['matched'] ?? [];
 
                 return $application;
             })

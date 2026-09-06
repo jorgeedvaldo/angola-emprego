@@ -9,6 +9,7 @@ use App\Models\JobApplication;
 use App\Models\JobApplicationAttachment;
 use App\Services\CvAnalysisService;
 use App\Support\HtmlSanitizer;
+use App\Support\KeywordMatcher;
 use App\Support\VectorSimilarity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -217,15 +218,21 @@ class CompanyController extends Controller
         $company = Auth::user()->company;
 
         $jobHasCurrentVector = (bool) $job->description_vector && $job->description_vector_model === VectorSimilarity::MODEL_ID;
+        $jobKeywords = KeywordMatcher::extractKeywords($job->description);
 
         $applications = $job->applications()->with('files')->orderByDesc('id')->get()
-            ->map(function (JobApplication $application) use ($job, $jobHasCurrentVector) {
+            ->map(function (JobApplication $application) use ($job, $jobHasCurrentVector, $jobKeywords) {
                 $applicationHasCurrentVector = (bool) $application->cv_vector && $application->cv_vector_model === VectorSimilarity::MODEL_ID;
 
-                $application->match_score = ($jobHasCurrentVector && $applicationHasCurrentVector)
+                $semanticScore = ($jobHasCurrentVector && $applicationHasCurrentVector)
                     ? VectorSimilarity::cosine($job->description_vector, $application->cv_vector)
                     : null;
+
+                $keywordResult = KeywordMatcher::score($jobKeywords, $application->cv_text);
+
+                $application->match_score = KeywordMatcher::blend($semanticScore, $keywordResult['score'] ?? null);
                 $application->has_current_vector = $applicationHasCurrentVector;
+                $application->matched_keywords = $keywordResult['matched'] ?? [];
 
                 return $application;
             })

@@ -52,6 +52,12 @@
                                 @endif
                             </h5>
                             <div class="small text-muted">{{ $application->email }} @if($application->phone)· {{ $application->phone }}@endif</div>
+                            @if(!empty($application->matched_keywords))
+                                <div class="small text-muted mt-1">
+                                    <i class="bi bi-check2-circle text-success"></i>
+                                    Termos da vaga encontrados no CV: {{ implode(', ', array_slice($application->matched_keywords, 0, 12)) }}
+                                </div>
+                            @endif
                         </div>
                         <div class="text-muted small">{{ $application->created_at->format('d/m/Y H:i') }}</div>
                     </div>

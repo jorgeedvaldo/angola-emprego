@@ -13,6 +13,8 @@ use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\ToolsController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\CvScreeningController;
+use App\Http\Controllers\RecruiterController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,6 +37,7 @@ Route::get('/sobre', [AboutController::class, 'index'])->name('sobre');
 Route::get('/analise-de-cv', [AboutController::class, 'cvAnalysis'])->name('cv-analysis.info');
 Route::get('/vagas', [JobController::class, 'index'])->name('vagas');
 Route::get('/empresas', [CompanyController::class, 'index'])->name('companies.index');
+Route::get('/empresas-e-recrutadores', [RecruiterController::class, 'index'])->name('recruiters.index');
 Route::get('/company/{slug}', [CompanyController::class, 'show'])->name('companies.show')->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*');
 Route::get('/company/{slug}/vagas/{jobSlug}', [CompanyController::class, 'showJob'])->name('companies.job')->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*');
 Route::post('/vagas/{slug}/candidatar', [JobApplicationController::class, 'store'])->name('jobs.apply')->middleware('throttle:10,1');
@@ -91,6 +94,19 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/candidaturas/{application}/analisar', [CompanyController::class, 'analyzeApplication'])->name('applications.analyze');
         Route::get('/candidaturas/{application}/cv', [CompanyController::class, 'downloadApplicationAttachment'])->name('applications.download');
         Route::get('/anexos/{attachment}', [CompanyController::class, 'downloadAttachment'])->name('attachments.download');
+    });
+
+    // Analisador de CVs para recrutadores (descrição da vaga + CVs carregados à mão)
+    Route::prefix('analisador-de-cv')->name('cv-screenings.')->group(function () {
+        Route::get('/', [CvScreeningController::class, 'index'])->name('index');
+        Route::post('/', [CvScreeningController::class, 'store'])->name('store');
+        Route::get('/{screening}', [CvScreeningController::class, 'show'])->name('show');
+        Route::delete('/{screening}', [CvScreeningController::class, 'destroy'])->name('destroy');
+        Route::post('/{screening}/cvs', [CvScreeningController::class, 'addCvs'])->name('cvs.store');
+        Route::post('/{screening}/analisar', [CvScreeningController::class, 'analyzeDescription'])->name('analyze');
+        Route::post('/{screening}/cvs/{candidate}/analisar', [CvScreeningController::class, 'analyzeCandidate'])->name('cvs.analyze');
+        Route::get('/{screening}/cvs/{candidate}', [CvScreeningController::class, 'download'])->name('cvs.download');
+        Route::delete('/{screening}/cvs/{candidate}', [CvScreeningController::class, 'destroyCandidate'])->name('cvs.destroy');
     });
 
     // Profile & Recommendations

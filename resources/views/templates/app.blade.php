@@ -288,17 +288,16 @@
 
       <nav id="navmenu" class="navmenu">
         <ul>
-          <li><a href="{{url('/')}}" class="{{ Request::is('/') ? 'active' : '' }}"><i class="bi bi-house-door"></i>
-              Início</a></li>
           <li><a href="{{url('/vagas')}}" class="{{ Request::is('vagas*') ? 'active' : '' }}"><i
                 class="bi bi-briefcase"></i> Vagas</a></li>
-          <li><a href="{{route('companies.index')}}" class="{{ Request::is('empresas') || Request::is('company*') ? 'active' : '' }}"><i
-                class="bi bi-building"></i> Empresas</a></li>
           <li><a href="{{route('courses.index')}}" class="{{ Request::is('cursos*') ? 'active' : '' }}"><i
                 class="bi bi-journal-bookmark"></i> Cursos</a></li>
           <li><a href="{{url('/noticias')}}"
               class="{{ Request::is('noticias*') || Request::is('blog*') ? 'active' : '' }}"><i
                 class="bi bi-newspaper"></i> Notícias</a></li>
+          <li><a href="{{route('recruiters.index')}}"
+              class="{{ Request::is('empresas*') || Request::is('company*') || Request::is('analisador-de-cv*') ? 'active' : '' }}"><i
+                class="bi bi-building"></i> Empresas e Recrutadores</a></li>
 
           <!-- Mobile Only Actions -->
           @guest
@@ -313,6 +312,7 @@
             <li class="d-xl-none"><a href="{{route('jobs.potential')}}"><i class="bi bi-stars"></i> Vagas Sugeridas</a>
             </li>
             @endif
+            <li class="d-xl-none"><a href="{{route('cv-screenings.index')}}"><i class="bi bi-stars"></i> Analisar CVs</a></li>
             <li class="d-xl-none">
               <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
                 class="text-danger">
@@ -370,6 +370,8 @@
               <li><a class="dropdown-item py-2" href="{{route('jobs.potential')}}"><i class="bi bi-stars me-2"></i> Vagas
                   Sugeridas</a></li>
               @endif
+              <li><a class="dropdown-item py-2" href="{{route('cv-screenings.index')}}"><i class="bi bi-stars me-2"></i>
+                  Analisar CVs</a></li>
               <li>
                 <hr class="dropdown-divider">
               </li>
@@ -420,6 +422,7 @@
             <li><a href="{{url('/sobre')}}" class="text-decoration-none text-muted">Sobre</a></li>
             <li><a href="{{url('/vagas')}}" class="text-decoration-none text-muted">Vagas</a></li>
             <li><a href="{{route('companies.index')}}" class="text-decoration-none text-muted">Empresas</a></li>
+            <li><a href="{{route('recruiters.index')}}" class="text-decoration-none text-muted">Empresas e Recrutadores</a></li>
             <li><a href="{{route('courses.index')}}" class="text-decoration-none text-muted">Cursos</a></li>
             <li><a href="{{url('/noticias')}}" class="text-decoration-none text-muted">Notícias</a></li>
           </ul>

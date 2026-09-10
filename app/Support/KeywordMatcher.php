@@ -116,12 +116,18 @@ class KeywordMatcher
         // sem estes, o que a empresa oferece entrava na lista de requisitos.
         'benefits', 'we offer', 'what we offer', 'how to apply', 'about us',
         'about the company', 'to apply', 'send your cv',
+        // Rodapé que os portais acrescentam a cada anúncio: é igual em todas as
+        // vagas e não diz nada sobre nenhuma delas.
+        'tags:', 'encontre aqui', 'nao recrutamos', 'a nossa missao e informar',
     ];
 
     private const ACRONYM_WEIGHT = 5.0;
     private const PHRASE_WEIGHT = 4.0;
     private const BIGRAM_WEIGHT = 3.0;
     private const REQUIREMENTS_BOOST = 1.5;
+
+    /** O título é a linha mais específica de um anúncio: pesa a dobrar. */
+    private const TITLE_BOOST = 2.0;
 
     /** Abaixo disto a "secção de requisitos" detectada é curta de mais para ser fiável. */
     private const MIN_REQUIREMENTS_LENGTH = 10;
@@ -139,18 +145,16 @@ class KeywordMatcher
      */
     public static function extractKeywordsFromRequirements(string $text): array
     {
-        return self::buildKeywords(
-            html_entity_decode(strip_tags($text), ENT_QUOTES, 'UTF-8'),
-            ''
-        );
+        return array_values(self::buildKeywords(PlainText::fromHtml($text), ''));
     }
 
     /**
+     * @param string|null $title título da vaga, quando existe
      * @return array<int, array{term: string, weight: float}>
      */
-    public static function extractKeywords(string $text): array
+    public static function extractKeywords(string $text, ?string $title = null): array
     {
-        $text = html_entity_decode(strip_tags($text), ENT_QUOTES, 'UTF-8');
+        $text = PlainText::fromHtml($text);
 
         // O vocabulário sai da secção de requisitos quando ela existe, em vez de
         // sair do anúncio inteiro. O resto do anúncio — quem é a empresa, o convite
@@ -163,7 +167,58 @@ class KeywordMatcher
             $source = $text;
         }
 
-        return self::buildKeywords($source, self::normalize($source));
+        $keywords = self::buildKeywords($source, self::normalize($source));
+
+        return array_values(self::withTitle($keywords, $title));
+    }
+
+    /**
+     * Junta ao vocabulário os termos do título da vaga, com peso reforçado.
+     *
+     * Nos anúncios reais é frequente o mesmo empregador publicar vários cargos com
+     * um bloco de requisitos igual — "experiência comprovada na função a que se
+     * candidatam", "disponibilidade para regime offshore". Vistos só pelos
+     * requisitos, Nutricionista e Técnico de IT são indistinguíveis; o que os
+     * separa é o título, e ignorá-lo deitava fora a informação mais específica do
+     * anúncio inteiro.
+     *
+     * @param array<string, array{term: string, weight: float}> $keywords
+     * @return array<string, array{term: string, weight: float}>
+     */
+    private static function withTitle(array $keywords, ?string $title): array
+    {
+        $title = trim(PlainText::fromHtml((string) $title));
+
+        if ($title === '') {
+            return $keywords;
+        }
+
+        $fromTitle = self::buildKeywords($title, '');
+
+        // Numa vaga de "Técnico de IT" ou "Assistente de RH", a sigla curta é o
+        // cargo — ao contrário do corpo do anúncio, onde siglas de duas letras são
+        // quase sempre ruído administrativo e por isso ficam de fora. Não se aplica
+        // a títulos escritos todos em maiúsculas, onde ser maiúscula nada distingue.
+        if ($title !== mb_strtoupper($title, 'UTF-8')) {
+            preg_match_all('/\b[A-Z][A-Z0-9]{1,9}\b/u', $title, $matches);
+
+            foreach (array_unique($matches[0]) as $acronym) {
+                $fromTitle[self::normalize($acronym)] = [
+                    'term' => $acronym,
+                    'weight' => self::ACRONYM_WEIGHT,
+                ];
+            }
+        }
+
+        foreach ($fromTitle as $key => $keyword) {
+            $weight = $keyword['weight'] * self::TITLE_BOOST;
+
+            if (!isset($keywords[$key]) || $keywords[$key]['weight'] < $weight) {
+                $keywords[$key] = ['term' => $keyword['term'], 'weight' => $weight];
+            }
+        }
+
+        return $keywords;
     }
 
     /**
@@ -205,7 +260,7 @@ class KeywordMatcher
             $add($term, self::weightForWordLength(mb_strlen($term, 'UTF-8')));
         }
 
-        return array_values($keywords);
+        return $keywords;
     }
 
     /**
@@ -214,9 +269,7 @@ class KeywordMatcher
      */
     public static function requirementsSection(string $text): string
     {
-        return self::extractRequirementsSection(
-            html_entity_decode(strip_tags($text), ENT_QUOTES, 'UTF-8')
-        );
+        return self::extractRequirementsSection(PlainText::fromHtml($text));
     }
 
     /**
@@ -585,7 +638,11 @@ class KeywordMatcher
      */
     private static function tokenizeStems(string $text): array
     {
-        preg_match_all('/\p{L}[\p{L}\p{N}]{2,}/u', mb_strtolower($text, 'UTF-8'), $matches);
+        // Duas letras chegam: siglas como IT, RH ou QA vindas do título da vaga
+        // têm de poder ser encontradas no CV. Palavras curtas sem valor ("de",
+        // "em") entram no conjunto mas nunca são procuradas, porque não chegam a
+        // ser extraídas como termo do lado da vaga.
+        preg_match_all('/\p{L}[\p{L}\p{N}]{1,}/u', mb_strtolower($text, 'UTF-8'), $matches);
 
         $stems = [];
 

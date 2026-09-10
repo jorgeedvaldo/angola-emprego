@@ -219,7 +219,7 @@ class CompanyController extends Controller
         $company = Auth::user()->company;
 
         $jobHasCurrentVector = (bool) $job->description_vector && $job->description_vector_model === VectorSimilarity::MODEL_ID;
-        $jobKeywords = KeywordMatcher::extractKeywords($job->description);
+        $jobKeywords = KeywordMatcher::extractKeywords($job->description, $job->title);
 
         $applications = $job->applications()->with('files')->orderByDesc('id')->get()
             ->map(function (JobApplication $application) use ($job, $jobHasCurrentVector, $jobKeywords) {
@@ -251,7 +251,7 @@ class CompanyController extends Controller
         // empresa, o convite, para onde enviar o CV) repete-se em qualquer vaga e
         // aproxima o vector de todos os CVs por igual, em vez de distinguir quem
         // cumpre os requisitos.
-        $result = $analysis->embed(JobRequirements::requirementsText($job->description));
+        $result = $analysis->embed(JobRequirements::requirementsText($job->description, $job->title));
 
         if (!$result) {
             return response()->json([

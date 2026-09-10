@@ -57,6 +57,7 @@ class CvAnalyzerController extends Controller
     public function analyzeJob(Request $request, CvAnalysisService $analysis)
     {
         $validated = $request->validate([
+            'title' => 'nullable|string|max:255',
             'description' => 'required|string|min:30|max:20000',
         ], [
             'description.required' => 'Escreva a descrição da vaga.',
@@ -64,13 +65,17 @@ class CvAnalyzerController extends Controller
         ]);
 
         $description = $validated['description'];
+        // O título é a linha mais específica de um anúncio: há empregadores que
+        // publicam vários cargos com o mesmo bloco de requisitos, e sem o título
+        // esses cargos ficam indistinguíveis.
+        $title = $validated['title'] ?? null;
         $lines = JobRequirements::lines($description);
 
         // Um requisito solto não dá uma análise por requisitos que se aproveite;
         // nesse caso fica a comparação com o texto todo, como fallback.
         $textsToEmbed = count($lines) >= 2
             ? $lines
-            : [JobRequirements::requirementsText($description)];
+            : [JobRequirements::requirementsText($description, $title)];
 
         $embedded = $analysis->embedMany($textsToEmbed);
 
@@ -99,7 +104,7 @@ class CvAnalyzerController extends Controller
             // inteiro com a vaga inteira, o comportamento antigo.
             'vector' => $this->round($embedded['vectors'][0]),
             'requirements' => $requirements,
-            'keywords' => KeywordMatcher::extractKeywords($description),
+            'keywords' => KeywordMatcher::extractKeywords($description, $title),
         ]);
     }
 

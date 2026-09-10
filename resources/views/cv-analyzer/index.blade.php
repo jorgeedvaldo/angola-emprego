@@ -33,6 +33,13 @@
                 <form id="cv-analyzer-form" class="card border-0 shadow-sm" style="border-radius: 12px;">
                     <div class="card-body p-4">
                         <div class="mb-3">
+                            <label for="cv-analyzer-title" class="form-label fw-semibold">Nome da vaga</label>
+                            <input type="text" id="cv-analyzer-title" maxlength="255" class="form-control"
+                                placeholder="Ex.: Técnico de Recursos Humanos">
+                            <div class="form-text">Ajuda a distinguir cargos com requisitos parecidos.</div>
+                        </div>
+
+                        <div class="mb-3">
                             <label for="cv-analyzer-description" class="form-label fw-semibold">Descrição da vaga</label>
                             <textarea id="cv-analyzer-description" rows="12" class="form-control"
                                 placeholder="Descreva as funções, os requisitos, a formação e a experiência pretendida. Quanto mais detalhada a descrição, melhor a ordenação."></textarea>

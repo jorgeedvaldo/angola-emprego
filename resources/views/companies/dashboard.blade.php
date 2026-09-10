@@ -14,15 +14,20 @@
                     <p class="text-muted mb-0">A página ficará pública depois da confirmação do email e aprovação do cadastro.</p>
                 @endif
             </div>
-            @if($company->isPublic())
-                <a href="{{ route('company.jobs.create') }}" class="btn btn-primary fw-bold" style="background-color: #2557a7; border-color: #2557a7;">
-                    <i class="bi bi-plus-lg me-1"></i> Publicar vaga
+            <div class="d-flex flex-wrap gap-2">
+                <a href="{{ route('cv-screenings.index') }}" class="btn btn-outline-primary fw-bold">
+                    <i class="bi bi-stars me-1"></i> Analisar CVs
                 </a>
-            @else
-                <button class="btn btn-secondary fw-bold" disabled title="Confirme o email e aguarde aprovação">
-                    <i class="bi bi-lock me-1"></i> Publicar vaga
-                </button>
-            @endif
+                @if($company->isPublic())
+                    <a href="{{ route('company.jobs.create') }}" class="btn btn-primary fw-bold" style="background-color: #2557a7; border-color: #2557a7;">
+                        <i class="bi bi-plus-lg me-1"></i> Publicar vaga
+                    </a>
+                @else
+                    <button class="btn btn-secondary fw-bold" disabled title="Confirme o email e aguarde aprovação">
+                        <i class="bi bi-lock me-1"></i> Publicar vaga
+                    </button>
+                @endif
+            </div>
         </div>
     </div>
 </div>

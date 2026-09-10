@@ -21,7 +21,7 @@ class HomeController extends Controller
     public function siteMapGenerator()
     {
         $staticPages = [
-            '/', '/sobre', '/vagas', '/noticias', '/cursos', '/empresas',
+            '/', '/sobre', '/vagas', '/noticias', '/cursos', '/empresas', '/empresas-e-recrutadores',
             '/noticias/resultados-concurso-csmj-2026'
         ];
 

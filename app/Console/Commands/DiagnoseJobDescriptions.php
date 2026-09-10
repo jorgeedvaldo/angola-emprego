@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Job;
 use App\Support\JobRequirements;
 use App\Support\KeywordMatcher;
+use App\Support\PlainText;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 
@@ -126,7 +127,7 @@ class DiagnoseJobDescriptions extends Command
      */
     private function candidatosATitulo(?string $description): array
     {
-        $texto = html_entity_decode(strip_tags((string) $description), ENT_QUOTES, 'UTF-8');
+        $texto = PlainText::fromHtml($description);
         $candidatos = [];
 
         foreach (preg_split('/\R/u', $texto) as $linha) {
@@ -158,7 +159,7 @@ class DiagnoseJobDescriptions extends Command
         $dados = array_map(fn (Job $vaga) => [
             'id' => $vaga->id,
             'titulo' => $vaga->title,
-            'descricao' => trim(html_entity_decode(strip_tags((string) $vaga->description), ENT_QUOTES, 'UTF-8')),
+            'descricao' => PlainText::fromHtml($vaga->description),
         ], $vagas);
 
         File::put($ficheiro, json_encode($dados, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));

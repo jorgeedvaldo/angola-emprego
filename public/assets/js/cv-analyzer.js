@@ -14,6 +14,7 @@
 
     const elements = {
         form: document.getElementById('cv-analyzer-form'),
+        title: document.getElementById('cv-analyzer-title'),
         description: document.getElementById('cv-analyzer-description'),
         input: document.getElementById('cv-analyzer-files'),
         button: document.getElementById('cv-analyzer-start'),
@@ -333,7 +334,10 @@
         elements.status.textContent = 'A analisar a descrição da vaga…';
 
         try {
-            const job = await postJson(config.jobUrl, { description });
+            const job = await postJson(config.jobUrl, {
+                title: elements.title ? elements.title.value.trim() : '',
+                description,
+            });
             const vector = JSON.stringify(job.vector);
             const keywords = JSON.stringify(job.keywords || []);
             const requirements = JSON.stringify(job.requirements || []);

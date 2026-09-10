@@ -38,7 +38,7 @@ class JobRequirements
      */
     public static function lines(string $description): array
     {
-        $text = html_entity_decode(strip_tags($description), ENT_QUOTES, 'UTF-8');
+        $text = PlainText::fromHtml($description);
 
         // Só há requisitos para listar se o anúncio tiver mesmo uma secção de
         // requisitos. Sem ela, partir o texto todo em linhas daria uma checklist
@@ -62,7 +62,7 @@ class JobRequirements
             }
 
             // Um cabeçalho ("Requisitos", "Perfil pretendido") não é um requisito.
-            if (KeywordMatcher::isRequirementHeading($line)) {
+            if (KeywordMatcher::isRequirementHeading($line) || self::isAdministrative($line)) {
                 continue;
             }
 
@@ -93,6 +93,32 @@ class JobRequirements
         'a plus', 'nao obrigatorio', 'facultativo', 'opcional',
     ];
 
+    /**
+     * Começos de linha que anunciam informação administrativa da vaga, não algo
+     * que se exija ao candidato: prazos, referências internas, tipo de contrato.
+     * Aparecem no meio das listas de requisitos dos anúncios reais e não fazem
+     * sentido numa checklist — ninguém "cumpre" um prazo de candidatura.
+     */
+    private const NON_REQUIREMENT_PREFIXES = [
+        'prazo', 'periodo de candidatura', 'data limite', 'data de encerramento',
+        'referencia da vaga', 'referencia:', 'ref.', 'validade', 'local de trabalho',
+        'tipo de contrato', 'contrato a termo', 'regime', 'numero de vagas',
+        'salario', 'remuneracao', 'horario de trabalho', 'inicio previsto',
+    ];
+
+    private static function isAdministrative(string $line): bool
+    {
+        $normalized = self::normalize($line);
+
+        foreach (self::NON_REQUIREMENT_PREFIXES as $prefix) {
+            if (str_starts_with($normalized, $prefix)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public static function isOptional(string $line): bool
     {
         $normalized = self::normalize($line);
@@ -122,11 +148,16 @@ class JobRequirements
      * existe, o anúncio todo quando não existe. É o que substitui o anúncio
      * completo no embedding da vaga.
      */
-    public static function requirementsText(string $description): string
+    public static function requirementsText(string $description, ?string $title = null): string
     {
-        $text = trim(html_entity_decode(strip_tags($description), ENT_QUOTES, 'UTF-8'));
+        $text = PlainText::fromHtml($description);
         $section = trim(KeywordMatcher::requirementsSection($text));
+        $relevant = mb_strlen($section, 'UTF-8') >= self::MIN_SECTION_LENGTH ? $section : $text;
 
-        return mb_strlen($section, 'UTF-8') >= self::MIN_SECTION_LENGTH ? $section : $text;
+        // O título entra no que vai para o vector pela mesma razão por que entra no
+        // vocabulário: é a linha que diz qual é a profissão.
+        $title = trim(PlainText::fromHtml((string) $title));
+
+        return $title === '' ? $relevant : $title . "\n" . $relevant;
     }
 }

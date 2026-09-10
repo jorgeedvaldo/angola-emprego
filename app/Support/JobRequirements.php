@@ -17,8 +17,12 @@ class JobRequirements
     /** Acima disto a lista deixa de caber no ecrã e o custo da análise dispara. */
     public const MAX_LINES = 10;
 
-    /** Abaixo disto a secção detectada é curta de mais para ser de confiança. */
-    private const MIN_SECTION_LENGTH = 60;
+    /**
+     * Serve apenas para rejeitar uma secção vazia. Pode ser tão baixo porque quem
+     * a detecta já exige um título numa linha só sua — e uma vaga pode mesmo ter um
+     * único requisito curto ("Domínio de Excel"), que não deve ser descartado.
+     */
+    private const MIN_SECTION_LENGTH = 10;
 
     private const MIN_LINE_LENGTH = 12;
     private const MAX_LINE_LENGTH = 240;
@@ -84,8 +88,9 @@ class JobRequirements
      */
     private const OPTIONAL_MARKERS = [
         'diferencial', 'desejavel', 'preferencial', 'preferencialmente', 'valorizado',
-        'valoriza-se', 'vantagem', 'mais-valia', 'mais valia', 'constitui vantagem',
-        'plus', 'bonus', 'nice to have', 'nao obrigatorio', 'facultativo', 'opcional',
+        'valoriza-se', 'mais-valia', 'mais valia', 'constitui vantagem',
+        'e uma vantagem', 'sera uma vantagem', 'como vantagem', 'nice to have',
+        'a plus', 'nao obrigatorio', 'facultativo', 'opcional',
     ];
 
     public static function isOptional(string $line): bool

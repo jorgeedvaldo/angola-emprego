@@ -112,6 +112,10 @@ class KeywordMatcher
         'oferecemos', 'beneficios', 'como se candidatar', 'candidatura', 'enviar cv',
         'contactos', 'sobre a empresa', 'sobre nos', 'o que oferecemos', 'salario',
         'remuneracao', 'horario de trabalho', 'local de trabalho',
+        // Anúncios escritos em inglês são comuns em multinacionais e no offshore;
+        // sem estes, o que a empresa oferece entrava na lista de requisitos.
+        'benefits', 'we offer', 'what we offer', 'how to apply', 'about us',
+        'about the company', 'to apply', 'send your cv',
     ];
 
     private const ACRONYM_WEIGHT = 5.0;
@@ -120,7 +124,10 @@ class KeywordMatcher
     private const REQUIREMENTS_BOOST = 1.5;
 
     /** Abaixo disto a "secção de requisitos" detectada é curta de mais para ser fiável. */
-    private const MIN_REQUIREMENTS_LENGTH = 60;
+    private const MIN_REQUIREMENTS_LENGTH = 10;
+
+    /** Acima disto a linha é texto corrido, não um título de secção. */
+    private const MAX_HEADING_LENGTH = 60;
     private const MAX_WORDS = 40;
     private const MAX_BIGRAMS = 20;
 
@@ -481,33 +488,96 @@ class KeywordMatcher
      */
     private static function extractRequirementsSection(string $text): string
     {
-        $lower = mb_strtolower($text, 'UTF-8');
-
+        $lines = preg_split('/\R/u', $text);
         $start = null;
+        $firstLine = null;
 
-        foreach (self::REQUIREMENT_HEADINGS as $heading) {
-            $pos = mb_stripos($lower, $heading, 0, 'UTF-8');
+        foreach ($lines as $index => $line) {
+            $folded = trim(self::foldForSearch($line));
 
-            if ($pos !== false && ($start === null || $pos < $start)) {
-                $start = $pos;
+            if (!self::isHeadingLine($folded, self::REQUIREMENT_HEADINGS)) {
+                continue;
             }
+
+            $start = $index;
+
+            // "Requisitos: dois anos de experiência" mete o título e o primeiro
+            // requisito na mesma linha; o que vem depois dos dois pontos conta.
+            $colon = mb_strpos($line, ':', 0, 'UTF-8');
+
+            if ($colon !== false) {
+                $rest = trim(mb_substr($line, $colon + 1, null, 'UTF-8'));
+                $firstLine = $rest !== '' ? $rest : null;
+            }
+
+            break;
         }
 
         if ($start === null) {
             return '';
         }
 
-        $end = mb_strlen($text, 'UTF-8');
+        $section = $firstLine === null ? [] : [$firstLine];
 
-        foreach (self::SECTION_END_HEADINGS as $heading) {
-            $pos = mb_stripos($lower, $heading, $start + 1, 'UTF-8');
+        foreach (array_slice($lines, $start + 1) as $line) {
+            $folded = trim(self::foldForSearch($line));
 
-            if ($pos !== false && $pos < $end) {
-                $end = $pos;
+            // O que a empresa oferece e como concorrer não são requisitos.
+            if (self::startsWithHeading($folded, self::SECTION_END_HEADINGS)) {
+                break;
+            }
+
+            $section[] = $line;
+        }
+
+        return trim(implode("\n", $section));
+    }
+
+    /**
+     * Uma linha é um título de secção se for curta, não terminar em ponto final e
+     * mencionar um dos títulos conhecidos.
+     *
+     * A regra anterior aceitava o título em qualquer sítio do texto, e por isso uma
+     * frase corrida como "Procuramos alguém com o perfil certo para receber os
+     * nossos clientes" abria a secção de requisitos a meio de uma frase de
+     * marketing — que passava depois a constar da lista de requisitos.
+     *
+     * @param array<int, string> $headings
+     */
+    private static function isHeadingLine(string $folded, array $headings): bool
+    {
+        if ($folded === '' || mb_strlen($folded, 'UTF-8') > self::MAX_HEADING_LENGTH) {
+            return false;
+        }
+
+        if (str_ends_with($folded, '.')) {
+            return false;
+        }
+
+        foreach ($headings as $heading) {
+            if (str_contains($folded, $heading)) {
+                return true;
             }
         }
 
-        return mb_substr($text, $start, $end - $start, 'UTF-8');
+        return false;
+    }
+
+    /**
+     * Para fechar a secção basta que a linha comece pelo título ("Benefícios: …",
+     * "Oferecemos: …", "Como se candidatar: …"), sem exigir que seja curta.
+     *
+     * @param array<int, string> $headings
+     */
+    private static function startsWithHeading(string $folded, array $headings): bool
+    {
+        foreach ($headings as $heading) {
+            if (str_starts_with($folded, $heading)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -554,9 +624,17 @@ class KeywordMatcher
 
     private static function normalize(string $text): string
     {
-        $text = mb_strtolower($text, 'UTF-8');
+        return trim(preg_replace('/\s+/', ' ', self::foldForSearch($text)));
+    }
 
-        $text = strtr($text, [
+    /**
+     * Minúsculas e sem acentos, carácter a carácter. Ao contrário de normalize(),
+     * não mexe nos espaços — por isso as posições encontradas aqui ainda servem
+     * para cortar o texto original.
+     */
+    private static function foldForSearch(string $text): string
+    {
+        return strtr(mb_strtolower($text, 'UTF-8'), [
             'á' => 'a', 'à' => 'a', 'ã' => 'a', 'â' => 'a', 'ä' => 'a',
             'é' => 'e', 'è' => 'e', 'ê' => 'e', 'ë' => 'e',
             'í' => 'i', 'ì' => 'i', 'î' => 'i', 'ï' => 'i',
@@ -564,7 +642,5 @@ class KeywordMatcher
             'ú' => 'u', 'ù' => 'u', 'û' => 'u', 'ü' => 'u',
             'ç' => 'c', 'ñ' => 'n',
         ]);
-
-        return trim(preg_replace('/\s+/', ' ', $text));
     }
 }

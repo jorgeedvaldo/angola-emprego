@@ -9,6 +9,7 @@ use App\Models\JobApplication;
 use App\Models\JobApplicationAttachment;
 use App\Services\CvAnalysisService;
 use App\Support\HtmlSanitizer;
+use App\Support\JobRequirements;
 use App\Support\KeywordMatcher;
 use App\Support\VectorSimilarity;
 use Illuminate\Http\Request;
@@ -246,7 +247,11 @@ class CompanyController extends Controller
     {
         $this->authorizeJob($job);
 
-        $result = $analysis->embed(trim(strip_tags($job->description)));
+        // Só a secção de requisitos vai para o vector: o resto do anúncio (quem é a
+        // empresa, o convite, para onde enviar o CV) repete-se em qualquer vaga e
+        // aproxima o vector de todos os CVs por igual, em vez de distinguir quem
+        // cumpre os requisitos.
+        $result = $analysis->embed(JobRequirements::requirementsText($job->description));
 
         if (!$result) {
             return response()->json([

@@ -112,14 +112,38 @@ class KeywordMatcher
         'oferecemos', 'beneficios', 'como se candidatar', 'candidatura', 'enviar cv',
         'contactos', 'sobre a empresa', 'sobre nos', 'o que oferecemos', 'salario',
         'remuneracao', 'horario de trabalho', 'local de trabalho',
+        // Anúncios escritos em inglês são comuns em multinacionais e no offshore;
+        // sem estes, o que a empresa oferece entrava na lista de requisitos.
+        'benefits', 'we offer', 'what we offer', 'how to apply', 'about us',
+        'about the company', 'to apply', 'send your cv',
     ];
 
     private const ACRONYM_WEIGHT = 5.0;
     private const PHRASE_WEIGHT = 4.0;
     private const BIGRAM_WEIGHT = 3.0;
     private const REQUIREMENTS_BOOST = 1.5;
+
+    /** Abaixo disto a "secção de requisitos" detectada é curta de mais para ser fiável. */
+    private const MIN_REQUIREMENTS_LENGTH = 10;
+
+    /** Acima disto a linha é texto corrido, não um título de secção. */
+    private const MAX_HEADING_LENGTH = 60;
     private const MAX_WORDS = 40;
     private const MAX_BIGRAMS = 20;
+
+    /**
+     * Vocabulário de um texto que já é só requisitos (uma linha de requisito, por
+     * exemplo), sem tentar descobrir secções dentro dele.
+     *
+     * @return array<int, array{term: string, weight: float}>
+     */
+    public static function extractKeywordsFromRequirements(string $text): array
+    {
+        return self::buildKeywords(
+            html_entity_decode(strip_tags($text), ENT_QUOTES, 'UTF-8'),
+            ''
+        );
+    }
 
     /**
      * @return array<int, array{term: string, weight: float}>
@@ -127,8 +151,26 @@ class KeywordMatcher
     public static function extractKeywords(string $text): array
     {
         $text = html_entity_decode(strip_tags($text), ENT_QUOTES, 'UTF-8');
-        $normalizedRequirements = self::normalize(self::extractRequirementsSection($text));
 
+        // O vocabulário sai da secção de requisitos quando ela existe, em vez de
+        // sair do anúncio inteiro. O resto do anúncio — quem é a empresa, o convite
+        // ("procura um novo desafio"), o email para onde enviar — repete-se em
+        // qualquer vaga e só dilui o peso dos termos que distinguem candidatos.
+        // Sem secção reconhecível, mantém-se o texto todo.
+        $source = self::extractRequirementsSection($text);
+
+        if (mb_strlen(trim($source), 'UTF-8') < self::MIN_REQUIREMENTS_LENGTH) {
+            $source = $text;
+        }
+
+        return self::buildKeywords($source, self::normalize($source));
+    }
+
+    /**
+     * @return array<int, array{term: string, weight: float}>
+     */
+    private static function buildKeywords(string $source, string $normalizedRequirements): array
+    {
         $keywords = [];
 
         $add = function (string $term, float $weight) use (&$keywords, $normalizedRequirements) {
@@ -147,23 +189,45 @@ class KeywordMatcher
             }
         };
 
-        foreach (self::extractAcronyms($text) as $term) {
+        foreach (self::extractAcronyms($source) as $term) {
             $add($term, self::ACRONYM_WEIGHT);
         }
 
-        foreach (self::extractCapitalizedPhrases($text) as $term) {
+        foreach (self::extractCapitalizedPhrases($source) as $term) {
             $add($term, self::PHRASE_WEIGHT);
         }
 
-        foreach (self::extractContentBigrams($text) as $term) {
+        foreach (self::extractContentBigrams($source) as $term) {
             $add($term, self::BIGRAM_WEIGHT);
         }
 
-        foreach (self::extractSignificantWords($text) as $term => $count) {
+        foreach (self::extractSignificantWords($source) as $term => $count) {
             $add($term, self::weightForWordLength(mb_strlen($term, 'UTF-8')));
         }
 
         return array_values($keywords);
+    }
+
+    /**
+     * A parte do anúncio que enumera requisitos, para quem precisa dela fora desta
+     * classe (o embedding da vaga, por exemplo). Devolve '' se não a reconhecer.
+     */
+    public static function requirementsSection(string $text): string
+    {
+        return self::extractRequirementsSection(
+            html_entity_decode(strip_tags($text), ENT_QUOTES, 'UTF-8')
+        );
+    }
+
+    /**
+     * Diz se uma linha é apenas um cabeçalho de secção ("Requisitos:", "Perfil
+     * pretendido") — útil para não a tratar como se fosse um requisito.
+     */
+    public static function isRequirementHeading(string $line): bool
+    {
+        $normalized = self::normalize(rtrim(trim($line), ':'));
+
+        return in_array($normalized, self::REQUIREMENT_HEADINGS, true);
     }
 
     /**
@@ -212,15 +276,20 @@ class KeywordMatcher
         ];
     }
 
-    private const SEMANTIC_WEIGHT = 0.8;
-    private const KEYWORD_WEIGHT = 0.2;
+    private const SEMANTIC_WEIGHT = 0.5;
+    private const KEYWORD_WEIGHT = 0.5;
 
     /**
-     * Combines the semantic (embedding) score with the keyword score. LaBSE already
-     * closes most of the cross-lingual gap on its own, so the semantic score carries
-     * most of the weight (80%); the keyword score is a light 20% reinforcement that
-     * catches literal requirement matches (acronyms, certifications) without
-     * overriding what the embedding model already gets right.
+     * Combina a pontuação semântica (embedding) com a das palavras-chave.
+     *
+     * Era 80/20 a favor da semântica, e isso comprimia os resultados: a semelhança
+     * de coseno entre dois documentos longos mede sobretudo "isto é um texto
+     * profissional em português", não "esta pessoa cumpre os requisitos". Medido
+     * num caso real: um CV de Técnica de Análises Clínicas contra uma vaga de
+     * Recursos Humanos deu 0,91 de semelhança — mais alto do que o de uma
+     * candidata da área — enquanto as palavras-chave, essas, acertaram em zero.
+     * Com 50/50 o sinal que distingue candidatos deixa de ser abafado pelo sinal
+     * que não distingue nada.
      */
     public static function blend(?float $semanticScore, ?float $keywordScore): ?float
     {
@@ -276,9 +345,24 @@ class KeywordMatcher
      */
     private static function extractCapitalizedPhrases(string $text): array
     {
-        preg_match_all('/\b(\p{Lu}\p{Ll}+(?:\s+\p{Lu}\p{Ll}+){1,3})\b/u', $text, $matches);
+        $phrases = [];
 
-        return array_values(array_unique(array_map('trim', $matches[0])));
+        // Linha a linha: uma "frase" que atravessa uma quebra de linha ("Requisitos
+        // Experiência", "Excel Diferencial") não existe em nenhum CV, por isso nunca
+        // poderia ser encontrada — apenas rouba peso aos termos reais.
+        foreach (preg_split('/\R+/u', $text) as $line) {
+            preg_match_all('/\b(\p{Lu}\p{Ll}+(?:[ \t]+\p{Lu}\p{Ll}+){1,3})\b/u', $line, $matches);
+
+            foreach ($matches[0] as $match) {
+                $phrase = trim($match);
+
+                if ($phrase !== '' && !in_array($phrase, $phrases, true)) {
+                    $phrases[] = $phrase;
+                }
+            }
+        }
+
+        return $phrases;
     }
 
     /**
@@ -298,11 +382,25 @@ class KeywordMatcher
         // connectors ("de", "em", "ao"...) — so adjacency in $words matches adjacency
         // in the real sentence; dropping short words here would silently collapse
         // "controlo DE poço" into "controlo poço" and lose the connector entirely.
-        preg_match_all('/\p{L}[\p{L}\p{N}]*/u', mb_strtolower($text, 'UTF-8'), $matches);
+        $phrases = [];
+
+        // Também aqui as quebras de linha são fronteiras: numa lista de requisitos,
+        // o fim de uma linha e o início da seguinte não formam uma expressão.
+        foreach (preg_split('/\R+/u', $text) as $line) {
+            self::collectLineBigrams($line, $phrases);
+        }
+
+        return array_slice($phrases, 0, self::MAX_BIGRAMS);
+    }
+
+    /**
+     * @param array<int, string> $phrases
+     */
+    private static function collectLineBigrams(string $line, array &$phrases): void
+    {
+        preg_match_all('/\p{L}[\p{L}\p{N}]*/u', mb_strtolower($line, 'UTF-8'), $matches);
         $words = $matches[0];
         $count = count($words);
-
-        $phrases = [];
 
         for ($i = 0; $i < $count - 1; $i++) {
             $a = $words[$i];
@@ -327,8 +425,6 @@ class KeywordMatcher
                 }
             }
         }
-
-        return array_slice($phrases, 0, self::MAX_BIGRAMS);
     }
 
     private static function addPhraseCandidate(array &$phrases, string $phrase): void
@@ -392,33 +488,96 @@ class KeywordMatcher
      */
     private static function extractRequirementsSection(string $text): string
     {
-        $lower = mb_strtolower($text, 'UTF-8');
-
+        $lines = preg_split('/\R/u', $text);
         $start = null;
+        $firstLine = null;
 
-        foreach (self::REQUIREMENT_HEADINGS as $heading) {
-            $pos = mb_stripos($lower, $heading, 0, 'UTF-8');
+        foreach ($lines as $index => $line) {
+            $folded = trim(self::foldForSearch($line));
 
-            if ($pos !== false && ($start === null || $pos < $start)) {
-                $start = $pos;
+            if (!self::isHeadingLine($folded, self::REQUIREMENT_HEADINGS)) {
+                continue;
             }
+
+            $start = $index;
+
+            // "Requisitos: dois anos de experiência" mete o título e o primeiro
+            // requisito na mesma linha; o que vem depois dos dois pontos conta.
+            $colon = mb_strpos($line, ':', 0, 'UTF-8');
+
+            if ($colon !== false) {
+                $rest = trim(mb_substr($line, $colon + 1, null, 'UTF-8'));
+                $firstLine = $rest !== '' ? $rest : null;
+            }
+
+            break;
         }
 
         if ($start === null) {
             return '';
         }
 
-        $end = mb_strlen($text, 'UTF-8');
+        $section = $firstLine === null ? [] : [$firstLine];
 
-        foreach (self::SECTION_END_HEADINGS as $heading) {
-            $pos = mb_stripos($lower, $heading, $start + 1, 'UTF-8');
+        foreach (array_slice($lines, $start + 1) as $line) {
+            $folded = trim(self::foldForSearch($line));
 
-            if ($pos !== false && $pos < $end) {
-                $end = $pos;
+            // O que a empresa oferece e como concorrer não são requisitos.
+            if (self::startsWithHeading($folded, self::SECTION_END_HEADINGS)) {
+                break;
+            }
+
+            $section[] = $line;
+        }
+
+        return trim(implode("\n", $section));
+    }
+
+    /**
+     * Uma linha é um título de secção se for curta, não terminar em ponto final e
+     * mencionar um dos títulos conhecidos.
+     *
+     * A regra anterior aceitava o título em qualquer sítio do texto, e por isso uma
+     * frase corrida como "Procuramos alguém com o perfil certo para receber os
+     * nossos clientes" abria a secção de requisitos a meio de uma frase de
+     * marketing — que passava depois a constar da lista de requisitos.
+     *
+     * @param array<int, string> $headings
+     */
+    private static function isHeadingLine(string $folded, array $headings): bool
+    {
+        if ($folded === '' || mb_strlen($folded, 'UTF-8') > self::MAX_HEADING_LENGTH) {
+            return false;
+        }
+
+        if (str_ends_with($folded, '.')) {
+            return false;
+        }
+
+        foreach ($headings as $heading) {
+            if (str_contains($folded, $heading)) {
+                return true;
             }
         }
 
-        return mb_substr($text, $start, $end - $start, 'UTF-8');
+        return false;
+    }
+
+    /**
+     * Para fechar a secção basta que a linha comece pelo título ("Benefícios: …",
+     * "Oferecemos: …", "Como se candidatar: …"), sem exigir que seja curta.
+     *
+     * @param array<int, string> $headings
+     */
+    private static function startsWithHeading(string $folded, array $headings): bool
+    {
+        foreach ($headings as $heading) {
+            if (str_starts_with($folded, $heading)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -465,9 +624,17 @@ class KeywordMatcher
 
     private static function normalize(string $text): string
     {
-        $text = mb_strtolower($text, 'UTF-8');
+        return trim(preg_replace('/\s+/', ' ', self::foldForSearch($text)));
+    }
 
-        $text = strtr($text, [
+    /**
+     * Minúsculas e sem acentos, carácter a carácter. Ao contrário de normalize(),
+     * não mexe nos espaços — por isso as posições encontradas aqui ainda servem
+     * para cortar o texto original.
+     */
+    private static function foldForSearch(string $text): string
+    {
+        return strtr(mb_strtolower($text, 'UTF-8'), [
             'á' => 'a', 'à' => 'a', 'ã' => 'a', 'â' => 'a', 'ä' => 'a',
             'é' => 'e', 'è' => 'e', 'ê' => 'e', 'ë' => 'e',
             'í' => 'i', 'ì' => 'i', 'î' => 'i', 'ï' => 'i',
@@ -475,7 +642,5 @@ class KeywordMatcher
             'ú' => 'u', 'ù' => 'u', 'û' => 'u', 'ü' => 'u',
             'ç' => 'c', 'ñ' => 'n',
         ]);
-
-        return trim(preg_replace('/\s+/', ' ', $text));
     }
 }

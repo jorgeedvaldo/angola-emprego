@@ -13,6 +13,34 @@ class CvAnalyzerTest extends TestCase
 {
     use RefreshDatabase;
 
+    private const VAGA = <<<TXT
+    Vaga para Técnico(a) de Recursos Humanos
+    O Grupo Terra está a recrutar um(a) Técnico(a) de Recursos Humanos para integrar a sua equipa.
+
+    Requisitos
+    Experiência mínima de 2 anos na função
+    Sólidos conhecimentos da Lei Geral do Trabalho de Angola
+    Domínio avançado de Excel
+    Diferencial: Conhecimento do ERP Primavera.
+
+    CANDIDATURAS
+    Envie o seu currículo para: rh@exemplo.co.ao
+    TXT;
+
+    private const CV_RECURSOS_HUMANOS = <<<TXT
+    Técnica de Recursos Humanos com 4 anos de experiência na função.
+    Processamento salarial e administração de pessoal numa empresa de 200 colaboradores.
+    Sólidos conhecimentos da Lei Geral do Trabalho de Angola.
+    Domínio avançado de Excel, com tabelas dinâmicas.
+    TXT;
+
+    private const CV_ANALISES_CLINICAS = <<<TXT
+    Técnica de Análises Clínicas com Ensino Médio e 3 anos de experiência na clínica.
+    Atendimento ao público e receção de pacientes no laboratório.
+    Colheita de amostras e orientação ao paciente sobre o preparo.
+    Noções básicas de enfermagem e biossegurança.
+    TXT;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -167,6 +195,157 @@ class CvAnalyzerTest extends TestCase
     private function pdf(string $name): UploadedFile
     {
         return UploadedFile::fake()->createWithContent($name, '%PDF-1.4 conteudo de teste');
+    }
+
+    public function test_the_job_is_broken_into_the_requirements_it_asks_for()
+    {
+        Http::fake(['*/embed' => Http::response([
+            'ok' => true,
+            'vector' => $this->vector(1.0),
+            'model' => VectorSimilarity::MODEL_ID,
+        ])]);
+
+        $response = $this->postJson(route('cv-analyzer.job'), ['description' => self::VAGA]);
+
+        $response->assertOk();
+        $this->assertSame(
+            [
+                'Experiência mínima de 2 anos na função',
+                'Sólidos conhecimentos da Lei Geral do Trabalho de Angola',
+                'Domínio avançado de Excel',
+                'Diferencial: Conhecimento do ERP Primavera.',
+            ],
+            array_column($response->json('requirements'), 'text')
+        );
+    }
+
+    /**
+     * O caso que motivou esta análise: um CV de Técnica de Análises Clínicas, sem
+     * nada a ver com a vaga de Recursos Humanos, ficava lado a lado com os
+     * candidatos da área. Aqui os embeddings são falsos mas coerentes — textos com
+     * as mesmas palavras ficam próximos — para que a ordenação seja verificável.
+     */
+    public function test_an_unrelated_cv_ranks_far_below_a_matching_one()
+    {
+        $this->fakeAnalysisService();
+
+        $vaga = $this->postJson(route('cv-analyzer.job'), ['description' => self::VAGA])->json();
+
+        $rh = $this->scoreCv($vaga, self::CV_RECURSOS_HUMANOS);
+        $clinica = $this->scoreCv($vaga, self::CV_ANALISES_CLINICAS);
+
+        // Os limiares aqui são os que este embedding de teste consegue exprimir: por
+        // ser um saco-de-palavras binário, penaliza requisitos curtos contra blocos
+        // longos, coisa que um modelo de frases a sério não faz. O que o teste tem
+        // de garantir é a distância entre os dois, que antes desta análise por
+        // requisitos era de um único ponto percentual (74% contra 73%).
+        $this->assertGreaterThan(0.5, $rh['score'], 'O CV da área devia pontuar alto.');
+        $this->assertLessThan(0.25, $clinica['score'], 'O CV sem relação devia pontuar baixo.');
+        $this->assertGreaterThan(
+            $clinica['score'] + 0.35,
+            $rh['score'],
+            'A distância entre os dois tem de ser evidente, não de meia dúzia de pontos.'
+        );
+    }
+
+    public function test_the_result_says_which_requirements_the_cv_meets()
+    {
+        $this->fakeAnalysisService();
+
+        $vaga = $this->postJson(route('cv-analyzer.job'), ['description' => self::VAGA])->json();
+        $rh = $this->scoreCv($vaga, self::CV_RECURSOS_HUMANOS);
+
+        $porTexto = collect($rh['requirements'])->keyBy('text');
+
+        $this->assertSame('cumpre', $porTexto['Domínio avançado de Excel']['status']);
+        // O CV de RH não fala em Primavera: o ERP é o único requisito em falta.
+        $this->assertSame('ausente', $porTexto['Diferencial: Conhecimento do ERP Primavera.']['status']);
+    }
+
+    public function test_an_advert_without_requirements_falls_back_to_whole_text_comparison()
+    {
+        $this->fakeAnalysisService();
+
+        $vaga = $this->postJson(route('cv-analyzer.job'), [
+            'description' => 'Precisamos de um técnico de recursos humanos para a nossa equipa em Luanda.',
+        ])->json();
+
+        $this->assertSame([], $vaga['requirements']);
+
+        $resultado = $this->scoreCv($vaga, self::CV_RECURSOS_HUMANOS);
+
+        $this->assertNotNull($resultado['score']);
+        $this->assertSame([], $resultado['requirements']);
+    }
+
+    /**
+     * Serviço de análise falso, mas coerente: o vector de um texto é a lista de
+     * palavras do vocabulário que ele contém, por isso dois textos que falam do
+     * mesmo ficam próximos e dois que falam de coisas diferentes ficam longe.
+     */
+    private function fakeAnalysisService(): void
+    {
+        Http::fake(function ($request) {
+            if (str_contains($request->url(), '/embed')) {
+                return Http::response([
+                    'ok' => true,
+                    'vector' => $this->topicVector($request->data()['text'] ?? ''),
+                    'model' => VectorSimilarity::MODEL_ID,
+                ]);
+            }
+
+            $texto = str_contains($request->body(), 'MARCA-RH')
+                ? self::CV_RECURSOS_HUMANOS
+                : self::CV_ANALISES_CLINICAS;
+
+            return Http::response([
+                'ok' => true,
+                'text' => $texto,
+                'vector' => $this->topicVector($texto),
+                'model' => VectorSimilarity::MODEL_ID,
+            ]);
+        });
+    }
+
+    /**
+     * @param array<string, mixed> $vaga
+     * @return array<string, mixed>
+     */
+    private function scoreCv(array $vaga, string $cvText): array
+    {
+        $marca = $cvText === self::CV_RECURSOS_HUMANOS ? 'MARCA-RH' : 'MARCA-CLINICA';
+
+        return $this->post(route('cv-analyzer.cv'), [
+            'cv' => UploadedFile::fake()->createWithContent('cv.pdf', $marca . ' ' . $cvText),
+            'vector' => json_encode($vaga['vector']),
+            'model' => $vaga['model'],
+            'keywords' => json_encode($vaga['keywords']),
+            'requirements' => json_encode($vaga['requirements']),
+        ])->assertOk()->json();
+    }
+
+    /**
+     * @return array<int, float>
+     */
+    private function topicVector(string $text): array
+    {
+        $vocabulario = [
+            'excel', 'primavera', 'salarial', 'pessoal', 'recursos', 'humanos',
+            'trabalho', 'anos', 'clinica', 'paciente', 'laboratorio', 'enfermagem',
+            'amostras', 'atendimento', 'lei',
+        ];
+
+        $normalizado = mb_strtolower($text, 'UTF-8');
+        $vector = array_fill(0, VectorSimilarity::DIMENSIONS, 0.0);
+
+        foreach ($vocabulario as $indice => $palavra) {
+            $vector[$indice] = str_contains($normalizado, $palavra) ? 1.0 : 0.0;
+        }
+
+        // Evita o vector nulo, que não tem coseno definido.
+        $vector[VectorSimilarity::DIMENSIONS - 1] = 0.01;
+
+        return $vector;
     }
 
     /**

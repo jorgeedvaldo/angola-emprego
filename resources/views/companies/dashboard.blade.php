@@ -15,7 +15,7 @@
                 @endif
             </div>
             <div class="d-flex flex-wrap gap-2">
-                <a href="{{ route('cv-screenings.index') }}" class="btn btn-outline-primary fw-bold">
+                <a href="{{ route('cv-analyzer.index') }}" class="btn btn-outline-primary fw-bold">
                     <i class="bi bi-stars me-1"></i> Analisar CVs
                 </a>
                 @if($company->isPublic())

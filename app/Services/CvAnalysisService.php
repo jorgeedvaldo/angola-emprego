@@ -39,6 +39,10 @@ class CvAnalysisService
         ];
     }
 
+    /**
+     * Analisa um CV já guardado em disco (usado pela análise de candidaturas das
+     * empresas, onde o anexo fica arquivado).
+     */
     public function analyzeCv(string $storageDisk, string $path): ?array
     {
         if (!$this->configured()) {
@@ -51,9 +55,25 @@ class CvAnalysisService
             return null;
         }
 
+        return $this->analyzeCvContents(Storage::disk($storageDisk)->get($path), basename($path));
+    }
+
+    /**
+     * Analisa o conteúdo de um CV sem o guardar em lado nenhum — é o que o
+     * analisador público usa: o ficheiro chega no pedido, é reencaminhado para o
+     * serviço de análise e desaparece com o fim do pedido.
+     */
+    public function analyzeCvContents(string $contents, string $filename): ?array
+    {
+        if (!$this->configured()) {
+            Log::warning('CvAnalysisService: analisecv não configurado (ANALISECV_URL/ANALISECV_API_KEY em falta).');
+
+            return null;
+        }
+
         try {
             $response = $this->client()
-                ->attach('cv', Storage::disk($storageDisk)->get($path), basename($path))
+                ->attach('cv', $contents, $filename)
                 ->post('/analyze-cv');
         } catch (\Throwable $exception) {
             Log::error('CvAnalysisService: falha ao contactar /analyze-cv.', ['message' => $exception->getMessage()]);

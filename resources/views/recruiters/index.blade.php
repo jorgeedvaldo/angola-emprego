@@ -86,17 +86,11 @@
                         <h5 class="fw-bold">Analisar CV</h5>
                         <p class="text-muted small flex-grow-1">
                             Escreva a descrição da vaga, carregue os CVs que tem em mão e receba-os ordenados do
-                            candidato mais compatível para o menos compatível.
+                            candidato mais compatível para o menos compatível. Sem conta e sem guardar os ficheiros.
                         </p>
-                        @auth
-                            <a href="{{ route('cv-screenings.index') }}" class="btn btn-primary fw-bold" style="background-color: #2557a7; border-color: #2557a7;">
-                                <i class="bi bi-stars me-1"></i> Abrir analisador de CVs
-                            </a>
-                        @else
-                            <a href="{{ route('login') }}" class="btn btn-primary fw-bold" style="background-color: #2557a7; border-color: #2557a7;">
-                                <i class="bi bi-box-arrow-in-right me-1"></i> Entrar para analisar CVs
-                            </a>
-                        @endauth
+                        <a href="{{ route('cv-analyzer.index') }}" class="btn btn-primary fw-bold" style="background-color: #2557a7; border-color: #2557a7;">
+                            <i class="bi bi-stars me-1"></i> Abrir analisador de CVs
+                        </a>
                     </div>
                 </div>
             </div>

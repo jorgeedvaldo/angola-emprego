@@ -300,6 +300,7 @@
                 class="bi bi-building"></i> Empresas e Recrutadores</a></li>
 
           <!-- Mobile Only Actions -->
+          <li class="d-xl-none"><a href="{{route('cv-analyzer.index')}}"><i class="bi bi-stars"></i> Analisar CVs</a></li>
           @guest
             <li class="d-xl-none"><a href="{{route('login')}}"><i class="bi bi-box-arrow-in-right"></i> Entrar</a></li>
             <li class="d-xl-none"><a href="{{route('register')}}"><i class="bi bi-person-plus"></i> Criar Conta</a></li>
@@ -312,7 +313,6 @@
             <li class="d-xl-none"><a href="{{route('jobs.potential')}}"><i class="bi bi-stars"></i> Vagas Sugeridas</a>
             </li>
             @endif
-            <li class="d-xl-none"><a href="{{route('cv-screenings.index')}}"><i class="bi bi-stars"></i> Analisar CVs</a></li>
             <li class="d-xl-none">
               <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
                 class="text-danger">
@@ -370,7 +370,7 @@
               <li><a class="dropdown-item py-2" href="{{route('jobs.potential')}}"><i class="bi bi-stars me-2"></i> Vagas
                   Sugeridas</a></li>
               @endif
-              <li><a class="dropdown-item py-2" href="{{route('cv-screenings.index')}}"><i class="bi bi-stars me-2"></i>
+              <li><a class="dropdown-item py-2" href="{{route('cv-analyzer.index')}}"><i class="bi bi-stars me-2"></i>
                   Analisar CVs</a></li>
               <li>
                 <hr class="dropdown-divider">

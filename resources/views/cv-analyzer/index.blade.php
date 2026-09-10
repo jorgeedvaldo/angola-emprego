@@ -66,11 +66,16 @@
                     <div class="card-body p-4">
                         <h6 class="fw-bold mb-3">Como funciona</h6>
                         <ol class="text-muted small mb-0 ps-3">
-                            <li class="mb-2">Escrevemos a descrição em números (um “resumo matemático” do texto).</li>
-                            <li class="mb-2">Lemos o texto de cada CV e fazemos o mesmo.</li>
-                            <li class="mb-2">Comparamos os dois e reforçamos com os termos da vaga encontrados no CV.</li>
-                            <li>A lista reordena-se sozinha à medida que cada CV é analisado.</li>
+                            <li class="mb-2">Separamos o anúncio nos requisitos que pede, um a um.</li>
+                            <li class="mb-2">Lemos o texto de cada CV e dividimo-lo em blocos.</li>
+                            <li class="mb-2">Para cada requisito procuramos o bloco do CV que melhor lhe responde,
+                                e confirmamos se os termos do requisito aparecem mesmo no texto.</li>
+                            <li>Cada CV fica com a lista do que cumpre e do que falta, e a ordenação sai daí.</li>
                         </ol>
+                        <p class="text-muted small mb-0 mt-3">
+                            Escreva os requisitos em linhas separadas, debaixo de um título como
+                            <em>Requisitos</em> — é assim que conseguimos lê-los um a um.
+                        </p>
                     </div>
                 </div>
             </div>
@@ -84,6 +89,8 @@
                 <div id="cv-analyzer-empty" class="bg-white p-5 text-center rounded-3 shadow-sm border text-muted">
                     Escolha os CVs à esquerda e clique em “Analisar CVs”.
                 </div>
+
+                <div id="cv-analyzer-requirements" class="alert alert-light border d-none"></div>
 
                 <div id="cv-analyzer-results"></div>
             </div>

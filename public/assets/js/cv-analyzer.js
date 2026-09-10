@@ -24,13 +24,14 @@
         progressWrap: document.getElementById('cv-analyzer-progress-wrap'),
         progressBar: document.getElementById('cv-analyzer-progress-bar'),
         status: document.getElementById('cv-analyzer-status'),
+        requirementsRead: document.getElementById('cv-analyzer-requirements'),
     };
 
     if (!elements.form || !elements.input || !elements.results) {
         return;
     }
 
-    /** @type {{file: File, name: string, score: number|null, matched: string[], error: string|null}[]} */
+    /** @type {{file: File, name: string, score: number|null, matched: string[], requirements: object[], error: string|null}[]} */
     let entries = [];
     let running = false;
 
@@ -74,6 +75,64 @@
         return element.innerHTML;
     }
 
+    const STATUS = {
+        cumpre: { icon: 'bi-check-circle-fill', color: 'text-success', label: 'cumpre' },
+        parcial: { icon: 'bi-dash-circle-fill', color: 'text-warning', label: 'parcial' },
+        ausente: { icon: 'bi-x-circle-fill', color: 'text-secondary', label: 'não encontrado' },
+    };
+
+    /**
+     * A checklist é o que torna a pontuação explicável: em vez de uma percentagem
+     * sozinha, o recrutador vê que requisitos é que este CV responde.
+     */
+    function requirementList(entry) {
+        if (!entry.requirements || !entry.requirements.length) {
+            return '';
+        }
+
+        const rows = entry.requirements.map((requirement) => {
+            const status = STATUS[requirement.status] || STATUS.ausente;
+            const terms = requirement.matched && requirement.matched.length
+                ? ' <span class="text-muted">— ' + escapeHtml(requirement.matched.join(', ')) + '</span>'
+                : '';
+            // Um diferencial em falta não é o mesmo que uma exigência em falta, e
+            // o recrutador tem de ver essa diferença na lista.
+            const optional = requirement.optional
+                ? ' <span class="badge bg-light text-muted border fw-normal">diferencial</span>'
+                : '';
+
+            return '<li class="mb-1"><i class="bi ' + status.icon + ' ' + status.color + ' me-1"></i>'
+                + escapeHtml(requirement.text)
+                + ' <span class="' + status.color + '">(' + status.label + ')</span>'
+                + optional
+                + terms
+                + '</li>';
+        }).join('');
+
+        return '<ul class="list-unstyled small mt-3 mb-0 border-top pt-3">' + rows + '</ul>';
+    }
+
+    /** Mostra ao recrutador que requisitos é que lemos do anúncio dele. */
+    function showRequirementsRead(requirements) {
+        if (!elements.requirementsRead) {
+            return;
+        }
+
+        if (!requirements.length) {
+            elements.requirementsRead.classList.add('d-none');
+            elements.requirementsRead.innerHTML = '';
+
+            return;
+        }
+
+        elements.requirementsRead.innerHTML =
+            '<div class="small fw-semibold mb-2">Requisitos lidos do anúncio:</div>'
+            + '<ol class="small text-muted mb-0 ps-3">'
+            + requirements.map((requirement) => '<li>' + escapeHtml(requirement.text) + '</li>').join('')
+            + '</ol>';
+        elements.requirementsRead.classList.remove('d-none');
+    }
+
     function render() {
         elements.count.textContent = entries.length
             ? entries.length + (entries.length === 1 ? ' CV escolhido' : ' CVs escolhidos')
@@ -100,6 +159,8 @@
                     + 'Termos da vaga encontrados no CV: ' + escapeHtml(entry.matched.join(', ')) + '</div>'
                 : '';
 
+            const checklist = requirementList(entry);
+
             const error = entry.error
                 ? '<div class="small text-danger mt-1">' + escapeHtml(entry.error) + '</div>'
                 : '';
@@ -112,6 +173,7 @@
                 + escapeHtml(entry.name) + scoreBadge(entry) + '</h6>'
                 + matched
                 + error
+                + checklist
                 + '</div>'
                 + '<div class="d-flex gap-2">'
                 + '<button type="button" class="btn btn-sm btn-outline-primary" data-open>'
@@ -168,7 +230,7 @@
                 return;
             }
 
-            entries.push({ file, name: file.name, score: null, matched: [], error: null });
+            entries.push({ file, name: file.name, score: null, matched: [], requirements: [], error: null });
         });
 
         if (rejected) {
@@ -274,11 +336,15 @@
             const job = await postJson(config.jobUrl, { description });
             const vector = JSON.stringify(job.vector);
             const keywords = JSON.stringify(job.keywords || []);
+            const requirements = JSON.stringify(job.requirements || []);
+
+            showRequirementsRead(job.requirements || []);
 
             // Uma nova descrição invalida as pontuações anteriores.
             entries.forEach((entry) => {
                 entry.score = null;
                 entry.matched = [];
+                entry.requirements = [];
                 entry.error = null;
             });
             render();
@@ -294,11 +360,13 @@
                 formData.append('vector', vector);
                 formData.append('model', job.model);
                 formData.append('keywords', keywords);
+                formData.append('requirements', requirements);
 
                 try {
                     const result = await postFile(config.cvUrl, formData);
                     entry.score = typeof result.score === 'number' ? result.score : null;
                     entry.matched = result.matched || [];
+                    entry.requirements = result.requirements || [];
                 } catch (error) {
                     failures += 1;
                     entry.error = error.message;

@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Services\CvAnalysisService;
+use App\Support\JobRequirements;
 use App\Support\KeywordMatcher;
+use App\Support\RequirementMatcher;
+use App\Support\TextChunker;
 use App\Support\VectorSimilarity;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
@@ -16,8 +19,8 @@ use Illuminate\Support\Str;
  * final) vive no browser do recrutador. O servidor só entra em dois momentos, e
  * em ambos apenas reencaminha para o serviço de análise e devolve o resultado:
  *
- *  1. /vaga — transforma a descrição em vector e extrai as palavras-chave;
- *  2. /cv   — recebe um PDF, obtém o texto/vector e devolve a pontuação.
+ *  1. /vaga — separa a vaga nos requisitos que pede e transforma cada um em vector;
+ *  2. /cv   — recebe um PDF, parte-o em blocos e diz que requisitos cada bloco cumpre.
  *
  * O PDF nunca é gravado: vive no directório temporário do PHP durante o pedido e
  * é descartado no fim. A análise de candidaturas das empresas (CompanyController)
@@ -34,13 +37,19 @@ class CvAnalyzerController extends Controller
     /** Tecto defensivo para a lista de palavras-chave devolvida pelo browser. */
     private const MAX_KEYWORDS = 300;
 
+    /**
+     * Casas decimais com que os vectores viajam para o browser. A semelhança de
+     * coseno não nota a diferença e o pedido de cada CV fica com metade do tamanho.
+     */
+    private const VECTOR_PRECISION = 5;
+
     public function index()
     {
         return view('cv-analyzer.index');
     }
 
     /**
-     * Passo 1: descrição da vaga -> vector + palavras-chave.
+     * Passo 1: a vaga -> requisitos individuais em vector + palavras-chave.
      *
      * As palavras-chave são extraídas aqui (e não no browser) para que o
      * KeywordMatcher continue a ser a única fonte da verdade da pontuação.
@@ -54,41 +63,65 @@ class CvAnalyzerController extends Controller
             'description.min' => 'A descrição está demasiado curta para comparar com os CVs.',
         ]);
 
-        $result = $analysis->embed(trim(strip_tags($validated['description'])));
+        $description = $validated['description'];
+        $lines = JobRequirements::lines($description);
 
-        if (!$result) {
+        // Um requisito solto não dá uma análise por requisitos que se aproveite;
+        // nesse caso fica a comparação com o texto todo, como fallback.
+        $textsToEmbed = count($lines) >= 2
+            ? $lines
+            : [JobRequirements::requirementsText($description)];
+
+        $embedded = $analysis->embedMany($textsToEmbed);
+
+        if (!$embedded) {
             return response()->json([
                 'ok' => false,
                 'message' => 'Não foi possível contactar o serviço de análise de CVs. Tente novamente dentro de momentos.',
             ], 502);
         }
 
+        $requirements = [];
+
+        if (count($lines) >= 2) {
+            foreach ($lines as $index => $line) {
+                $requirements[] = [
+                    'text' => $line,
+                    'vector' => $this->round($embedded['vectors'][$index]),
+                ];
+            }
+        }
+
         return response()->json([
             'ok' => true,
-            'vector' => $result['vector'],
-            'model' => $result['model'],
-            'keywords' => KeywordMatcher::extractKeywords($validated['description']),
+            'model' => $embedded['model'],
+            // Usado quando não há requisitos identificáveis: comparação do CV
+            // inteiro com a vaga inteira, o comportamento antigo.
+            'vector' => $this->round($embedded['vectors'][0]),
+            'requirements' => $requirements,
+            'keywords' => KeywordMatcher::extractKeywords($description),
         ]);
     }
 
     /**
-     * Passo 2: um CV -> pontuação de compatibilidade com a vaga do passo 1.
+     * Passo 2: um CV -> que requisitos cumpre e pontuação final.
      *
-     * O vector e as palavras-chave da vaga voltam do browser em cada pedido, o
-     * que evita guardar sessão ou repetir o embedding da descrição por CV.
+     * Os requisitos (texto e vector) voltam do browser em cada pedido, o que evita
+     * guardar sessão ou repetir a análise da vaga a cada CV.
      */
     public function analyzeCv(Request $request, CvAnalysisService $analysis)
     {
-        // O OCR de um CV digitalizado pode demorar; o limite de execução por
-        // omissão do alojamento partilhado (30-60s) cortaria o pedido antes da
-        // resposta do serviço.
-        set_time_limit(130);
+        // O OCR de um CV digitalizado pode demorar, e a este passo somam-se ainda
+        // os vectores de cada bloco; o limite por omissão do alojamento partilhado
+        // (30-60s) cortaria o pedido a meio.
+        set_time_limit(180);
 
         $request->validate([
             'cv' => ['required', 'file', 'max:' . self::MAX_CV_SIZE_KB, $this->pdfRule()],
             'vector' => 'required|string|max:200000',
             'model' => 'required|string|max:120',
             'keywords' => 'nullable|string|max:200000',
+            'requirements' => 'nullable|string|max:2000000',
         ], [
             'cv.required' => 'Escolha um CV em PDF.',
             'cv.max' => 'Cada CV não pode ultrapassar 5 MB.',
@@ -128,16 +161,51 @@ class CvAnalyzerController extends Controller
         // Vectores de modelos diferentes não são comparáveis: se o serviço tiver
         // sido actualizado entre o passo 1 e o passo 2, fica só a pontuação por
         // palavras-chave em vez de uma semelhança sem significado.
-        $semanticScore = $result['model'] === $request->input('model')
-            ? VectorSimilarity::cosine($jobVector, $result['vector'])
-            : null;
-
+        $sameModel = $result['model'] === $request->input('model');
+        $requirements = $this->requirements($request->input('requirements'));
         $keywordResult = KeywordMatcher::score($this->keywords($request->input('keywords')), $result['text']);
+
+        if ($requirements !== [] && $sameModel) {
+            return $this->requirementResponse($analysis, $requirements, $result, $keywordResult);
+        }
+
+        // Sem requisitos identificáveis (ou com o modelo trocado a meio), volta-se
+        // à comparação do CV inteiro com a vaga inteira.
+        $semanticScore = $sameModel ? VectorSimilarity::cosine($jobVector, $result['vector']) : null;
 
         return response()->json([
             'ok' => true,
             'score' => KeywordMatcher::blend($semanticScore, $keywordResult['score'] ?? null),
             'matched' => array_slice($keywordResult['matched'] ?? [], 0, 12),
+            'requirements' => [],
+        ]);
+    }
+
+    /**
+     * @param array<int, array{text: string, vector: array<int, float>}> $requirements
+     * @param array{text: string|null, vector: array<int, float>, model: string} $cv
+     * @param array{score: float, matched: array<int, string>, total: int}|null $keywordResult
+     */
+    private function requirementResponse(
+        CvAnalysisService $analysis,
+        array $requirements,
+        array $cv,
+        ?array $keywordResult
+    ) {
+        $chunks = TextChunker::chunk((string) $cv['text']);
+        $embedded = $chunks === [] ? null : $analysis->embedMany($chunks);
+
+        // Se os blocos falharem, o vector do CV inteiro ainda serve de bloco único:
+        // pior resolução, mas melhor do que devolver um erro ao recrutador.
+        $chunkVectors = $embedded['vectors'] ?? [$cv['vector']];
+
+        $evaluation = RequirementMatcher::evaluate($requirements, $chunkVectors, $cv['text']);
+
+        return response()->json([
+            'ok' => true,
+            'score' => $evaluation['score'],
+            'matched' => array_slice($keywordResult['matched'] ?? [], 0, 12),
+            'requirements' => $evaluation['requirements'],
         ]);
     }
 
@@ -199,5 +267,54 @@ class CvAnalyzerController extends Controller
         }
 
         return $keywords;
+    }
+
+    /**
+     * Idem para os requisitos: texto e vector de cada um chegam do browser e só
+     * entram na análise se tiverem a forma esperada.
+     *
+     * @return array<int, array{text: string, vector: array<int, float>}>
+     */
+    private function requirements(?string $json): array
+    {
+        $decoded = json_decode((string) $json, true);
+
+        if (!is_array($decoded)) {
+            return [];
+        }
+
+        $requirements = [];
+
+        foreach (array_slice($decoded, 0, JobRequirements::MAX_LINES) as $entry) {
+            if (!is_array($entry) || !isset($entry['text'], $entry['vector'])) {
+                continue;
+            }
+
+            if (!is_string($entry['text']) || !VectorSimilarity::isValidVector($entry['vector'])) {
+                continue;
+            }
+
+            $text = trim($entry['text']);
+
+            if ($text === '') {
+                continue;
+            }
+
+            $requirements[] = [
+                'text' => Str::limit($text, 240, ''),
+                'vector' => array_map('floatval', $entry['vector']),
+            ];
+        }
+
+        return $requirements;
+    }
+
+    /**
+     * @param array<int, float> $vector
+     * @return array<int, float>
+     */
+    private function round(array $vector): array
+    {
+        return array_map(fn ($value) => round((float) $value, self::VECTOR_PRECISION), $vector);
     }
 }

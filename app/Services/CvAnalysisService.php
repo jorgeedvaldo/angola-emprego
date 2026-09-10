@@ -43,6 +43,32 @@ class CvAnalysisService
      * Analisa um CV já guardado em disco (usado pela análise de candidaturas das
      * empresas, onde o anexo fica arquivado).
      */
+    /**
+     * Vários textos de uma vez. Hoje é um pedido por texto; se o serviço vier a
+     * aceitar lotes, é aqui que se muda, sem tocar em quem chama.
+     *
+     * @param array<int, string> $texts
+     * @return array{vectors: array<int, array<int, float>>, model: string}|null
+     */
+    public function embedMany(array $texts): ?array
+    {
+        $vectors = [];
+        $model = null;
+
+        foreach ($texts as $text) {
+            $result = $this->embed($text);
+
+            if (!$result) {
+                return null;
+            }
+
+            $vectors[] = $result['vector'];
+            $model = $result['model'];
+        }
+
+        return $vectors === [] ? null : ['vectors' => $vectors, 'model' => $model];
+    }
+
     public function analyzeCv(string $storageDisk, string $path): ?array
     {
         if (!$this->configured()) {

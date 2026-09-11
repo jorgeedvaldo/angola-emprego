@@ -212,6 +212,13 @@ O servidor aceitou a ligação e fechou-a a meio do aperto de mão. Repare que
 por isso o problema raramente é a chave estar errada. Por ordem de
 probabilidade:
 
+0. **A chave tem palavra-passe.** Se ao ligar-se do seu computador aparece
+   `Enter passphrase for key`, é esta a causa: no GitHub Actions não há ninguém
+   para a escrever, a chave nunca chega a ser oferecida e o servidor fecha a
+   ligação por falta de método de autenticação. O workflow passou a detectar
+   isto antes de tentar ligar-se, com uma mensagem clara. A solução é uma chave
+   dedicada, sem palavra-passe — veja "A chave privada", no ponto 3.
+
 1. **Chave RSA contra servidor antigo.** Desde o OpenSSH 8.8 o cliente já não
    assina com `ssh-rsa`/SHA-1, e muito alojamento partilhado só aceita isso. O
    workflow já acrescenta `PubkeyAcceptedKeyTypes=+ssh-rsa`, o que resolve a

@@ -39,6 +39,18 @@ jobs:
           printf '%s\n' "$SSH_KEY" > ~/.ssh/id_deploy
           chmod 600 ~/.ssh/id_deploy
 
+          # Uma chave com palavra-passe não serve aqui: não há ninguém para a
+          # escrever. Sem esta verificação o sintoma seria o servidor a fechar a
+          # ligação sem explicação, porque o cliente nem chega a oferecer a chave.
+          if ! ssh-keygen -y -P "" -f ~/.ssh/id_deploy >/dev/null 2>&1; then
+            echo "::error::A chave em DEPLOY_SSH_KEY tem palavra-passe, ou está mal colada."
+            echo "::error::Gere uma chave sem palavra-passe: ssh-keygen -t ed25519 -N \"\" -f caminho/da/chave"
+            echo "::error::Confirme também que colou a chave privada inteira, da linha BEGIN à linha END."
+            exit 1
+          fi
+
+          echo "Chave carregada: $(ssh-keygen -l -f ~/.ssh/id_deploy)"
+
           if [ -n "$KNOWN_HOSTS" ]; then
             printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
             chmod 644 ~/.ssh/known_hosts

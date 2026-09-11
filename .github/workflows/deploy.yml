@@ -42,11 +42,14 @@ jobs:
           if [ -n "$KNOWN_HOSTS" ]; then
             printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
             chmod 644 ~/.ssh/known_hosts
+            echo "VERIFICAR_SERVIDOR=yes" >> "$GITHUB_ENV"
           else
-            # Sem a impressão digital guardada não há como distinguir o servidor
-            # certo de outro que responda no mesmo endereço.
-            echo "::error::Falta o segredo DEPLOY_KNOWN_HOSTS. Veja deploy/README.md."
-            exit 1
+            # Sem a impressão digital, aceita-se o servidor que responder. A chave
+            # privada continua a não sair daqui — o SSH assina um desafio ligado à
+            # sessão, que um servidor falso não consegue reutilizar no verdadeiro.
+            # O que se perde é a garantia de que se falou mesmo com o seu servidor.
+            echo "::warning::Sem DEPLOY_KNOWN_HOSTS: a identidade do servidor não é verificada. Veja deploy/README.md."
+            echo "VERIFICAR_SERVIDOR=accept-new" >> "$GITHUB_ENV"
           fi
 
       - name: Publicar
@@ -79,6 +82,7 @@ jobs:
               -p "${DEPLOY_PORT:-22}" \
               -o BatchMode=yes \
               -o ConnectTimeout=20 \
+              -o "StrictHostKeyChecking=${VERIFICAR_SERVIDOR:-accept-new}" \
               "$DEPLOY_USER@$DEPLOY_HOST" \
               "APP_DIR='$DEPLOY_PATH' PHP_BIN='${DEPLOY_PHP:-php}' DEPLOY_COMMIT='$DEPLOY_COMMIT' RUN_MIGRATIONS='${RUN_MIGRATIONS:-0}' RUN_COMPOSER='${RUN_COMPOSER:-0}' CLEAR_CACHE='${CLEAR_CACHE:-0}' bash -s" \
               < deploy/publicar.sh

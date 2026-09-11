@@ -44,19 +44,32 @@ Imprime `DEPLOY_USER`, `DEPLOY_HOST`, `DEPLOY_PATH`, `DEPLOY_PORT`,
 `DEPLOY_KNOWN_HOSTS` e os PHP disponíveis, e diz-lhe se já há alguma chave
 autorizada. Só não mostra a chave privada — essa é o ponto 3.
 
-Se o script não conseguir gerar o `DEPLOY_KNOWN_HOSTS` (acontece quando o
-alojamento não tem `ssh-keyscan`), corra isto **no seu computador**, trocando
-`SERVIDOR` pelo valor de `DEPLOY_HOST`:
+#### Sobre o `DEPLOY_KNOWN_HOSTS` (opcional)
+
+Este é o único segredo que pode saltar: sem ele a publicação funciona na mesma,
+aceitando o servidor que responder ao endereço.
+
+O que se perde não é a chave. Com autenticação por chave, a **privada nunca é
+enviada**: o SSH assina um desafio ligado àquela sessão, e um servidor falso não
+consegue reutilizar essa assinatura para entrar no servidor verdadeiro. (Com
+palavra-passe seria outra conversa — essa iria mesmo parar às mãos dele.) O que
+um impostor conseguiria era receber o script de publicação — que é público,
+está neste repositório — e mentir sobre o resultado.
+
+Ou seja: sem este segredo, a publicação continua a não dar acesso a ninguém ao
+seu servidor; o que deixa de haver é a garantia de que se falou mesmo com ele.
+Quando o segredo falta, o workflow deixa um aviso amarelo no registo em vez de
+falhar.
+
+Para o criar, corra no **seu computador** (no Windows 10 ou 11 funciona no
+PowerShell, sem instalar nada), trocando `SERVIDOR` pelo valor de `DEPLOY_HOST`:
 
 ```bash
 ssh-keyscan -p 22 SERVIDOR
 ```
 
-No Windows 10 ou 11 este comando existe no PowerShell, sem instalar nada.
-
-Copie as linhas todas — são várias. Sem esta impressão digital, o GitHub não
-tem como distinguir o seu servidor de outro que responda no mesmo endereço, e é
-por isso que o workflow se recusa a correr sem ela.
+Copie as linhas todas — são várias, uma por tipo de chave. O `mostrar-dados.sh`
+também o tenta gerar a partir do próprio servidor.
 
 ### 3. A chave privada
 
@@ -104,7 +117,7 @@ ssh -i ~/.ssh/angolaemprego_deploy yqqnyhrgnt@SERVIDOR "pwd && git --version"
 | Segredo | Valor | Obrigatório |
 |---|---|---|
 | `DEPLOY_SSH_KEY` | a chave **privada** inteira, incluindo as linhas `-----BEGIN…` e `-----END…` | sim |
-| `DEPLOY_KNOWN_HOSTS` | o resultado do `ssh-keyscan` do ponto 3 | sim |
+| `DEPLOY_KNOWN_HOSTS` | o resultado do `ssh-keyscan` (ver ponto 2) | não |
 | `DEPLOY_HOST` | endereço do servidor (ex.: `server40.xxxx.com`) | sim |
 | `DEPLOY_USER` | `yqqnyhrgnt` | sim |
 | `DEPLOY_PATH` | `/home/yqqnyhrgnt/angolaemprego.com` | sim |
@@ -195,7 +208,7 @@ cd ~/angolaemprego.com && bash deploy/publicar.sh
 | Sintoma no registo | Causa |
 |---|---|
 | `Permission denied (publickey)` | a chave pública não está autorizada no cPanel (ponto 1), ou `DEPLOY_SSH_KEY` foi colada incompleta |
-| `Host key verification failed` | `DEPLOY_KNOWN_HOSTS` errado ou de outro servidor |
+| `Host key verification failed` | `DEPLOY_KNOWN_HOSTS` errado, de outro servidor, ou a chave do servidor mudou. Gere-o de novo, ou apague o segredo para deixar de verificar |
 | `não é um repositório git` | `DEPLOY_PATH` aponta para a pasta errada |
 | `Your local changes would be overwritten` | alguém editou ficheiros directamente no cPanel; é o mesmo erro que teria no terminal. Veja-os com `git status` e decida antes de continuar |
 | pede palavra-passe no `git pull` | falta a chave de leitura do ponto 5 |

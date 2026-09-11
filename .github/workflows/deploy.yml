@@ -90,19 +90,14 @@ jobs:
 
           # O script vai daqui pelo canal do SSH: corre sempre a versão que está
           # neste commit, e não uma cópia esquecida no servidor.
-          # PubkeyAcceptedKeyTypes/HostKeyAlgorithms: o OpenSSH 8.8+ (que o runner
-          # usa) deixou de assinar com ssh-rsa/SHA-1 por omissão. Muito servidor de
-          # alojamento partilhado ainda só aceita isso, e o sintoma é a ligação ser
-          # fechada sem sequer chegar a "Permission denied". Estas opções apenas
-          # acrescentam o algoritmo antigo à lista; os modernos continuam a ser
-          # preferidos quando o servidor os suporta.
+          # Sem opções para algoritmos antigos: o servidor negoceia bem com os
+          # modernos, confirmado com uma chave ed25519. Se algum dia for preciso
+          # reactivar o ssh-rsa/SHA-1, o passo de diagnóstico abaixo testa-o.
           ssh -i ~/.ssh/id_deploy \
               -p "${DEPLOY_PORT:-22}" \
               -o BatchMode=yes \
               -o ConnectTimeout=20 \
               -o "StrictHostKeyChecking=${VERIFICAR_SERVIDOR:-accept-new}" \
-              -o PubkeyAcceptedKeyTypes=+ssh-rsa \
-              -o HostKeyAlgorithms=+ssh-rsa \
               "$DEPLOY_USER@$DEPLOY_HOST" \
               "APP_DIR='$DEPLOY_PATH' PHP_BIN='${DEPLOY_PHP:-php}' DEPLOY_COMMIT='$DEPLOY_COMMIT' RUN_MIGRATIONS='${RUN_MIGRATIONS:-0}' RUN_COMPOSER='${RUN_COMPOSER:-0}' CLEAR_CACHE='${CLEAR_CACHE:-0}' bash -s" \
               < deploy/publicar.sh

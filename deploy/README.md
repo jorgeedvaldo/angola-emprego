@@ -205,6 +205,55 @@ cd ~/angolaemprego.com && bash deploy/publicar.sh
 
 ## Se correr mal
 
+### `Connection closed by ... port 22` (saída 255)
+
+O servidor aceitou a ligação e fechou-a a meio do aperto de mão. Repare que
+**não** diz `Permission denied (publickey)` — a autenticação nem chegou ao fim,
+por isso o problema raramente é a chave estar errada. Por ordem de
+probabilidade:
+
+0. **A chave tem palavra-passe.** Se ao ligar-se do seu computador aparece
+   `Enter passphrase for key`, é esta a causa: no GitHub Actions não há ninguém
+   para a escrever, a chave nunca chega a ser oferecida e o servidor fecha a
+   ligação por falta de método de autenticação. O workflow passou a detectar
+   isto antes de tentar ligar-se, com uma mensagem clara. A solução é uma chave
+   dedicada, sem palavra-passe — veja "A chave privada", no ponto 3.
+
+1. **Chave RSA contra servidor antigo.** Desde o OpenSSH 8.8 o cliente já não
+   assina com `ssh-rsa`/SHA-1, e muito alojamento partilhado só aceita isso. O
+   workflow já acrescenta `PubkeyAcceptedKeyTypes=+ssh-rsa`, o que resolve a
+   maioria dos casos. Em alternativa, gere uma chave `ed25519`, que não tem este
+   problema:
+
+   ```bash
+   ssh-keygen -t ed25519 -N "" -C "github-deploy" -f ~/.ssh/angolaemprego_deploy
+   ```
+
+   e autorize a `.pub` nova no cPanel.
+
+2. **A firewall do alojamento bloqueia o GitHub.** Os runners do GitHub mudam de
+   endereço a cada corrida, e firewalls como o CSF, ou o cPHulk, fecham ligações
+   de endereços desconhecidos. Peça ao suporte do alojamento para permitir SSH a
+   partir do exterior, ou para libertar os
+   [endereços dos runners do GitHub](https://api.github.com/meta).
+
+3. **Acesso SSH externo desligado na conta.** O Terminal do cPanel funciona pelo
+   browser e não prova que o SSH está aberto de fora. Confirme ligando-se a
+   partir do seu computador:
+
+   ```bash
+   ssh -p 22 yqqnyhrgnt@SERVIDOR
+   ```
+
+   Se isto não entrar, nenhum workflow entra. É um pedido ao suporte, não uma
+   correcção no código.
+
+Quando a publicação falha, o workflow corre sozinho um passo de **Diagnóstico da
+ligação** com `ssh -vvv`: as últimas linhas dizem em que ponto o servidor
+desistiu, e ainda testa se a porta sequer responde.
+
+### Outros erros
+
 | Sintoma no registo | Causa |
 |---|---|
 | `Permission denied (publickey)` | a chave pública não está autorizada no cPanel (ponto 1), ou `DEPLOY_SSH_KEY` foi colada incompleta |

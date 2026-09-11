@@ -39,6 +39,18 @@ jobs:
           printf '%s\n' "$SSH_KEY" > ~/.ssh/id_deploy
           chmod 600 ~/.ssh/id_deploy
 
+          # Uma chave com palavra-passe não serve aqui: não há ninguém para a
+          # escrever. Sem esta verificação o sintoma seria o servidor a fechar a
+          # ligação sem explicação, porque o cliente nem chega a oferecer a chave.
+          if ! ssh-keygen -y -P "" -f ~/.ssh/id_deploy >/dev/null 2>&1; then
+            echo "::error::A chave em DEPLOY_SSH_KEY tem palavra-passe, ou está mal colada."
+            echo "::error::Gere uma chave sem palavra-passe: ssh-keygen -t ed25519 -N \"\" -f caminho/da/chave"
+            echo "::error::Confirme também que colou a chave privada inteira, da linha BEGIN à linha END."
+            exit 1
+          fi
+
+          echo "Chave carregada: $(ssh-keygen -l -f ~/.ssh/id_deploy)"
+
           if [ -n "$KNOWN_HOSTS" ]; then
             printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
             chmod 644 ~/.ssh/known_hosts
@@ -78,6 +90,9 @@ jobs:
 
           # O script vai daqui pelo canal do SSH: corre sempre a versão que está
           # neste commit, e não uma cópia esquecida no servidor.
+          # Sem opções para algoritmos antigos: o servidor negoceia bem com os
+          # modernos, confirmado com uma chave ed25519. Se algum dia for preciso
+          # reactivar o ssh-rsa/SHA-1, o passo de diagnóstico abaixo testa-o.
           ssh -i ~/.ssh/id_deploy \
               -p "${DEPLOY_PORT:-22}" \
               -o BatchMode=yes \
@@ -86,6 +101,27 @@ jobs:
               "$DEPLOY_USER@$DEPLOY_HOST" \
               "APP_DIR='$DEPLOY_PATH' PHP_BIN='${DEPLOY_PHP:-php}' DEPLOY_COMMIT='$DEPLOY_COMMIT' RUN_MIGRATIONS='${RUN_MIGRATIONS:-0}' RUN_COMPOSER='${RUN_COMPOSER:-0}' CLEAR_CACHE='${CLEAR_CACHE:-0}' bash -s" \
               < deploy/publicar.sh
+
+      # Só corre quando a publicação falha. Sem isto, o registo diz apenas
+      # "Connection closed" e fica-se sem saber em que ponto do aperto de mão é
+      # que o servidor desistiu.
+      - name: Diagnóstico da ligação
+        if: failure()
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
+        run: |
+          echo "===== Que chave estamos a usar ====="
+          ssh-keygen -l -f ~/.ssh/id_deploy || echo "(a chave não é legível — pode estar mal colada)"
+
+          echo
+          echo "===== Ligação detalhada ====="
+          ssh -vvv -i ~/.ssh/id_deploy               -p "${DEPLOY_PORT:-22}"               -o BatchMode=yes               -o ConnectTimeout=20               -o StrictHostKeyChecking=accept-new               -o PubkeyAcceptedKeyTypes=+ssh-rsa               -o HostKeyAlgorithms=+ssh-rsa               "$DEPLOY_USER@$DEPLOY_HOST" 'echo LIGACAO-OK; whoami; pwd' 2>&1 | tail -80 || true
+
+          echo
+          echo "===== O servidor responde na porta? ====="
+          timeout 10 bash -c "cat < /dev/null > /dev/tcp/$DEPLOY_HOST/${DEPLOY_PORT:-22}"             && echo "porta aberta"             || echo "porta fechada ou filtrada — pode ser a firewall do alojamento a bloquear o GitHub"
 
       - name: Apagar a chave
         if: always()

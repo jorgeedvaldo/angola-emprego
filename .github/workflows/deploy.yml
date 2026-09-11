@@ -1,0 +1,88 @@
+name: Publicar na hospedagem
+
+# Sempre que a main muda, a hospedagem vai buscar o código novo. O disparo
+# manual serve para testar a configuração sem ter de fazer um commit, e para
+# repetir uma publicação que tenha falhado.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Duas publicações ao mesmo tempo no mesmo servidor dariam um git a meio de
+# outro. A segunda espera pela primeira em vez de a cancelar.
+concurrency:
+  group: publicar-producao
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    name: git pull na hospedagem
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Obter o código
+        uses: actions/checkout@v4
+
+      - name: Preparar o acesso SSH
+        env:
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          if [ -z "$SSH_KEY" ]; then
+            echo "::error::Falta o segredo DEPLOY_SSH_KEY."
+            exit 1
+          fi
+
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+
+          if [ -n "$KNOWN_HOSTS" ]; then
+            printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+            chmod 644 ~/.ssh/known_hosts
+          else
+            # Sem a impressão digital guardada não há como distinguir o servidor
+            # certo de outro que responda no mesmo endereço.
+            echo "::error::Falta o segredo DEPLOY_KNOWN_HOSTS. Veja deploy/README.md."
+            exit 1
+          fi
+
+      - name: Publicar
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          DEPLOY_PHP: ${{ secrets.DEPLOY_PHP }}
+          DEPLOY_COMMIT: ${{ github.sha }}
+          # Desligados por omissão: a publicação faz o mesmo que se faz à mão no
+          # Terminal do cPanel, que é só o git pull. Para passar a correr também
+          # as migrações, crie o segredo DEPLOY_RUN_MIGRATIONS com o valor 1.
+          RUN_MIGRATIONS: ${{ secrets.DEPLOY_RUN_MIGRATIONS }}
+          RUN_COMPOSER: ${{ secrets.DEPLOY_RUN_COMPOSER }}
+          CLEAR_CACHE: ${{ secrets.DEPLOY_CLEAR_CACHE }}
+        run: |
+          set -euo pipefail
+
+          for nome in DEPLOY_HOST DEPLOY_USER DEPLOY_PATH; do
+            if [ -z "${!nome}" ]; then
+              echo "::error::Falta o segredo $nome."
+              exit 1
+            fi
+          done
+
+          # O script vai daqui pelo canal do SSH: corre sempre a versão que está
+          # neste commit, e não uma cópia esquecida no servidor.
+          ssh -i ~/.ssh/id_deploy \
+              -p "${DEPLOY_PORT:-22}" \
+              -o BatchMode=yes \
+              -o ConnectTimeout=20 \
+              "$DEPLOY_USER@$DEPLOY_HOST" \
+              "APP_DIR='$DEPLOY_PATH' PHP_BIN='${DEPLOY_PHP:-php}' DEPLOY_COMMIT='$DEPLOY_COMMIT' RUN_MIGRATIONS='${RUN_MIGRATIONS:-0}' RUN_COMPOSER='${RUN_COMPOSER:-0}' CLEAR_CACHE='${CLEAR_CACHE:-0}' bash -s" \
+              < deploy/publicar.sh
+
+      - name: Apagar a chave
+        if: always()
+        run: rm -f ~/.ssh/id_deploy

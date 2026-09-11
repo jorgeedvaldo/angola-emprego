@@ -32,30 +32,70 @@ ssh -i ~/.ssh/a_sua_chave_privada yqqnyhrgnt@SERVIDOR "pwd && git --version"
 
 Se isto não entrar, o workflow também não entra — resolva aqui primeiro.
 
-### 2. Descobrir os valores a guardar
+### 2. Descobrir todos os valores de uma vez
 
 No **Terminal do cPanel**:
 
 ```bash
-cd ~/angolaemprego.com && pwd          # -> valor de DEPLOY_PATH
-git remote -v                          # confirma que é mesmo um repositório git
-whoami                                 # -> valor de DEPLOY_USER
-ls /usr/local/bin/ea-php*              # -> valor de DEPLOY_PHP (ex.: ea-php81)
+bash ~/angolaemprego.com/deploy/mostrar-dados.sh
 ```
 
-O `DEPLOY_PATH` tem de ser a pasta onde está o ficheiro `artisan`.
+Imprime `DEPLOY_USER`, `DEPLOY_HOST`, `DEPLOY_PATH`, `DEPLOY_PORT`,
+`DEPLOY_KNOWN_HOSTS` e os PHP disponíveis, e diz-lhe se já há alguma chave
+autorizada. Só não mostra a chave privada — essa é o ponto 3.
 
-### 3. Guardar a impressão digital do servidor
-
-No **seu computador** (não no cPanel):
+Se o script não conseguir gerar o `DEPLOY_KNOWN_HOSTS` (acontece quando o
+alojamento não tem `ssh-keyscan`), corra isto **no seu computador**, trocando
+`SERVIDOR` pelo valor de `DEPLOY_HOST`:
 
 ```bash
 ssh-keyscan -p 22 SERVIDOR
 ```
 
-Copie as linhas todas — são o valor de `DEPLOY_KNOWN_HOSTS`. Sem isto o GitHub
-não tem como distinguir o seu servidor de outro que responda no mesmo endereço,
-e por isso o workflow recusa-se a correr sem esse segredo.
+No Windows 10 ou 11 este comando existe no PowerShell, sem instalar nada.
+
+Copie as linhas todas — são várias. Sem esta impressão digital, o GitHub não
+tem como distinguir o seu servidor de outro que responda no mesmo endereço, e é
+por isso que o workflow se recusa a correr sem ela.
+
+### 3. A chave privada
+
+O segredo `DEPLOY_SSH_KEY` é a chave **privada** que faz par com a pública que
+autorizou no ponto 1.
+
+**Se gerou a chave no cPanel:** SSH Access → Manage SSH Keys → em *Private
+Keys*, **View/Download**. O conteúdo do ficheiro é o valor do segredo.
+
+**Se gerou a chave no seu computador:** é o ficheiro sem `.pub`, normalmente
+`~/.ssh/id_rsa` (no Windows, `C:\Users\SEU_NOME\.ssh\id_rsa`).
+
+Três coisas que costumam correr mal:
+
+1. **Copie o ficheiro inteiro**, da linha `-----BEGIN` à linha `-----END`
+   inclusive, com a mudança de linha final. Sem a última linha, o GitHub dá
+   `error in libcrypto` ou `invalid format`.
+2. **Não use o `.pub`.** A que vai para o GitHub é a privada; a `.pub` é a que
+   vai para o cPanel.
+3. **A chave não pode ter palavra-passe.** O GitHub corre sem ninguém para a
+   escrever. Para confirmar, no seu computador:
+
+   ```bash
+   ssh-keygen -y -P "" -f ~/.ssh/id_rsa >/dev/null && echo "sem palavra-passe, serve"
+   ```
+
+   Se falhar, gere uma chave só para isto, sem palavra-passe:
+
+   ```bash
+   ssh-keygen -t rsa -b 4096 -N "" -C "github-deploy" -f ~/.ssh/angolaemprego_deploy
+   ```
+
+   e autorize a `.pub` nova no cPanel (ponto 1).
+
+Antes de guardar o segredo, teste que a chave entra mesmo:
+
+```bash
+ssh -i ~/.ssh/angolaemprego_deploy yqqnyhrgnt@SERVIDOR "pwd && git --version"
+```
 
 ### 4. Criar os segredos no GitHub
 
@@ -68,11 +108,15 @@ e por isso o workflow recusa-se a correr sem esse segredo.
 | `DEPLOY_HOST` | endereço do servidor (ex.: `server40.xxxx.com`) | sim |
 | `DEPLOY_USER` | `yqqnyhrgnt` | sim |
 | `DEPLOY_PATH` | `/home/yqqnyhrgnt/angolaemprego.com` | sim |
-| `DEPLOY_PORT` | porta SSH, se não for a 22 | não |
+| `DEPLOY_PORT` | porta SSH, só se não for a 22 | não |
 | `DEPLOY_PHP` | executável do PHP, ex.: `/usr/local/bin/ea-php81` | não |
 
-A chave privada tem de ser colada **tal e qual**, com a última linha em branco
-incluída. Se estiver no formato novo (`OPENSSH PRIVATE KEY`) funciona na mesma.
+O `DEPLOY_PHP` **não é preciso** para a publicação normal: o script só faz `git
+pull` e nunca chama o PHP. Só o crie se ligar as migrações ou a limpeza de cache
+(ver mais abaixo); serve também para a mensagem de aviso mostrar o comando certo.
+
+A chave privada é colada tal e qual, e funciona tanto no formato antigo (`RSA
+PRIVATE KEY`) como no novo (`OPENSSH PRIVATE KEY`).
 
 ### 5. Deixar o servidor puxar do GitHub
 

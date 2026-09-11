@@ -56,8 +56,13 @@ jobs:
           DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
           DEPLOY_PHP: ${{ secrets.DEPLOY_PHP }}
-          DEPLOY_BRANCH: main
           DEPLOY_COMMIT: ${{ github.sha }}
+          # Desligados por omissão: a publicação faz o mesmo que se faz à mão no
+          # Terminal do cPanel, que é só o git pull. Para passar a correr também
+          # as migrações, crie o segredo DEPLOY_RUN_MIGRATIONS com o valor 1.
+          RUN_MIGRATIONS: ${{ secrets.DEPLOY_RUN_MIGRATIONS }}
+          RUN_COMPOSER: ${{ secrets.DEPLOY_RUN_COMPOSER }}
+          CLEAR_CACHE: ${{ secrets.DEPLOY_CLEAR_CACHE }}
         run: |
           set -euo pipefail
 
@@ -75,7 +80,7 @@ jobs:
               -o BatchMode=yes \
               -o ConnectTimeout=20 \
               "$DEPLOY_USER@$DEPLOY_HOST" \
-              "APP_DIR='$DEPLOY_PATH' PHP_BIN='${DEPLOY_PHP:-php}' DEPLOY_BRANCH='$DEPLOY_BRANCH' DEPLOY_COMMIT='$DEPLOY_COMMIT' bash -s" \
+              "APP_DIR='$DEPLOY_PATH' PHP_BIN='${DEPLOY_PHP:-php}' DEPLOY_COMMIT='$DEPLOY_COMMIT' RUN_MIGRATIONS='${RUN_MIGRATIONS:-0}' RUN_COMPOSER='${RUN_COMPOSER:-0}' CLEAR_CACHE='${CLEAR_CACHE:-0}' bash -s" \
               < deploy/publicar.sh
 
       - name: Apagar a chave

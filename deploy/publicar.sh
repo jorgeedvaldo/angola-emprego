@@ -1,27 +1,35 @@
 #!/usr/bin/env bash
 #
 # Corre no servidor de alojamento, enviado pelo SSH a partir do GitHub Actions.
-# Também pode ser corrido à mão no Terminal do cPanel:
 #
-#   cd ~/angolaemprego.com && bash deploy/publicar.sh
+# Faz o mesmo que se faz à mão no Terminal do cPanel:
+#
+#   cd ~/angolaemprego.com
+#   git pull
+#
+# Nada mais. Migrações, composer e limpeza de cache continuam a ser decisão sua
+# — o script só avisa quando este commit traz alguma coisa que as exija. Para as
+# fazer correr aqui, veja as variáveis RUN_* no fim deste comentário.
 #
 # Variáveis aceites:
 #   APP_DIR        pasta da aplicação no servidor (por omissão, a pasta actual)
-#   PHP_BIN        executável do PHP (em cPanel costuma ser ea-php81, ea-php82…)
-#   DEPLOY_BRANCH  ramo a publicar (por omissão main)
-#   DEPLOY_COMMIT  commit que se espera ficar activo, para conferir no fim
-#   FORCE_RESET=1  deita fora alterações feitas à mão no servidor (ver abaixo)
+#   PHP_BIN        executável do PHP (em cPanel, ex.: /usr/local/bin/ea-php81)
+#   DEPLOY_COMMIT  commit que se espera ficar activo, só para conferir no fim
+#   RUN_MIGRATIONS=1   corre também 'artisan migrate --force'
+#   RUN_COMPOSER=1     corre também 'composer install' quando o lock mudou
+#   CLEAR_CACHE=1      corre também 'artisan optimize:clear'
 
 set -euo pipefail
 
 APP_DIR="${APP_DIR:-$(pwd)}"
 PHP_BIN="${PHP_BIN:-php}"
-DEPLOY_BRANCH="${DEPLOY_BRANCH:-main}"
 DEPLOY_COMMIT="${DEPLOY_COMMIT:-}"
-FORCE_RESET="${FORCE_RESET:-0}"
+RUN_MIGRATIONS="${RUN_MIGRATIONS:-0}"
+RUN_COMPOSER="${RUN_COMPOSER:-0}"
+CLEAR_CACHE="${CLEAR_CACHE:-0}"
 
 passo() { printf '\n\033[1m==> %s\033[0m\n' "$1"; }
-aviso() { printf '    [aviso] %s\n' "$1"; }
+aviso() { printf '    \033[33m[atenção]\033[0m %s\n' "$1"; }
 
 passo "Pasta da aplicação"
 cd "$APP_DIR"
@@ -29,103 +37,101 @@ echo "    $(pwd)"
 
 if [ ! -d .git ]; then
     echo "    ERRO: $APP_DIR não é um repositório git." >&2
-    echo "    Clone o repositório aqui, ou use o Git Version Control do cPanel." >&2
+    echo "    Confirme o valor de DEPLOY_PATH com 'pwd' no Terminal do cPanel." >&2
     exit 1
 fi
 
-if [ ! -f artisan ]; then
-    aviso "não encontrei o ficheiro artisan — confirme que APP_DIR aponta para a raiz do Laravel."
+ANTES="$(git rev-parse HEAD)"
+echo "    ramo: $(git rev-parse --abbrev-ref HEAD)"
+echo "    commit: $(git rev-parse --short HEAD)"
+
+passo "git pull"
+git pull
+
+DEPOIS="$(git rev-parse HEAD)"
+
+if [ "$ANTES" = "$DEPOIS" ]; then
+    echo "    (já estava actualizado)"
+else
+    echo "    $(git rev-parse --short "$ANTES") -> $(git rev-parse --short "$DEPOIS")"
 fi
 
-passo "Estado actual"
-echo "    commit: $(git rev-parse --short HEAD) ($(git rev-parse --abbrev-ref HEAD))"
+# A partir daqui nada altera o site: é só dizer o que este commit trouxe e que
+# possa precisar de um passo seu, como já acontece hoje quando corre as
+# migrações de propósito.
+passo "O que mudou"
 
-# Guardado antes do pull para, mais abaixo, saber se as dependências mudaram.
-LOCK_ANTES="$(git rev-parse HEAD:composer.lock 2>/dev/null || echo nenhum)"
-
-passo "A buscar o código novo"
-git fetch --prune origin "$DEPLOY_BRANCH"
-
-if [ "$FORCE_RESET" = "1" ]; then
-    # Descarta o que esteja alterado no servidor. Só quando se sabe que não há
-    # nada de valor lá — edições feitas directamente no cPanel perdem-se.
-    aviso "FORCE_RESET activo: alterações locais no servidor serão descartadas."
-    git checkout -B "$DEPLOY_BRANCH" "origin/$DEPLOY_BRANCH"
-    git reset --hard "origin/$DEPLOY_BRANCH"
+if [ "$ANTES" != "$DEPOIS" ]; then
+    MIGRACOES="$(git diff --name-only --diff-filter=A "$ANTES" "$DEPOIS" -- database/migrations || true)"
+    LOCK="$(git diff --name-only "$ANTES" "$DEPOIS" -- composer.lock || true)"
+    ASSETS="$(git diff --name-only "$ANTES" "$DEPOIS" -- package.json resources/js resources/css || true)"
 else
-    # Sem forçar: se alguém mexeu nos ficheiros do servidor, a publicação pára
-    # com erro em vez de apagar esse trabalho sem avisar.
-    if [ -n "$(git status --porcelain)" ]; then
-        echo "    ERRO: há alterações por commitar no servidor:" >&2
-        git status --short >&2
-        echo "    Resolva-as, ou repita com FORCE_RESET=1 para as descartar." >&2
-        exit 1
+    MIGRACOES=""
+    LOCK=""
+    ASSETS=""
+fi
+
+if [ -n "$MIGRACOES" ]; then
+    aviso "este commit traz migrações novas:"
+    printf '        %s\n' $MIGRACOES
+    if [ "$RUN_MIGRATIONS" != "1" ]; then
+        aviso "corra-as quando lhe der jeito: $PHP_BIN artisan migrate --force"
     fi
-
-    git checkout "$DEPLOY_BRANCH" 2>/dev/null || git checkout -B "$DEPLOY_BRANCH" "origin/$DEPLOY_BRANCH"
-    git merge --ff-only "origin/$DEPLOY_BRANCH"
 fi
 
-echo "    agora em: $(git rev-parse --short HEAD)"
-
-passo "Dependências"
-if [ ! -d vendor ]; then
-    aviso "a pasta vendor não existe — a aplicação não arranca sem ela."
+if [ -n "$LOCK" ]; then
+    aviso "o composer.lock mudou — a pasta vendor/ neste servidor ficou desactualizada."
+    if [ "$RUN_COMPOSER" != "1" ]; then
+        aviso "actualize vendor/ (composer install, ou o envio do vendor.zip)."
+    fi
 fi
 
-LOCK_DEPOIS="$(git rev-parse HEAD:composer.lock 2>/dev/null || echo nenhum)"
+if [ -n "$ASSETS" ]; then
+    aviso "houve alterações em assets (resources/js, resources/css ou package.json);"
+    aviso "se o site usa os ficheiros compilados, é preciso gerá-los e enviá-los."
+fi
 
-if [ "$LOCK_ANTES" = "$LOCK_DEPOIS" ]; then
-    # O caso normal. Correr o composer em todas as publicações só traria o risco
-    # de uma falha dele (versão de PHP diferente, memória, rede) deitar abaixo
-    # uma publicação que nem sequer mexeu em dependências.
-    echo "    composer.lock não mudou — nada a instalar."
-else
-    echo "    composer.lock mudou nesta publicação."
+if [ -z "$MIGRACOES$LOCK$ASSETS" ]; then
+    echo "    nada que exija um passo adicional."
+fi
 
+# Passos extra, desligados por omissão. Ligam-se pelas variáveis RUN_*, que o
+# workflow passa a partir de segredos do GitHub — assim a publicação continua a
+# ser o que você faz à mão, a não ser que decida o contrário.
+if [ "$RUN_COMPOSER" = "1" ] && [ -n "$LOCK" ]; then
+    passo "composer install"
     if command -v composer >/dev/null 2>&1; then
-        COMPOSER_CMD="composer"
+        composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
     elif [ -f composer.phar ]; then
-        COMPOSER_CMD="$PHP_BIN composer.phar"
+        "$PHP_BIN" composer.phar install --no-dev --optimize-autoloader --no-interaction --prefer-dist
     else
-        COMPOSER_CMD=""
-    fi
-
-    if [ -n "$COMPOSER_CMD" ]; then
-        $COMPOSER_CMD install --no-dev --optimize-autoloader --no-interaction --prefer-dist
-    else
-        # Alojamento partilhado muitas vezes não tem composer, e aqui isso é
-        # grave: o código novo já está no servidor e as dependências dele não.
-        echo "    ERRO: as dependências mudaram e não há composer no servidor." >&2
-        echo "    Actualize vendor/ à mão (envie o vendor.zip) e repita a publicação." >&2
+        echo "    ERRO: RUN_COMPOSER=1 mas não há composer neste servidor." >&2
         exit 1
     fi
 fi
 
-passo "Base de dados"
-"$PHP_BIN" artisan migrate --force
-
-passo "Limpeza de cache"
-# Nota: não se faz route:cache. routes/web.php tem rotas definidas com closures
-# e o Laravel não as consegue serializar — o comando falharia e deixaria o site
-# em baixo.
-"$PHP_BIN" artisan optimize:clear
-
-if [ ! -L public/storage ] && [ ! -d public/storage ]; then
-    aviso "public/storage não existe; a criar a ligação simbólica."
-    "$PHP_BIN" artisan storage:link || aviso "storage:link falhou — crie a ligação à mão."
+if [ "$RUN_MIGRATIONS" = "1" ]; then
+    passo "artisan migrate"
+    "$PHP_BIN" artisan migrate --force
 fi
 
-passo "Confirmação"
-ACTUAL="$(git rev-parse HEAD)"
-echo "    commit activo: $ACTUAL"
-
-if [ -n "$DEPLOY_COMMIT" ] && [ "$ACTUAL" != "$DEPLOY_COMMIT" ]; then
-    # Acontece quando entrou outro commit na main entretanto. Não é
-    # necessariamente mau, mas quem publicou tem de saber que o que está no ar
-    # não é exactamente o que mandou publicar.
-    echo "    ERRO: esperava $DEPLOY_COMMIT mas ficou $ACTUAL." >&2
-    exit 1
+if [ "$CLEAR_CACHE" = "1" ]; then
+    passo "artisan optimize:clear"
+    # Nota: nunca route:cache. routes/web.php tem rotas definidas com closures,
+    # que o Laravel não consegue serializar — o comando falha e deixa o site em
+    # baixo.
+    "$PHP_BIN" artisan optimize:clear
 fi
 
-printf '\n\033[1mPublicado com sucesso.\033[0m\n'
+passo "Resultado"
+echo "    commit activo: $(git rev-parse HEAD)"
+
+if [ -n "$DEPLOY_COMMIT" ] && [ "$DEPOIS" != "$DEPLOY_COMMIT" ]; then
+    # Não é erro: pode ter entrado outro commit na main entretanto, ou o git ter
+    # feito um merge em vez de avançar a direito. Mas quem publicou tem de saber
+    # que o que está no ar não é exactamente o que mandou publicar.
+    aviso "esperava $DEPLOY_COMMIT"
+    aviso "o servidor ficou noutro commit — veja o 'git log' antes de assumir que está actualizado."
+fi
+
+printf '\n\033[1mActualizado.\033[0m\n'

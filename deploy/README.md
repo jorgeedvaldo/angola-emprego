@@ -1,9 +1,19 @@
 # Publicação automática na hospedagem
 
-Sempre que a `main` muda, o GitHub liga-se por SSH ao alojamento e actualiza o
-site. O que corre lá é o `deploy/publicar.sh`, enviado pelo próprio SSH — corre
-sempre a versão que está no commit publicado, nunca uma cópia esquecida no
-servidor.
+Sempre que a `main` muda, o GitHub faz por si o que faria à mão:
+
+```bash
+cd ~/angolaemprego.com
+git pull
+```
+
+Nada mais. As migrações, o composer e a limpeza de cache continuam a ser decisão
+sua — o script apenas **avisa** quando o commit publicado traz alguma coisa que
+os exija, para não ter de ir verificar de cada vez.
+
+O que corre no servidor é o `deploy/publicar.sh`, enviado pelo próprio canal do
+SSH: corre sempre a versão que está no commit publicado, nunca uma cópia
+esquecida no servidor.
 
 ## O que é preciso configurar uma vez
 
@@ -96,25 +106,39 @@ git fetch origin main   # deve funcionar sem pedir nada
 Não espere por um commit. Vá a **Actions → Publicar na hospedagem → Run
 workflow** e corra à mão. Se falhar, o registo diz exactamente em que passo.
 
-## O que o script faz, e o que não faz
+## Os avisos
 
-Por esta ordem: vai buscar o código, instala dependências **só se o
-`composer.lock` tiver mudado**, corre as migrações, limpa a cache e confirma que
-ficou no commit certo.
+Depois do `git pull`, o script compara o que havia antes com o que veio agora e
+diz-lhe se este commit precisa de mais alguma coisa da sua parte:
 
-Três decisões que vale a pena conhecer:
+```
+==> O que mudou
+    [atenção] este commit traz migrações novas:
+        database/migrations/2026_09_11_000001_criar_tabela.php
+    [atenção] corra-as quando lhe der jeito: php artisan migrate --force
+    [atenção] o composer.lock mudou — a pasta vendor/ ficou desactualizada.
+```
 
-- **Não corre `route:cache`.** O `routes/web.php` tem rotas definidas com
-  closures, que o Laravel não consegue serializar: o comando falharia e deixava
-  o site em baixo.
-- **Não corre o composer em todas as publicações.** Numa hospedagem partilhada o
-  composer falha por pouca memória ou por versão de PHP diferente; não faz
-  sentido arriscar isso quando as dependências nem mudaram. Quando mudam e não
-  há composer no servidor, a publicação pára com erro — o código novo já lá
-  está sem as dependências dele, e isso tem de dar erro visível.
-- **Pára se alguém editou ficheiros directamente no servidor**, em vez de os
-  apagar sem avisar. Para os descartar de propósito, corra à mão com
-  `FORCE_RESET=1 bash deploy/publicar.sh`.
+Quando não há nada a fazer, diz `nada que exija um passo adicional`. É só
+informação: o script não altera nada além do `git pull`.
+
+## Ligar passos adicionais (opcional)
+
+Se quiser que a publicação passe a fazer mais do que o `git pull`, crie o
+segredo correspondente com o valor `1`:
+
+| Segredo | O que passa a correr |
+|---|---|
+| `DEPLOY_RUN_MIGRATIONS` | `artisan migrate --force` em cada publicação |
+| `DEPLOY_RUN_COMPOSER` | `composer install` quando o `composer.lock` mudou |
+| `DEPLOY_CLEAR_CACHE` | `artisan optimize:clear` |
+
+Para apagar, basta remover o segredo. Recomendo começar sem nenhum, tal como
+faz hoje, e ligar as migrações só quando confiar no resto.
+
+Uma nota técnica: **nunca se corre `route:cache`** neste projecto. O
+`routes/web.php` tem rotas definidas com closures, que o Laravel não consegue
+serializar — o comando falha e deixa o site em baixo.
 
 ## Correr à mão, sem o GitHub
 
@@ -129,6 +153,6 @@ cd ~/angolaemprego.com && bash deploy/publicar.sh
 | `Permission denied (publickey)` | a chave pública não está autorizada no cPanel (ponto 1), ou `DEPLOY_SSH_KEY` foi colada incompleta |
 | `Host key verification failed` | `DEPLOY_KNOWN_HOSTS` errado ou de outro servidor |
 | `não é um repositório git` | `DEPLOY_PATH` aponta para a pasta errada |
-| `há alterações por commitar no servidor` | alguém editou ficheiros no cPanel; veja-os com `git status` antes de decidir |
-| `as dependências mudaram e não há composer` | envie o `vendor/` actualizado e repita |
-| pede palavra-passe no `git fetch` | falta a chave de leitura do ponto 5 |
+| `Your local changes would be overwritten` | alguém editou ficheiros directamente no cPanel; é o mesmo erro que teria no terminal. Veja-os com `git status` e decida antes de continuar |
+| pede palavra-passe no `git pull` | falta a chave de leitura do ponto 5 |
+| `o servidor ficou noutro commit` | entrou outra coisa na `main` entretanto, ou o `git pull` fez um merge. O site está actualizado, mas não exactamente no commit publicado |

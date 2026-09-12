@@ -24,6 +24,17 @@
         return pdfJsPromise;
     }
 
+    function t(config, chave, valores) {
+        const strings = (config && config.strings) || {};
+        let texto = strings[chave] !== undefined ? strings[chave] : chave;
+
+        for (const nome in valores || {}) {
+            texto = texto.replace(':' + nome, valores[nome]);
+        }
+
+        return texto;
+    }
+
     function showMessage(container, text, isError) {
         container.innerHTML = '';
         const message = document.createElement('div');
@@ -33,7 +44,7 @@
     }
 
     async function renderPdf(config, url, container) {
-        showMessage(container, 'A carregar CV…', false);
+        showMessage(container, t(config, 'js_a_carregar_cv'), false);
 
         let requestToken;
         container.dataset.renderToken = requestToken = String(Date.now() + Math.random());
@@ -43,7 +54,7 @@
 
             const response = await fetch(url);
             if (!response.ok) {
-                throw new Error('Não foi possível obter o ficheiro (' + response.status + ').');
+                throw new Error(t(config, 'js_sem_ficheiro', { status: response.status }));
             }
 
             const buffer = await response.arrayBuffer();
@@ -76,11 +87,7 @@
             }
         } catch (error) {
             if (container.dataset.renderToken === requestToken) {
-                showMessage(
-                    container,
-                    'Não foi possível pré-visualizar este CV. Use o botão de download. (' + error.message + ')',
-                    true
-                );
+                showMessage(container, t(config, 'js_sem_previsualizacao', { mensagem: error.message }), true);
             }
         }
     }

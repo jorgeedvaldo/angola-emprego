@@ -14,6 +14,7 @@ use App\Http\Controllers\ToolsController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\CvAnalyzerController;
+use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\RecruiterController;
 
 /*
@@ -33,6 +34,7 @@ Route::get('/linkstorage', function () {
     return 'Symlink criado: <pre>' . Artisan::output() . '</pre>';
 });
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/idioma/{locale}', [LocaleController::class, 'switch'])->name('locale.switch');
 Route::get('/sobre', [AboutController::class, 'index'])->name('sobre');
 Route::get('/analise-de-cv', [AboutController::class, 'cvAnalysis'])->name('cv-analysis.info');
 Route::get('/vagas', [JobController::class, 'index'])->name('vagas');

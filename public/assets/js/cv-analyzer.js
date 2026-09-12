@@ -12,6 +12,22 @@
         return;
     }
 
+    /**
+     * Texto no idioma do visitante, vindo do Blade. O fallback para a chave só
+     * aparece se alguém acrescentar uma mensagem aqui e se esquecer de a pôr nos
+     * ficheiros de tradução — é feio, mas é visível, que é o que interessa.
+     */
+    function t(chave, valores) {
+        const strings = config.strings || {};
+        let texto = strings[chave] !== undefined ? strings[chave] : chave;
+
+        for (const nome in valores || {}) {
+            texto = texto.replace(':' + nome, valores[nome]);
+        }
+
+        return texto;
+    }
+
     const elements = {
         form: document.getElementById('cv-analyzer-form'),
         title: document.getElementById('cv-analyzer-title'),
@@ -56,17 +72,17 @@
 
     function scoreBadge(entry) {
         if (entry.error) {
-            return '<span class="badge bg-danger-subtle text-danger border border-danger-subtle ms-2">Falhou</span>';
+            return '<span class="badge bg-danger-subtle text-danger border border-danger-subtle ms-2">' + t('falhou') + '</span>';
         }
 
         if (entry.score === null || entry.score === undefined) {
-            return '<span class="badge bg-light text-muted border ms-2">Por analisar</span>';
+            return '<span class="badge bg-light text-muted border ms-2">' + t('por_analisar') + '</span>';
         }
 
         const percent = Math.round(Math.max(0, entry.score) * 100);
         const style = entry.score >= 0.5 ? 'bg-success' : (entry.score >= 0.3 ? 'bg-warning text-dark' : 'bg-secondary');
 
-        return '<span class="badge ' + style + ' ms-2">' + percent + '% compatível</span>';
+        return '<span class="badge ' + style + ' ms-2">' + t('compativel', { percent: percent }) + '</span>';
     }
 
     function escapeHtml(text) {
@@ -77,9 +93,9 @@
     }
 
     const STATUS = {
-        cumpre: { icon: 'bi-check-circle-fill', color: 'text-success', label: 'cumpre' },
-        parcial: { icon: 'bi-dash-circle-fill', color: 'text-warning', label: 'parcial' },
-        ausente: { icon: 'bi-x-circle-fill', color: 'text-secondary', label: 'não encontrado' },
+        cumpre: { icon: 'bi-check-circle-fill', color: 'text-success', chave: 'cumpre' },
+        parcial: { icon: 'bi-dash-circle-fill', color: 'text-warning', chave: 'parcial' },
+        ausente: { icon: 'bi-x-circle-fill', color: 'text-secondary', chave: 'ausente' },
     };
 
     /**
@@ -99,12 +115,12 @@
             // Um diferencial em falta não é o mesmo que uma exigência em falta, e
             // o recrutador tem de ver essa diferença na lista.
             const optional = requirement.optional
-                ? ' <span class="badge bg-light text-muted border fw-normal">diferencial</span>'
+                ? ' <span class="badge bg-light text-muted border fw-normal">' + t('diferencial') + '</span>'
                 : '';
 
             return '<li class="mb-1"><i class="bi ' + status.icon + ' ' + status.color + ' me-1"></i>'
                 + escapeHtml(requirement.text)
-                + ' <span class="' + status.color + '">(' + status.label + ')</span>'
+                + ' <span class="' + status.color + '">(' + t(status.chave) + ')</span>'
                 + optional
                 + terms
                 + '</li>';
@@ -127,7 +143,7 @@
         }
 
         elements.requirementsRead.innerHTML =
-            '<div class="small fw-semibold mb-2">Requisitos lidos do anúncio:</div>'
+            '<div class="small fw-semibold mb-2">' + t('requisitos_lidos') + '</div>'
             + '<ol class="small text-muted mb-0 ps-3">'
             + requirements.map((requirement) => '<li>' + escapeHtml(requirement.text) + '</li>').join('')
             + '</ol>';
@@ -136,7 +152,7 @@
 
     function render() {
         elements.count.textContent = entries.length
-            ? entries.length + (entries.length === 1 ? ' CV escolhido' : ' CVs escolhidos')
+            ? entries.length + ' ' + (entries.length === 1 ? t('escolhidos_um') : t('escolhidos_varios'))
             : '';
         elements.empty.classList.toggle('d-none', entries.length > 0);
         elements.results.innerHTML = '';
@@ -157,7 +173,7 @@
 
             const matched = entry.matched.length
                 ? '<div class="small text-muted mt-1"><i class="bi bi-check2-circle text-success"></i> '
-                    + 'Termos da vaga encontrados no CV: ' + escapeHtml(entry.matched.join(', ')) + '</div>'
+                    + t('termos_encontrados') + ' ' + escapeHtml(entry.matched.join(', ')) + '</div>'
                 : '';
 
             const checklist = requirementList(entry);
@@ -178,7 +194,7 @@
                 + '</div>'
                 + '<div class="d-flex gap-2">'
                 + '<button type="button" class="btn btn-sm btn-outline-primary" data-open>'
-                + '<i class="bi bi-eye me-1"></i> Abrir</button>'
+                + '<i class="bi bi-eye me-1"></i> ' + t('abrir') + '</button>'
                 + '<button type="button" class="btn btn-sm btn-outline-danger" data-remove>'
                 + '<i class="bi bi-x-lg"></i></button>'
                 + '</div>'
@@ -235,10 +251,7 @@
         });
 
         if (rejected) {
-            showAlert(
-                'Ignorámos ' + rejected + ' ficheiro(s): só aceitamos PDF, no máximo '
-                + config.maxFiles + ' de cada vez.'
-            );
+            showAlert(t('ignorados', { count: rejected, max: config.maxFiles }));
         }
 
         render();
@@ -299,10 +312,10 @@
         }
 
         if (status === 429) {
-            return 'Demasiados pedidos seguidos. Espere um minuto e tente de novo.';
+            return t('demasiados_pedidos');
         }
 
-        return 'O pedido ao servidor falhou (' + status + ').';
+        return t('pedido_falhou', { status: status });
     }
 
     async function run() {
@@ -315,14 +328,14 @@
         const description = elements.description.value.trim();
 
         if (description.length < 30) {
-            showAlert('Escreva a descrição da vaga com algum detalhe antes de analisar.');
+            showAlert(t('descricao_curta'));
             elements.description.focus();
 
             return;
         }
 
         if (!entries.length) {
-            showAlert('Escolha pelo menos um CV em PDF.');
+            showAlert(t('sem_ficheiros'));
 
             return;
         }
@@ -331,7 +344,7 @@
         elements.button.disabled = true;
         elements.progressWrap.classList.remove('d-none');
         elements.progressBar.style.width = '0%';
-        elements.status.textContent = 'A analisar a descrição da vaga…';
+        elements.status.textContent = t('a_analisar_vaga');
 
         try {
             const job = await postJson(config.jobUrl, {
@@ -357,7 +370,7 @@
             let failures = 0;
 
             for (const entry of entries) {
-                elements.status.textContent = 'A analisar ' + entry.name + '…';
+                elements.status.textContent = t('a_analisar_cv', { nome: entry.name });
 
                 const formData = new FormData();
                 formData.append('cv', entry.file, entry.file.name);
@@ -382,8 +395,8 @@
             }
 
             elements.status.textContent = failures
-                ? 'Análise concluída com ' + failures + ' erro(s).'
-                : 'Análise concluída. Os CVs estão ordenados do mais para o menos compatível.';
+                ? t('concluida_com_erros', { count: failures })
+                : t('concluida');
         } catch (error) {
             elements.status.textContent = '';
             showAlert(error.message);

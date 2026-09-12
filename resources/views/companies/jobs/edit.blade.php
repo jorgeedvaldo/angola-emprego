@@ -1,11 +1,11 @@
 @extends('templates.app')
-@section('title', 'Editar vaga')
-@section('description', 'Actualizar vaga publicada')
+@section('title', __('site.vaga_form.editar_titulo'))
+@section('description', __('site.vaga_form.editar_descricao'))
 
 @section('content')
 <div class="bg-light py-4">
     <div class="container">
-        <h1 class="fw-bold">Editar vaga</h1>
+        <h1 class="fw-bold">{{ __('site.vaga_form.editar_titulo') }}</h1>
     </div>
 </div>
 
@@ -18,8 +18,8 @@
                     @method('PUT')
                     @include('companies.jobs._form')
                     <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary fw-bold" style="background-color: #2557a7; border-color: #2557a7;">Guardar alterações</button>
-                        <a href="{{ route('company.dashboard') }}" class="btn btn-outline-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-primary fw-bold" style="background-color: #2557a7; border-color: #2557a7;">{{ __('site.vaga_form.guardar_alteracoes') }}</button>
+                        <a href="{{ route('company.dashboard') }}" class="btn btn-outline-secondary">{{ __('site.vaga_form.cancelar') }}</a>
                     </div>
                 </form>
             </div>

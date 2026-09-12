@@ -1,5 +1,5 @@
 @extends('templates.company')
-@section('title', 'Carreiras')
+@section('title', __('site.empresas.carreiras'))
 @section('description', Str::limit(strip_tags($company->headline ?: $company->description ?: 'Vagas abertas na ' . $company->name), 160))
 @section('canonical_link', url('/company/' . $company->slug))
 
@@ -9,7 +9,7 @@
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb company-breadcrumb mb-4">
                 <li class="breadcrumb-item"><a href="{{ route('companies.show', $company->slug) }}">{{ $company->name }}</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Carreiras</li>
+                <li class="breadcrumb-item active" aria-current="page">{{ __('site.empresas.carreiras') }}</li>
             </ol>
         </nav>
 
@@ -24,20 +24,20 @@
                         @endif
                     </div>
                     <div>
-                        <p class="company-eyebrow mb-2">Carreiras na {{ $company->name }}</p>
-                        <h1 class="display-5 fw-bold mb-3">{{ $company->headline ?: 'Faça parte da nossa equipa' }}</h1>
+                        <p class="company-eyebrow mb-2">{{ __('site.empresas.carreiras_em', ['empresa' => $company->name]) }}</p>
+                        <h1 class="display-5 fw-bold mb-3">{{ $company->headline ?: __('site.empresas.faca_parte') }}</h1>
                         <div class="d-flex flex-wrap gap-3 company-meta">
                             @if($company->location)
                                 <span><i class="bi bi-geo-alt"></i> {{ $company->location }}</span>
                             @endif
-                            <span><i class="bi bi-briefcase"></i> {{ $jobs->total() }} {{ $jobs->total() === 1 ? 'vaga aberta' : 'vagas abertas' }}</span>
+                            <span><i class="bi bi-briefcase"></i> {{ trans_choice('site.empresas.contagem_abertas', $jobs->total(), ['count' => $jobs->total()]) }}</span>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-lg-4 text-lg-end">
                 <a href="#vagas" class="btn btn-light btn-lg rounded-pill fw-bold px-4">
-                    Ver vagas abertas <i class="bi bi-arrow-down ms-1"></i>
+                    {{ __('site.empresas.ver_vagas_abertas') }} <i class="bi bi-arrow-down ms-1"></i>
                 </a>
             </div>
         </div>
@@ -48,22 +48,22 @@
     <div class="container">
         <div class="row gy-5">
             <div class="col-lg-8">
-                <p class="company-section-label mb-2">Quem somos</p>
-                <h2 class="fw-bold mb-4">Sobre a {{ $company->name }}</h2>
+                <p class="company-section-label mb-2">{{ __('site.empresas.quem_somos') }}</p>
+                <h2 class="fw-bold mb-4">{{ __('site.empresas.sobre_a_empresa', ['empresa' => $company->name]) }}</h2>
                 <div class="company-about">
                     @if($company->description)
                         {!! nl2br(e($company->description)) !!}
                     @else
-                        <p class="text-muted">Conheça as oportunidades disponíveis e encontre o seu próximo desafio profissional na {{ $company->name }}.</p>
+                        <p class="text-muted">{{ __('site.empresas.sem_descricao', ['empresa' => $company->name]) }}</p>
                     @endif
                 </div>
             </div>
             <div class="col-lg-4">
                 <aside class="company-info-card">
-                    <h5 class="fw-bold mb-3">Conheça-nos melhor</h5>
+                    <h5 class="fw-bold mb-3">{{ __('site.empresas.conheca_nos') }}</h5>
                     @if($company->website)
                         <a href="{{ $company->website }}" target="_blank" rel="noopener noreferrer" class="company-contact-link">
-                            <i class="bi bi-globe"></i><span>Visitar website</span>
+                            <i class="bi bi-globe"></i><span>{{ __('site.empresas.visitar_website') }}</span>
                         </a>
                     @endif
                     @if($company->email)
@@ -79,7 +79,7 @@
 
                     @if($company->linkedin_url || $company->facebook_url || $company->instagram_url)
                         <div class="border-top mt-3 pt-3">
-                            <p class="small fw-semibold text-muted mb-2">Siga a empresa</p>
+                            <p class="small fw-semibold text-muted mb-2">{{ __('site.empresas.siga_empresa') }}</p>
                             <div class="d-flex gap-2">
                                 @if($company->linkedin_url)
                                     <a href="{{ $company->linkedin_url }}" target="_blank" rel="noopener noreferrer" class="company-social-link" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
@@ -103,8 +103,8 @@
     <div class="container">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-2 mb-4">
             <div>
-                <p class="company-section-label mb-2">Oportunidades</p>
-                <h2 class="fw-bold mb-0">Vagas abertas</h2>
+                <p class="company-section-label mb-2">{{ __('site.empresas.oportunidades') }}</p>
+                <h2 class="fw-bold mb-0">{{ __('site.empresas.vagas_abertas') }}</h2>
             </div>
             <span class="text-muted">{{ $jobs->total() }} {{ $jobs->total() === 1 ? 'oportunidade' : 'oportunidades' }}</span>
         </div>
@@ -123,8 +123,8 @@
         @empty
             <div class="company-empty-jobs text-center">
                 <i class="bi bi-briefcase display-5"></i>
-                <h5 class="fw-bold mt-3">Sem vagas abertas neste momento</h5>
-                <p class="text-muted mb-0">Volte em breve para conhecer novas oportunidades.</p>
+                <h5 class="fw-bold mt-3">{{ __('site.empresas.sem_vagas') }}</h5>
+                <p class="text-muted mb-0">{{ __('site.empresas.sem_vagas_dica') }}</p>
             </div>
         @endforelse
 

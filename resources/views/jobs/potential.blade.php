@@ -1,13 +1,13 @@
 @extends('templates.app')
 
-@section('title', 'Vagas Sugeridas para Si')
-@section('description', 'Encontre as melhores oportunidades baseadas no seu perfil e interesses.')
+@section('title', __('site.sugeridas.meta_titulo'))
+@section('description', __('site.sugeridas.meta_descricao'))
 
 @section('content')
 <div class="bg-light py-5">
     <div class="container">
-         <h1 class="fw-bold mb-2 text-dark">Vagas Sugeridas</h1>
-         <p class="text-muted mb-0">Baseado nas categorias que selecionou no seu perfil.</p>
+         <h1 class="fw-bold mb-2 text-dark">{{ __('site.sugeridas.titulo') }}</h1>
+         <p class="text-muted mb-0">{{ __('site.sugeridas.subtitulo') }}</p>
     </div>
 </div>
 
@@ -55,10 +55,10 @@
         @else
             <div class="text-center py-5">
                 <i class="bi bi-briefcase display-1 text-muted opacity-25"></i>
-                <h3 class="mt-4 text-dark fw-bold">Nenhuma sugestão encontrada</h3>
-                <p class="text-muted">Ainda não encontrámos vagas para as suas categorias, ou ainda não selecionou nenhuma categoria.</p>
+                <h3 class="mt-4 text-dark fw-bold">{{ __('site.sugeridas.sem_sugestoes') }}</h3>
+                <p class="text-muted">{{ __('site.sugeridas.sem_sugestoes_dica') }}</p>
                 <a href="{{ route('profile.show') }}" class="btn btn-primary rounded-pill mt-3 px-4">
-                    <i class="bi bi-pencil-square me-2"></i> Editar Preferências
+                    <i class="bi bi-pencil-square me-2"></i> {{ __('site.sugeridas.editar_preferencias') }}
                 </a>
             </div>
         @endif

@@ -1,7 +1,7 @@
 @extends('templates.app')
 
-@section('title', 'Acesso Negado (403)')
-@section('description', 'Não tem permissão para aceder a este recurso.')
+@section('title', __('site.erros.403_meta'))
+@section('description', __('site.erros.403_meta_descricao'))
 
 @section('content')
 <section class="section py-5 d-flex align-items-center" style="min-height: 70vh;">
@@ -14,18 +14,18 @@
                 </div>
 
                 <h1 class="display-4 fw-bold mb-3 text-dark">403</h1>
-                <h2 class="h4 text-muted mb-4">Acesso Negado</h2>
+                <h2 class="h4 text-muted mb-4">{{ __('site.erros.403_titulo') }}</h2>
 
                 <p class="lead text-muted mb-5">
-                    Não tem permissão para aceder a este recurso ou realizar esta acção.
+                    {{ __('site.erros.403_texto') }}
                 </p>
 
                 <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
                     <a href="{{ url('/') }}" class="btn btn-primary btn-lg px-4 gap-3 rounded-pill">
-                        <i class="bi bi-house-door me-2"></i>Voltar ao Início
+                        <i class="bi bi-house-door me-2"></i>{{ __('site.erros.voltar_inicio') }}
                     </a>
                     <a href="{{ url('/vagas') }}" class="btn btn-outline-secondary btn-lg px-4 rounded-pill">
-                        <i class="bi bi-search me-2"></i>Ver Vagas
+                        <i class="bi bi-search me-2"></i>{{ __('site.erros.ver_vagas') }}
                     </a>
                 </div>
             </div>

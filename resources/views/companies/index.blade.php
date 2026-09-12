@@ -1,6 +1,6 @@
 @extends('templates.app')
-@section('title', 'Empresas no Angola Emprego')
-@section('description', 'Conheça as empresas que publicam vagas no Angola Emprego e candidate-se directamente.')
+@section('title', __('site.empresas.meta_titulo'))
+@section('description', __('site.empresas.meta_descricao'))
 @section('canonical_link', url('/empresas'))
 
 @section('content')
@@ -8,12 +8,12 @@
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-8">
-                <h1 class="fw-bold mb-2 text-dark">Empresas</h1>
-                <p class="text-muted mb-0">Páginas oficiais de empresas com vagas publicadas no Angola Emprego.</p>
+                <h1 class="fw-bold mb-2 text-dark">{{ __('site.empresas.titulo') }}</h1>
+                <p class="text-muted mb-0">{{ __('site.empresas.subtitulo') }}</p>
             </div>
             <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
                 <a href="{{ route('register.company') }}" class="btn btn-primary fw-bold rounded-pill px-4" style="background-color: #2557a7; border-color: #2557a7;">
-                    <i class="bi bi-building-add me-1"></i> Registar empresa
+                    <i class="bi bi-building-add me-1"></i> {{ __('site.empresas.registar') }}
                 </a>
             </div>
         </div>
@@ -25,8 +25,8 @@
         @if($companies->isEmpty())
             <div class="text-center py-5 bg-white rounded-3 shadow-sm border">
                 <i class="bi bi-building display-4 text-muted"></i>
-                <p class="mt-3 text-muted mb-4">Ainda não há empresas registadas.</p>
-                <a href="{{ route('register.company') }}" class="btn btn-primary">Seja a primeira empresa</a>
+                <p class="mt-3 text-muted mb-4">{{ __('site.empresas.sem_empresas') }}</p>
+                <a href="{{ route('register.company') }}" class="btn btn-primary">{{ __('site.empresas.seja_a_primeira') }}</a>
             </div>
         @else
             <div class="row g-4">
@@ -49,7 +49,7 @@
                                         </div>
                                     </div>
                                     <p class="text-muted small mb-2">{{ \Illuminate\Support\Str::limit(strip_tags($company->description), 110) }}</p>
-                                    <span class="badge bg-light text-dark border">{{ $company->jobs_count }} {{ $company->jobs_count === 1 ? 'vaga' : 'vagas' }}</span>
+                                    <span class="badge bg-light text-dark border">{{ trans_choice('site.empresas.contagem_vagas', $company->jobs_count, ['count' => $company->jobs_count]) }}</span>
                                 </div>
                             </div>
                         </a>

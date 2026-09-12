@@ -105,8 +105,8 @@
       <div class="container">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb mb-4">
-             <li class="breadcrumb-item"><a href="{{url('/')}}">Início</a></li>
-             <li class="breadcrumb-item"><a href="{{url('/noticias')}}">Notícias</a></li>
+             <li class="breadcrumb-item"><a href="{{url('/')}}">{{ __('site.noticias.inicio') }}</a></li>
+             <li class="breadcrumb-item"><a href="{{url('/noticias')}}">{{ __('site.nav.noticias') }}</a></li>
              <li class="breadcrumb-item active" aria-current="page">{{ \Illuminate\Support\Str::limit($post->title, 50) }}</li>
           </ol>
         </nav>
@@ -138,7 +138,7 @@
             <div class="bg-white p-lg-5 p-4 rounded-3 text-dark shadow-sm border mb-4 article-content">
                 <!-- Botões de compartilhamento -->
                 <div class="d-flex gap-2 mb-4">
-                    <a class="btn btn-outline-primary btn-sm rounded-pill px-3" href="https://www.facebook.com/sharer/sharer.php?u={{ url('/noticias/'. $post->slug) }}" target="_blank"><i class="bi bi-facebook me-1"></i> Partilhar</a>
+                    <a class="btn btn-outline-primary btn-sm rounded-pill px-3" href="https://www.facebook.com/sharer/sharer.php?u={{ url('/noticias/'. $post->slug) }}" target="_blank"><i class="bi bi-facebook me-1"></i> {{ __('site.noticias.partilhar') }}</a>
                     <a class="btn btn-outline-success btn-sm rounded-pill px-3" href="https://api.whatsapp.com/send?text={{ $post->title }} {{ url('/noticias/'. $post->slug) }}" target="_blank"><i class="bi bi-whatsapp me-1"></i> WhatsApp</a>
                 </div>
 
@@ -153,7 +153,7 @@
             <div class="sticky-top" style="top: 100px;">
                  <div class="card shadow-sm border-0 mb-4 rounded-3">
                     <div class="card-header bg-white py-3 border-bottom-0">
-                        <h5 class="fw-bold m-0 text-dark">Categorias</h5>
+                        <h5 class="fw-bold m-0 text-dark">{{ __('site.noticias.categorias') }}</h5>
                     </div>
                     <div class="card-body">
                          <div class="d-flex flex-wrap gap-2">
@@ -166,7 +166,7 @@
 
                 <div class="card shadow-sm border-0 rounded-3">
                      <div class="card-header bg-white py-3 border-bottom-0">
-                        <h5 class="fw-bold m-0 text-dark">Artigos Recentes</h5>
+                        <h5 class="fw-bold m-0 text-dark">{{ __('site.noticias.artigos_recentes') }}</h5>
                     </div>
                     <div class="list-group list-group-flush">
                       @foreach($LastPosts as $item)

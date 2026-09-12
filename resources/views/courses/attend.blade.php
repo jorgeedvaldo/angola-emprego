@@ -7,7 +7,7 @@
     <div class="container">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item"><a href="{{ route('courses.index') }}" class="text-white-50 text-decoration-none">Cursos</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('courses.index') }}" class="text-white-50 text-decoration-none">{{ __('site.nav.cursos') }}</a></li>
                 <li class="breadcrumb-item"><a href="{{ route('courses.show', $course->slug) }}" class="text-white-50 text-decoration-none">{{ $course->title }}</a></li>
                 <li class="breadcrumb-item active text-white" aria-current="page">{{ $lesson->title }}</li>
             </ol>
@@ -31,7 +31,7 @@
                             @if($videoId)
                                 <iframe src="https://www.youtube.com/embed/{{ $videoId }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                             @else
-                                <div class="d-flex justify-content-center align-items-center text-white h-100">Vídeo inválido</div>
+                                <div class="d-flex justify-content-center align-items-center text-white h-100">{{ __('site.cursos.video_invalido') }}</div>
                             @endif
                         @else
                             <iframe src="{{ $lesson->video_url }}" title="Video player" allowfullscreen></iframe>
@@ -45,21 +45,21 @@
                     </div>
                    <form action="{{ route('courses.complete', ['slug' => $course->slug, 'lessonSlug' => $lesson->slug]) }}" method="POST">
                        @csrf
-                       <button type="submit" class="btn btn-success btn-lg px-4"><i class="bi bi-check-circle-fill me-2"></i> Marcar como Concluída</button>
+                       <button type="submit" class="btn btn-success btn-lg px-4"><i class="bi bi-check-circle-fill me-2"></i> {{ __('site.cursos.marcar_concluida') }}</button>
                    </form>
                 </div>
 
                 <div class="d-flex justify-content-between">
                     @if($previous)
-                        <a href="{{ route('courses.attend', ['slug' => $course->slug, 'lessonSlug' => $previous->slug]) }}" class="btn btn-outline-secondary px-4 py-2"><i class="bi bi-arrow-left me-2"></i> Aula Anterior</a>
+                        <a href="{{ route('courses.attend', ['slug' => $course->slug, 'lessonSlug' => $previous->slug]) }}" class="btn btn-outline-secondary px-4 py-2"><i class="bi bi-arrow-left me-2"></i> {{ __('site.cursos.aula_anterior') }}</a>
                     @else
                         <div></div>
                     @endif
 
                     @if($next)
-                        <a href="{{ route('courses.attend', ['slug' => $course->slug, 'lessonSlug' => $next->slug]) }}" class="btn btn-outline-primary px-4 py-2">Próxima Aula <i class="bi bi-arrow-right ms-2"></i></a>
+                        <a href="{{ route('courses.attend', ['slug' => $course->slug, 'lessonSlug' => $next->slug]) }}" class="btn btn-outline-primary px-4 py-2">{{ __('site.cursos.proxima_aula') }} <i class="bi bi-arrow-right ms-2"></i></a>
                     @else
-                         <a href="{{ route('courses.show', $course->slug) }}" class="btn btn-primary px-4 py-2">Voltar ao Curso</a>
+                         <a href="{{ route('courses.show', $course->slug) }}" class="btn btn-primary px-4 py-2">{{ __('site.cursos.voltar_curso') }}</a>
                     @endif
                 </div>
 
@@ -68,7 +68,7 @@
             <div class="col-lg-4">
                 <div class="card border-0 shadow-sm" style="border-radius: 12px; overflow: hidden;">
                     <div class="card-header bg-white py-3 border-bottom">
-                         <h5 class="fw-bold m-0"><i class="bi bi-list-ul me-2"></i> Conteúdo do Curso</h5>
+                         <h5 class="fw-bold m-0"><i class="bi bi-list-ul me-2"></i> {{ __('site.cursos.conteudo') }}</h5>
                     </div>
                     <div class="list-group list-group-flush" style="max-height: 500px; overflow-y: auto;">
                         @foreach($course->lessons as $l)

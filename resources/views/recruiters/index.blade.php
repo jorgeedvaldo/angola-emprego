@@ -1,6 +1,6 @@
 @extends('templates.app')
-@section('title', 'Empresas e Recrutadores')
-@section('description', 'Registe a sua empresa, veja as empresas que contratam em Angola e analise CVs com inteligência artificial.')
+@section('title', __('site.recrutadores.titulo'))
+@section('description', __('site.recrutadores.intro'))
 @section('canonical_link', url('/empresas-e-recrutadores'))
 
 @section('content')
@@ -8,15 +8,12 @@
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-8">
-                <h1 class="fw-bold mb-2 text-dark">Empresas e Recrutadores</h1>
-                <p class="text-muted mb-0" style="max-width: 640px;">
-                    Tudo o que precisa para contratar num só sítio: criar a página da sua empresa, conhecer as
-                    empresas que já publicam vagas e analisar os CVs que recebeu.
-                </p>
+                <h1 class="fw-bold mb-2 text-dark">{{ __('site.recrutadores.titulo') }}</h1>
+                <p class="text-muted mb-0" style="max-width: 640px;">{{ __('site.recrutadores.intro') }}</p>
             </div>
             <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
                 <a href="{{ route('cv-analysis.info') }}" class="text-decoration-none fw-semibold">
-                    <i class="bi bi-question-circle me-1"></i> Como funciona a análise de CV
+                    <i class="bi bi-question-circle me-1"></i> {{ __('site.recrutadores.como_funciona') }}
                 </a>
             </div>
         </div>
@@ -33,24 +30,21 @@
                             style="width: 48px; height: 48px; background-color: #2557a7;">
                             <i class="bi bi-building-add fs-4"></i>
                         </div>
-                        <h5 class="fw-bold">Criar empresa</h5>
-                        <p class="text-muted small flex-grow-1">
-                            Registe a sua empresa gratuitamente, monte a página oficial com logótipo e contactos
-                            e comece a publicar vagas.
-                        </p>
+                        <h5 class="fw-bold">{{ __('site.recrutadores.criar_empresa') }}</h5>
+                        <p class="text-muted small flex-grow-1">{{ __('site.recrutadores.criar_empresa_texto') }}</p>
                         @auth
                             @if(auth()->user()->isCompany())
                                 <a href="{{ route('company.dashboard') }}" class="btn btn-primary fw-bold" style="background-color: #2557a7; border-color: #2557a7;">
-                                    <i class="bi bi-speedometer2 me-1"></i> Ir para o painel
+                                    <i class="bi bi-speedometer2 me-1"></i> {{ __('site.recrutadores.ir_para_painel') }}
                                 </a>
                             @else
                                 <a href="{{ route('companies.index') }}" class="btn btn-outline-primary fw-bold">
-                                    <i class="bi bi-building me-1"></i> Ver empresas
+                                    <i class="bi bi-building me-1"></i> {{ __('site.recrutadores.ver_empresas') }}
                                 </a>
                             @endif
                         @else
                             <a href="{{ route('register.company') }}" class="btn btn-primary fw-bold" style="background-color: #2557a7; border-color: #2557a7;">
-                                <i class="bi bi-plus-lg me-1"></i> Registar empresa
+                                <i class="bi bi-plus-lg me-1"></i> {{ __('site.recrutadores.registar_empresa') }}
                             </a>
                         @endauth
                     </div>
@@ -64,13 +58,10 @@
                             style="width: 48px; height: 48px; background-color: #2557a7;">
                             <i class="bi bi-buildings fs-4"></i>
                         </div>
-                        <h5 class="fw-bold">Lista de empresas</h5>
-                        <p class="text-muted small flex-grow-1">
-                            {{ $companiesCount }} empresa(s) com página oficial no Angola Emprego. Veja quem está a
-                            contratar e as vagas de cada uma.
-                        </p>
+                        <h5 class="fw-bold">{{ __('site.recrutadores.lista_empresas') }}</h5>
+                        <p class="text-muted small flex-grow-1">{{ __('site.recrutadores.lista_empresas_texto', ['count' => $companiesCount]) }}</p>
                         <a href="{{ route('companies.index') }}" class="btn btn-outline-primary fw-bold">
-                            <i class="bi bi-list-ul me-1"></i> Ver lista de empresas
+                            <i class="bi bi-list-ul me-1"></i> {{ __('site.recrutadores.ver_lista') }}
                         </a>
                     </div>
                 </div>
@@ -83,13 +74,10 @@
                             style="width: 48px; height: 48px; background-color: #2557a7;">
                             <i class="bi bi-stars fs-4"></i>
                         </div>
-                        <h5 class="fw-bold">Analisar CV</h5>
-                        <p class="text-muted small flex-grow-1">
-                            Escreva a descrição da vaga, carregue os CVs que tem em mão e receba-os ordenados do
-                            candidato mais compatível para o menos compatível. Sem conta e sem guardar os ficheiros.
-                        </p>
+                        <h5 class="fw-bold">{{ __('site.recrutadores.analisar_cv') }}</h5>
+                        <p class="text-muted small flex-grow-1">{{ __('site.recrutadores.analisar_cv_texto') }}</p>
                         <a href="{{ route('cv-analyzer.index') }}" class="btn btn-primary fw-bold" style="background-color: #2557a7; border-color: #2557a7;">
-                            <i class="bi bi-stars me-1"></i> Abrir analisador de CVs
+                            <i class="bi bi-stars me-1"></i> {{ __('site.recrutadores.abrir_analisador') }}
                         </a>
                     </div>
                 </div>
@@ -98,8 +86,8 @@
 
         @if($latestCompanies->isNotEmpty())
             <div class="d-flex justify-content-between align-items-center mt-5 mb-3">
-                <h5 class="fw-bold mb-0">Empresas recentes</h5>
-                <a href="{{ route('companies.index') }}" class="small text-decoration-none">Ver todas</a>
+                <h5 class="fw-bold mb-0">{{ __('site.recrutadores.empresas_recentes') }}</h5>
+                <a href="{{ route('companies.index') }}" class="small text-decoration-none">{{ __('site.recrutadores.ver_todas') }}</a>
             </div>
             <div class="row g-3">
                 @foreach($latestCompanies as $company)

@@ -37,7 +37,7 @@
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb company-breadcrumb mb-4">
                 <li class="breadcrumb-item"><a href="{{ route('companies.show', $company->slug) }}">{{ $company->name }}</a></li>
-                <li class="breadcrumb-item"><a href="{{ route('companies.show', $company->slug) }}#vagas">Carreiras</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('companies.show', $company->slug) }}#vagas">{{ __('site.empresas.carreiras') }}</a></li>
                 <li class="breadcrumb-item active" aria-current="page">{{ $job->title }}</li>
             </ol>
         </nav>
@@ -55,7 +55,7 @@
         <div class="row gy-4">
             <div class="col-lg-8">
                 <div class="company-panel mb-4">
-                    <h2 class="h4 fw-bold mb-3">Descrição da vaga</h2>
+                    <h2 class="h4 fw-bold mb-3">{{ __('site.empresas.descricao_vaga') }}</h2>
                     <div class="company-job-description">{!! $job->description !!}</div>
                 </div>
 
@@ -64,11 +64,9 @@
                 @endphp
 
                 <div id="candidatura" class="company-panel">
-                    <h2 class="h4 fw-bold mb-3">Enviar candidatura</h2>
+                    <h2 class="h4 fw-bold mb-3">{{ __('site.empresas.enviar_candidatura') }}</h2>
                     <p class="text-muted small">
-                        Preencha o assunto, a mensagem e anexe até <strong>{{ $maxAttachments }}</strong>
-                        {{ $maxAttachments === 1 ? 'ficheiro' : 'ficheiros' }}
-                        (PDF, DOC ou DOCX, até 5 MB cada).
+                        {!! trans_choice('site.vaga.anexos_ajuda', $maxAttachments, ['count' => $maxAttachments]) !!}
                     </p>
 
                     @if(session('success'))
@@ -82,31 +80,31 @@
                         @csrf
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <label class="form-label fw-semibold">Nome</label>
+                                <label class="form-label fw-semibold">{{ __('site.vaga.nome') }}</label>
                                 <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name', auth()->user()->name ?? '') }}" required>
                                 @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label fw-semibold">Email</label>
+                                <label class="form-label fw-semibold">{{ __('site.vaga.email') }}</label>
                                 <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email', auth()->user()->email ?? '') }}" required>
                                 @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label fw-semibold">Telefone</label>
+                                <label class="form-label fw-semibold">{{ __('site.vaga.telefone') }}</label>
                                 <input type="text" name="phone" class="form-control" value="{{ old('phone', auth()->user()->mobile ?? '') }}">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label fw-semibold">Assunto</label>
-                                <input type="text" name="subject" class="form-control @error('subject') is-invalid @enderror" value="{{ old('subject', 'Candidatura — ' . $job->title) }}" required>
+                                <label class="form-label fw-semibold">{{ __('site.vaga.assunto') }}</label>
+                                <input type="text" name="subject" class="form-control @error('subject') is-invalid @enderror" value="{{ old('subject', __('site.vaga.assunto_predefinido', ['vaga' => $job->title])) }}" required>
                                 @error('subject')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
                             <div class="col-12">
-                                <label class="form-label fw-semibold">Mensagem</label>
+                                <label class="form-label fw-semibold">{{ __('site.vaga.mensagem') }}</label>
                                 <textarea name="message" rows="5" class="form-control @error('message') is-invalid @enderror" required>{{ old('message') }}</textarea>
                                 @error('message')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
                             <div class="col-12">
-                                <label class="form-label fw-semibold">Anexos</label>
+                                <label class="form-label fw-semibold">{{ __('site.vaga.anexos') }}</label>
                                 @for($i = 0; $i < $maxAttachments; $i++)
                                     <input type="file"
                                         name="attachments[]"
@@ -114,7 +112,7 @@
                                         accept=".pdf,.doc,.docx,application/pdf"
                                         @if($i === 0) required @endif>
                                     <small class="text-muted d-block mb-2">
-                                        {{ $i === 0 ? 'Obrigatório (CV)' : 'Opcional (certificado, carta, etc.)' }}
+                                        {{ $i === 0 ? __('site.vaga.anexo_obrigatorio') : __('site.vaga.anexo_opcional') }}
                                     </small>
                                 @endfor
                                 @error('attachments')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror

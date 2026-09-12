@@ -438,6 +438,74 @@ class LocaleTest extends TestCase
         );
     }
 
+    public function test_the_company_listing_translates()
+    {
+        $empresa = $this->empresaAprovada();
+        Job::factory()->create(['company_id' => $empresa->id]);
+
+        $this->get(route('companies.index'))
+            ->assertOk()
+            ->assertSee('Páginas oficiais de empresas')
+            ->assertSee('Registar empresa')
+            // Uma vaga só: singular.
+            ->assertSee('1 vaga')
+            ->assertDontSee('1 vagas');
+
+        $this->get(route('locale.switch', 'en'));
+
+        $this->get(route('companies.index'))
+            ->assertOk()
+            ->assertSee('Official pages of companies')
+            ->assertSee('Register a company')
+            ->assertSee('1 job')
+            ->assertDontSee('1 jobs');
+    }
+
+    /**
+     * A página pública de cada empresa usa um layout próprio, com o seu cabeçalho
+     * e rodapé — que também tem de acompanhar o idioma.
+     */
+    public function test_the_public_company_page_translates()
+    {
+        $empresa = $this->empresaAprovada();
+
+        $this->get(url('/company/' . $empresa->slug))
+            ->assertOk()
+            ->assertSee('Vagas abertas')
+            ->assertSee('Contactos')
+            ->assertSee('Todos os direitos reservados')
+            ->assertSee('<html lang="pt-AO">', false);
+
+        $this->get(route('locale.switch', 'en'));
+
+        $this->get(url('/company/' . $empresa->slug))
+            ->assertOk()
+            ->assertSee('Open positions')
+            ->assertSee('Contact')
+            ->assertSee('All rights reserved')
+            ->assertSee('<html lang="en">', false)
+            ->assertDontSee('Vagas abertas');
+    }
+
+    public function test_a_job_on_the_company_page_translates()
+    {
+        $empresa = $this->empresaAprovada();
+        $vaga = Job::factory()->create(['company_id' => $empresa->id]);
+
+        $this->get(url('/company/' . $empresa->slug . '/vagas/' . $vaga->slug))
+            ->assertOk()
+            ->assertSee('Descrição da vaga')
+            ->assertSee('Enviar candidatura');
+
+        $this->get(route('locale.switch', 'en'));
+
+        $this->get(url('/company/' . $empresa->slug . '/vagas/' . $vaga->slug))
+            ->assertOk()
+            ->assertSee('Job description')
+            ->assertSee('Send your application')
+            ->assertDontSee('Descrição da vaga');
+    }
+
     /**
      * Uma chave em falta rende como o próprio nome da chave ("site.home.novo"),
      * que passa despercebido numa página cheia. Nas páginas que já traduzimos,
@@ -456,6 +524,7 @@ class LocaleTest extends TestCase
             $paginas[] = route('password.request');
             $paginas[] = route('courses.index');
             $paginas[] = '/noticias';
+            $paginas[] = route('companies.index');
 
             foreach ($paginas as $pagina) {
                 $this->get($pagina)
@@ -472,6 +541,7 @@ class LocaleTest extends TestCase
                     ->assertDontSee('site.candidaturas.')
                     ->assertDontSee('site.cursos.')
                     ->assertDontSee('site.noticias.')
+                    ->assertDontSee('site.empresas.')
                     ->assertDontSee('site.recrutadores.');
             }
         }

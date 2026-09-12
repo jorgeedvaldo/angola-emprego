@@ -363,6 +363,36 @@ return [
         'artigos_recentes' => 'Artigos Recentes',
     ],
 
+    'empresas' => [
+        'meta_titulo' => 'Empresas no Angola Emprego',
+        'meta_descricao' => 'Conheça as empresas que publicam vagas no Angola Emprego e candidate-se directamente.',
+        'titulo' => 'Empresas',
+        'subtitulo' => 'Páginas oficiais de empresas com vagas publicadas no Angola Emprego.',
+        'registar' => 'Registar empresa',
+        'sem_empresas' => 'Ainda não há empresas registadas.',
+        'seja_a_primeira' => 'Seja a primeira empresa',
+        'contagem_vagas' => ':count vaga|:count vagas',
+
+        // Página pública de cada empresa
+        'carreiras' => 'Carreiras',
+        'quem_somos' => 'Quem somos',
+        'conheca_nos' => 'Conheça-nos melhor',
+        'visitar_website' => 'Visitar website',
+        'siga_empresa' => 'Siga a empresa',
+        'oportunidades' => 'Oportunidades',
+        'vagas_abertas' => 'Vagas abertas',
+        'sem_vagas' => 'Sem vagas abertas neste momento',
+        'sem_vagas_dica' => 'Volte em breve para conhecer novas oportunidades.',
+        'ver_vagas_abertas' => 'Ver vagas abertas',
+        'contactos' => 'Contactos',
+        'siga_nos' => 'Siga-nos',
+        'direitos' => '© :ano :empresa. Todos os direitos reservados.',
+
+        // Vaga dentro da página da empresa
+        'descricao_vaga' => 'Descrição da vaga',
+        'enviar_candidatura' => 'Enviar candidatura',
+    ],
+
     'recrutadores' => [
         'titulo' => 'Empresas e Recrutadores',
         'intro' => 'Tudo o que precisa para contratar num só sítio: criar a página da sua empresa, conhecer as empresas que já publicam vagas e analisar os CVs que recebeu.',

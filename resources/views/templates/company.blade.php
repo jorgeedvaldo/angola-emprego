@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-AO">
+<html lang="{{ app()->getLocale() === 'pt' ? 'pt-AO' : app()->getLocale() }}">
 
 <head>
   <meta charset="utf-8">
@@ -200,7 +200,7 @@
         </span>
         <span>
           <span class="company-nav-name d-block">{{ $company->name }}</span>
-          <span class="company-nav-tag">Carreiras</span>
+          <span class="company-nav-tag">{{ __('site.empresas.carreiras') }}</span>
         </span>
       </a>
 
@@ -254,7 +254,7 @@
         </div>
 
         <div class="col-md-3">
-          <h6 class="text-white fw-bold mb-3">Contactos</h6>
+          <h6 class="text-white fw-bold mb-3">{{ __('site.empresas.contactos') }}</h6>
           <ul class="list-unstyled mb-0">
             @if($company->location)
               <li class="mb-2"><i class="bi bi-geo-alt me-2"></i>{{ $company->location }}</li>
@@ -271,7 +271,7 @@
         </div>
 
         <div class="col-md-3">
-          <h6 class="text-white fw-bold mb-3">Siga-nos</h6>
+          <h6 class="text-white fw-bold mb-3">{{ __('site.empresas.siga_nos') }}</h6>
           <div class="d-flex flex-wrap gap-2">
             @if($company->linkedin_url)
               <a href="{{ $company->linkedin_url }}" target="_blank" rel="noopener noreferrer"
@@ -295,8 +295,8 @@
       </div>
 
       <div class="company-footer-bottom d-flex flex-column flex-md-row justify-content-between gap-2">
-        <span>&copy; {{ date('Y') }} {{ $company->name }}. Todos os direitos reservados.</span>
-        <a href="{{ route('companies.show', $company->slug) }}#vagas">Ver vagas abertas</a>
+        <span>{{ __('site.empresas.direitos', ['ano' => date('Y'), 'empresa' => $company->name]) }}</span>
+        <a href="{{ route('companies.show', $company->slug) }}#vagas">{{ __('site.empresas.ver_vagas_abertas') }}</a>
       </div>
     </div>
   </footer>

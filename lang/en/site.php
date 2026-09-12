@@ -351,6 +351,34 @@ return [
         'artigos_recentes' => 'Recent articles',
     ],
 
+    'empresas' => [
+        'meta_titulo' => 'Companies on Angola Emprego',
+        'meta_descricao' => 'Meet the companies posting jobs on Angola Emprego and apply directly.',
+        'titulo' => 'Companies',
+        'subtitulo' => 'Official pages of companies with jobs posted on Angola Emprego.',
+        'registar' => 'Register a company',
+        'sem_empresas' => 'No companies registered yet.',
+        'seja_a_primeira' => 'Be the first company',
+        'contagem_vagas' => ':count job|:count jobs',
+
+        'carreiras' => 'Careers',
+        'quem_somos' => 'Who we are',
+        'conheca_nos' => 'Get to know us',
+        'visitar_website' => 'Visit website',
+        'siga_empresa' => 'Follow the company',
+        'oportunidades' => 'Opportunities',
+        'vagas_abertas' => 'Open positions',
+        'sem_vagas' => 'No open positions at the moment',
+        'sem_vagas_dica' => 'Come back soon for new opportunities.',
+        'ver_vagas_abertas' => 'See open positions',
+        'contactos' => 'Contact',
+        'siga_nos' => 'Follow us',
+        'direitos' => '© :ano :empresa. All rights reserved.',
+
+        'descricao_vaga' => 'Job description',
+        'enviar_candidatura' => 'Send your application',
+    ],
+
     'recrutadores' => [
         'titulo' => 'Companies & Recruiters',
         'intro' => 'Everything you need to hire, in one place: build your company page, see who else is posting jobs, and analyse the CVs you have received.',

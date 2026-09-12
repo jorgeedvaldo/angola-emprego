@@ -1,12 +1,12 @@
 @extends('templates.app')
-@section('title', 'Publicar vaga')
-@section('description', 'Publique uma nova vaga na página da sua empresa')
+@section('title', __('site.vaga_form.publicar_titulo'))
+@section('description', __('site.vaga_form.publicar_descricao'))
 
 @section('content')
 <div class="bg-light py-4">
     <div class="container">
-        <h1 class="fw-bold">Publicar vaga</h1>
-        <p class="text-muted mb-0">A vaga aparece na página <strong>/company/{{ $company->slug }}</strong> e na listagem de vagas.</p>
+        <h1 class="fw-bold">{{ __('site.vaga_form.publicar_titulo') }}</h1>
+        <p class="text-muted mb-0">{!! __('site.vaga_form.publicar_nota', ['url' => e('/company/' . $company->slug)]) !!}</p>
     </div>
 </div>
 
@@ -18,8 +18,8 @@
                     @csrf
                     @include('companies.jobs._form')
                     <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary fw-bold" style="background-color: #2557a7; border-color: #2557a7;">Publicar vaga</button>
-                        <a href="{{ route('company.dashboard') }}" class="btn btn-outline-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-primary fw-bold" style="background-color: #2557a7; border-color: #2557a7;">{{ __('site.vaga_form.publicar_botao') }}</button>
+                        <a href="{{ route('company.dashboard') }}" class="btn btn-outline-secondary">{{ __('site.vaga_form.cancelar') }}</a>
                     </div>
                 </form>
             </div>

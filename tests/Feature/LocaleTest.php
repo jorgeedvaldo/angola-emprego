@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Http\Middleware\SetLocale;
 use App\Models\Company;
 use App\Models\Job;
+use App\Models\JobApplication;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -261,6 +262,99 @@ class LocaleTest extends TestCase
             ->assertSessionHasErrors(['email' => 'O campo email deve ser um email válido.']);
     }
 
+    public function test_the_company_dashboard_translates()
+    {
+        $empresa = $this->empresaAprovada();
+
+        $this->actingAs($empresa->user)->get(route('company.dashboard'))
+            ->assertOk()
+            ->assertSee('Painel da Empresa')
+            ->assertSee('Candidaturas recebidas')
+            ->assertSee('Guardar página')
+            ->assertSee('As suas vagas');
+
+        $this->get(route('locale.switch', 'en'));
+
+        $this->actingAs($empresa->user)->get(route('company.dashboard'))
+            ->assertOk()
+            ->assertSee('Company dashboard')
+            ->assertSee('Applications received')
+            ->assertSee('Save page')
+            ->assertSee('Your jobs')
+            ->assertDontSee('Painel da Empresa');
+    }
+
+    public function test_the_job_form_and_applications_pages_translate()
+    {
+        $empresa = $this->empresaAprovada();
+        $vaga = Job::factory()->create(['company_id' => $empresa->id]);
+
+        $this->actingAs($empresa->user)->get(route('company.jobs.create'))
+            ->assertOk()
+            ->assertSee('Título da vaga')
+            ->assertSee('Cancelar');
+
+        $this->actingAs($empresa->user)->get(route('company.jobs.applications', $vaga))
+            ->assertOk()
+            ->assertSee('Análise de CVs por IA')
+            ->assertSee('Ainda não há candidaturas para esta vaga.');
+
+        $this->get(route('locale.switch', 'en'));
+
+        $this->actingAs($empresa->user)->get(route('company.jobs.create'))
+            ->assertOk()
+            ->assertSee('Job title')
+            ->assertSee('Cancel')
+            ->assertDontSee('Título da vaga');
+
+        $this->actingAs($empresa->user)->get(route('company.jobs.applications', $vaga))
+            ->assertOk()
+            ->assertSee('CV analysis with AI')
+            ->assertSee('No applications for this job yet.');
+    }
+
+    /**
+     * O texto que o JavaScript do painel mostra vem do Blade, porque um ficheiro
+     * .js não lê os ficheiros de tradução. Se essa ponte se partir, a página
+     * traduz e as mensagens de progresso ficam na língua errada.
+     */
+    public function test_the_panel_javascript_receives_translated_strings()
+    {
+        $empresa = $this->empresaAprovada();
+        $vaga = Job::factory()->create(['company_id' => $empresa->id]);
+        // Sem factory para candidaturas, e o bloco do JavaScript só é rendido
+        // quando existe pelo menos uma.
+        JobApplication::create([
+            'job_id' => $vaga->id,
+            'name' => 'Ana Nzuzi',
+            'email' => 'ana@exemplo.co.ao',
+            'subject' => 'Candidatura',
+            'message' => 'Boa tarde.',
+            'status' => 'new',
+            'attachment_path' => 'job-applications/cv.pdf',
+            'attachment_name' => 'cv.pdf',
+        ]);
+
+        $this->actingAs($empresa->user)->get(route('company.jobs.applications', $vaga))
+            ->assertOk()
+            ->assertSee('A analisar a descri', false);
+
+        $this->get(route('locale.switch', 'en'));
+
+        $this->actingAs($empresa->user)->get(route('company.jobs.applications', $vaga))
+            ->assertOk()
+            ->assertSee('Analysing the job description', false)
+            ->assertDontSee('A analisar a descri', false);
+    }
+
+    private function empresaAprovada(): Company
+    {
+        $empresa = Company::factory()->create(['approval_status' => 'approved']);
+        $empresa->user->markEmailAsVerified();
+
+        return $empresa;
+    }
+
     /**
      * Uma chave em falta rende como o próprio nome da chave ("site.home.novo"),
      * que passa despercebido numa página cheia. Nas páginas que já traduzimos,
@@ -288,6 +382,9 @@ class LocaleTest extends TestCase
                     ->assertDontSee('site.analisador.')
                     ->assertDontSee('site.vaga.')
                     ->assertDontSee('site.auth.')
+                    ->assertDontSee('site.painel.')
+                    ->assertDontSee('site.vaga_form.')
+                    ->assertDontSee('site.candidaturas.')
                     ->assertDontSee('site.recrutadores.');
             }
         }

@@ -4,7 +4,7 @@
         return meta ? meta.getAttribute('content') : '';
     }
 
-    async function postJson(url) {
+    async function postJson(config, url) {
         const response = await fetch(url, {
             method: 'POST',
             headers: {
@@ -17,10 +17,25 @@
         const data = await response.json().catch(() => null);
 
         if (!response.ok || !data || data.ok !== true) {
-            throw new Error((data && data.message) || 'O pedido ao servidor falhou (' + response.status + ').');
+            throw new Error((data && data.message) || t(config, 'js_pedido_falhou', { status: response.status }));
         }
 
         return data;
+    }
+
+    /**
+     * Texto no idioma do visitante, vindo do Blade — o JavaScript não tem acesso
+     * aos ficheiros de tradução.
+     */
+    function t(config, chave, valores) {
+        const strings = (config && config.strings) || {};
+        let texto = strings[chave] !== undefined ? strings[chave] : chave;
+
+        for (const nome in valores || {}) {
+            texto = texto.replace(':' + nome, valores[nome]);
+        }
+
+        return texto;
     }
 
     async function run(config, elements) {
@@ -33,15 +48,15 @@
 
         try {
             if (!config.job.hasVector) {
-                elements.status.textContent = 'A analisar a descrição da vaga…';
-                await postJson(config.job.analyzeUrl);
+                elements.status.textContent = t(config, 'js_a_analisar_vaga');
+                await postJson(config, config.job.analyzeUrl);
             }
 
             for (const application of pending) {
-                elements.status.textContent = 'A analisar o CV de ' + application.name + '…';
+                elements.status.textContent = t(config, 'js_a_analisar_cv', { nome: application.name });
 
                 try {
-                    await postJson(application.analyzeUrl);
+                    await postJson(config, application.analyzeUrl);
                 } catch (error) {
                     failures += 1;
                     console.error('Falha ao analisar candidatura', application.id, error);
@@ -53,12 +68,12 @@
             }
 
             elements.status.textContent = failures
-                ? 'Análise concluída com ' + failures + ' erro(s). A actualizar a lista…'
-                : 'Análise concluída. A actualizar a lista…';
+                ? t(config, 'js_concluida_com_erros', { count: failures })
+                : t(config, 'js_concluida');
 
             window.location.reload();
         } catch (error) {
-            elements.status.textContent = 'Erro: ' + error.message;
+            elements.status.textContent = t(config, 'js_erro', { mensagem: error.message });
             elements.button.disabled = false;
         }
     }

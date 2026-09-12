@@ -1,7 +1,7 @@
 @extends('templates.app')
 
-@section('title', 'Cursos Gratuitos Online em Angola')
-@section('description', 'Cursos online gratuitos para desenvolver as suas competências profissionais. Aprenda ao seu ritmo e obtenha certificados reconhecidos. Formação em diversas áreas.')
+@section('title', __('site.cursos.meta_titulo'))
+@section('description', __('site.cursos.meta_descricao'))
 @section('canonical_link', url('/cursos'))
 
 @section('head-scripts')
@@ -37,8 +37,8 @@
     <div class="container">
 
         <div class="text-center mb-5">
-            <h2 class="fw-bold text-dark">Desenvolva as suas competências</h2>
-            <p class="text-muted lead">Cursos práticos para impulsionar a sua carreira</p>
+            <h2 class="fw-bold text-dark">{{ __('site.cursos.titulo') }}</h2>
+            <p class="text-muted lead">{{ __('site.cursos.subtitulo') }}</p>
         </div>
 
         <div class="row g-4">
@@ -60,7 +60,7 @@
                                 {!! \Illuminate\Support\Str::limit(strip_tags($course->description), 120) !!}
                             </p>
                             <div class="mt-3 pt-3 border-top d-flex justify-content-between align-items-center">
-                                <span class="text-primary fw-bold small">Começar agora</span>
+                                <span class="text-primary fw-bold small">{{ __('site.cursos.comecar') }}</span>
                                 <i class="bi bi-arrow-right text-primary"></i>
                             </div>
                         </div>
@@ -71,8 +71,8 @@
             <div class="col-12 text-center py-5">
                 <div class="p-5 bg-white rounded-3 shadow-sm">
                     <i class="bi bi-journal-x text-muted display-4 mb-3"></i>
-                    <h4 class="text-muted">Nenhum curso disponível no momento.</h4>
-                    <p class="text-muted">Volte mais tarde para novas oportunidades de aprendizado.</p>
+                    <h4 class="text-muted">{{ __('site.cursos.sem_cursos') }}</h4>
+                    <p class="text-muted">{{ __('site.cursos.sem_cursos_dica') }}</p>
                 </div>
             </div>
             @endforelse

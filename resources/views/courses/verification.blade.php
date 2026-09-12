@@ -1,16 +1,16 @@
 @extends('templates.app')
 
-@section('title', 'Verificação de Certificado')
-@section('description', 'Verifique a autenticidade do certificado de conclusão de curso.')
+@section('title', __('site.cursos.verificacao_titulo'))
+@section('description', __('site.cursos.verificacao_descricao'))
 
 @section('content')
 <div class="bg-light py-5">
     <div class="container">
-         <h1 class="fw-bold mb-2 text-dark">Verificação de Certificado</h1>
+         <h1 class="fw-bold mb-2 text-dark">{{ __('site.cursos.verificacao_titulo') }}</h1>
          <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item"><a href="{{url('/')}}">Início</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Validar Certificado</li>
+                <li class="breadcrumb-item"><a href="{{url('/')}}">{{ __('site.cursos.inicio') }}</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ __('site.cursos.validar_certificado') }}</li>
             </ol>
         </nav>
     </div>
@@ -22,16 +22,16 @@
             <div class="col-lg-10">
                 <div class="card border-0 shadow-lg rounded-3 overflow-hidden">
                     <div class="card-header bg-success text-white py-3 text-center">
-                        <h4 class="mb-0 fw-bold"><i class="bi bi-patch-check-fill me-2"></i> Certificado Válido</h4>
+                        <h4 class="mb-0 fw-bold"><i class="bi bi-patch-check-fill me-2"></i> {{ __('site.cursos.certificado_valido') }}</h4>
                     </div>
                     <div class="card-body p-4 text-center">
                         
                         <div class="mb-4">
-                            <h5 class="text-muted">Este certificado confirma que</h5>
+                            <h5 class="text-muted">{{ __('site.cursos.confirma_que') }}</h5>
                             <h2 class="fw-bold text-dark">{{ $user->name }}</h2>
-                            <h5 class="text-muted">concluiu com sucesso o curso</h5>
+                            <h5 class="text-muted">{{ __('site.cursos.concluiu_curso') }}</h5>
                             <h3 class="text-primary fw-bold">{{ $course->title }}</h3>
-                            <p class="text-muted mt-2">Data de Conclusão: <strong>{{ $completionDate->format('d/m/Y') }}</strong></p>
+                            <p class="text-muted mt-2">{{ __('site.cursos.data_conclusao') }} <strong>{{ $completionDate->format('d/m/Y') }}</strong></p>
                         </div>
 
                         <!-- Certificate Visual Representation -->
@@ -156,7 +156,7 @@
                         </div>
                     
                         <div class="mt-4 pt-3 border-top">
-                            <p class="text-muted small mb-2">Link público para verificação:</p>
+                            <p class="text-muted small mb-2">{{ __('site.cursos.link_verificacao') }}</p>
                             <div class="input-group mb-3 mx-auto" style="max-width: 600px;">
                                 <input type="text" class="form-control" value="{{ route('certificates.verify', ['user' => $user->id, 'course' => $course->slug]) }}" id="verifyLink" readonly>
                                 <button class="btn btn-outline-primary" type="button" onclick="copyLink()">

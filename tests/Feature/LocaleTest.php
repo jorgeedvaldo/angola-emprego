@@ -4,6 +4,8 @@ namespace Tests\Feature;
 
 use App\Http\Middleware\SetLocale;
 use App\Models\Company;
+use App\Models\Course;
+use App\Models\Post;
 use App\Models\Job;
 use App\Models\JobApplication;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -355,6 +357,87 @@ class LocaleTest extends TestCase
         return $empresa;
     }
 
+    public function test_the_courses_pages_translate()
+    {
+        $curso = Course::create([
+            'title' => 'Excel para Recursos Humanos',
+            'slug' => 'excel-para-recursos-humanos',
+            'description' => 'Curso prático de Excel.',
+            'is_published' => true,
+        ]);
+
+        $this->get(route('courses.index'))
+            ->assertOk()
+            ->assertSee('Desenvolva as suas competências')
+            ->assertSee('Começar agora');
+
+        $this->get(route('courses.show', $curso->slug))
+            ->assertOk()
+            ->assertSee('Conteúdo do Curso')
+            ->assertSee('O seu Progresso');
+
+        $this->get(route('locale.switch', 'en'));
+
+        $this->get(route('courses.index'))
+            ->assertOk()
+            ->assertSee('Build your skills')
+            ->assertSee('Start now')
+            ->assertDontSee('Começar agora');
+
+        $this->get(route('courses.show', $curso->slug))
+            ->assertOk()
+            ->assertSee('Course content')
+            ->assertSee('Your progress')
+            // O título do curso é conteúdo, fica como foi escrito.
+            ->assertSee('Excel para Recursos Humanos');
+    }
+
+    public function test_the_news_pages_translate()
+    {
+        // O slug é regerado no evento created, mas a coluna não aceita nulo.
+        $artigo = Post::create([
+            'title' => 'Mercado de trabalho em Luanda',
+            'slug' => 'mercado-de-trabalho-em-luanda',
+            'description' => 'Um artigo sobre o mercado.',
+        ]);
+
+        $this->get('/noticias')
+            ->assertOk()
+            ->assertSee('Notícias, dicas de carreira e atualizações do mercado.')
+            ->assertSee('Ler mais');
+
+        $this->get('/noticias/' . $artigo->fresh()->slug)
+            ->assertOk()
+            ->assertSee('Artigos Recentes');
+
+        $this->get(route('locale.switch', 'en'));
+
+        $this->get('/noticias')
+            ->assertOk()
+            ->assertSee('News, career advice and market updates.')
+            ->assertSee('Read more')
+            ->assertDontSee('Ler mais');
+
+        $this->get('/noticias/' . $artigo->fresh()->slug)
+            ->assertOk()
+            ->assertSee('Recent articles')
+            ->assertSee('Mercado de trabalho em Luanda');
+    }
+
+    /**
+     * O certificado fica em português de propósito, nos dois idiomas: é um
+     * documento formal emitido em Angola, e o título "CERTIFICADO DE CONCLUSÃO"
+     * está impresso na imagem de fundo — traduzir só o texto sobreposto daria um
+     * documento com o corpo numa língua e o título noutra.
+     */
+    public function test_the_certificate_stays_in_portuguese()
+    {
+        $this->assertStringContainsString(
+            'Este certificado é concedido a',
+            file_get_contents(resource_path('views/courses/certificate.blade.php'))
+        );
+    }
+
     /**
      * Uma chave em falta rende como o próprio nome da chave ("site.home.novo"),
      * que passa despercebido numa página cheia. Nas páginas que já traduzimos,
@@ -371,6 +454,8 @@ class LocaleTest extends TestCase
             $paginas[] = route('register');
             $paginas[] = route('register.company');
             $paginas[] = route('password.request');
+            $paginas[] = route('courses.index');
+            $paginas[] = '/noticias';
 
             foreach ($paginas as $pagina) {
                 $this->get($pagina)
@@ -385,6 +470,8 @@ class LocaleTest extends TestCase
                     ->assertDontSee('site.painel.')
                     ->assertDontSee('site.vaga_form.')
                     ->assertDontSee('site.candidaturas.')
+                    ->assertDontSee('site.cursos.')
+                    ->assertDontSee('site.noticias.')
                     ->assertDontSee('site.recrutadores.');
             }
         }

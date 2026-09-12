@@ -1,6 +1,6 @@
 @extends('templates.app')
-@section('title', 'Notícias de Angola e do mundo')
-@section('description', 'Fique atualizado com as últimas notícias de Angola e do mundo, incluindo notícias de emprego, notícias de tecnologia, notícias de política e muito mais.')
+@section('title', __('site.noticias.meta_titulo'))
+@section('description', __('site.noticias.meta_descricao'))
 @section('canonical_link', url('/noticias'))
 
 @section('head-scripts')
@@ -54,14 +54,14 @@
       <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-8">
-                 <h1 class="fw-bold mb-2 text-dark">Últimas Notícias</h1>
-                 <p class="text-muted mb-0">Notícias, dicas de carreira e atualizações do mercado.</p>
+                 <h1 class="fw-bold mb-2 text-dark">{{ __('site.noticias.titulo') }}</h1>
+                 <p class="text-muted mb-0">{{ __('site.noticias.subtitulo') }}</p>
             </div>
             <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
                  <nav aria-label="breadcrumb">
                   <ol class="breadcrumb justify-content-lg-end mb-0">
-                    <li class="breadcrumb-item"><a href="{{url('/')}}">Início</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Notícias</li>
+                    <li class="breadcrumb-item"><a href="{{url('/')}}">{{ __('site.noticias.inicio') }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ __('site.nav.noticias') }}</li>
                   </ol>
                 </nav>
             </div>
@@ -97,7 +97,7 @@
                             </p>
                         </div>
                         <div class="card-footer bg-white border-0 px-4 pb-4 pt-0">
-                            <span class="text-primary fw-bold small">Ler mais <i class="bi bi-arrow-right ms-1"></i></span>
+                            <span class="text-primary fw-bold small">{{ __('site.noticias.ler_mais') }} <i class="bi bi-arrow-right ms-1"></i></span>
                         </div>
                     </a>
                   </article>

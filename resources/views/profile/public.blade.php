@@ -30,13 +30,13 @@
                 
                 {{-- Social Share Buttons --}}
                 <div class="d-flex justify-content-center gap-2 mt-3">
-                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(route('profile.public', $user->username)) }}" target="_blank" class="btn share-btn share-facebook" title="Partilhar no Facebook">
+                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(route('profile.public', $user->username)) }}" target="_blank" class="btn share-btn share-facebook" title="{{ __('site.perfil.partilhar_facebook') }}">
                         <i class="bi bi-facebook"></i>
                     </a>
-                    <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ urlencode(route('profile.public', $user->username)) }}&title={{ urlencode('Perfil Profissional de ' . $user->name) }}" target="_blank" class="btn share-btn share-linkedin" title="Partilhar no LinkedIn">
+                    <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ urlencode(route('profile.public', $user->username)) }}&title={{ urlencode('Perfil Profissional de ' . $user->name) }}" target="_blank" class="btn share-btn share-linkedin" title="{{ __('site.perfil.partilhar_linkedin') }}">
                         <i class="bi bi-linkedin"></i>
                     </a>
-                    <a href="https://api.whatsapp.com/send?text={{ urlencode('Veja o meu perfil profissional: ' . route('profile.public', $user->username)) }}" target="_blank" class="btn share-btn share-whatsapp" title="Partilhar no WhatsApp">
+                    <a href="https://api.whatsapp.com/send?text={{ urlencode('Veja o meu perfil profissional: ' . route('profile.public', $user->username)) }}" target="_blank" class="btn share-btn share-whatsapp" title="{{ __('site.perfil.partilhar_whatsapp') }}">
                         <i class="bi bi-whatsapp"></i>
                     </a>
                 </div>
@@ -57,7 +57,7 @@
                 <div class="profile-card mb-4">
                     <div class="profile-card-header">
                         <h4 class="profile-card-title">
-                            <i class="bi bi-mortarboard-fill text-primary me-2"></i> Cursos Concluídos
+                            <i class="bi bi-mortarboard-fill text-primary me-2"></i> {{ __('site.perfil.cursos_concluidos') }}
                         </h4>
                     </div>
                     <div class="profile-card-body">
@@ -72,7 +72,7 @@
                                             <div class="flex-grow-1">
                                                 <h6 class="fw-bold mb-1">{{ $course->title }}</h6>
                                                 <a href="{{ route('certificates.verify', ['user' => $user->id, 'course' => $course->slug]) }}" class="btn btn-sm btn-outline-primary rounded-pill mt-1" target="_blank">
-                                                    <i class="bi bi-award me-1"></i> Ver Certificado
+                                                    <i class="bi bi-award me-1"></i> {{ __('site.perfil.ver_certificado') }}
                                                 </a>
                                             </div>
                                         </div>
@@ -89,7 +89,7 @@
                 <div class="profile-card mb-4">
                     <div class="profile-card-header">
                         <h4 class="profile-card-title">
-                            <i class="bi bi-lightning-fill text-warning me-2"></i> Habilidades
+                            <i class="bi bi-lightning-fill text-warning me-2"></i> {{ __('site.perfil.habilidades') }}
                         </h4>
                     </div>
                     <div class="profile-card-body">
@@ -107,7 +107,7 @@
                 <div class="profile-card mb-4">
                     <div class="profile-card-header">
                         <h4 class="profile-card-title">
-                            <i class="bi bi-briefcase-fill text-success me-2"></i> Experiência Profissional
+                            <i class="bi bi-briefcase-fill text-success me-2"></i> {{ __('site.perfil.experiencia') }}
                         </h4>
                     </div>
                     <div class="profile-card-body">
@@ -140,7 +140,7 @@
                 <div class="profile-card mb-4">
                     <div class="profile-card-header">
                         <h4 class="profile-card-title">
-                            <i class="bi bi-book-fill text-info me-2"></i> Formação Académica
+                            <i class="bi bi-book-fill text-info me-2"></i> {{ __('site.perfil.formacao') }}
                         </h4>
                     </div>
                     <div class="profile-card-body">
@@ -174,7 +174,7 @@
                 <div class="profile-card mb-4">
                     <div class="profile-card-header">
                         <h4 class="profile-card-title">
-                            <i class="bi bi-translate text-danger me-2"></i> Idiomas
+                            <i class="bi bi-translate text-danger me-2"></i> {{ __('site.perfil.idiomas') }}
                         </h4>
                     </div>
                     <div class="profile-card-body">
@@ -197,7 +197,7 @@
                 <div class="profile-card mb-4">
                     <div class="profile-card-header">
                         <h4 class="profile-card-title">
-                            <i class="bi bi-tags-fill text-secondary me-2"></i> Áreas de Interesse
+                            <i class="bi bi-tags-fill text-secondary me-2"></i> {{ __('site.perfil.areas_interesse') }}
                         </h4>
                     </div>
                     <div class="profile-card-body">
@@ -217,7 +217,7 @@
                 <div class="profile-card mb-4">
                     <div class="profile-card-header">
                         <h4 class="profile-card-title">
-                            <i class="bi bi-file-earmark-pdf-fill text-danger me-2"></i> Currículos
+                            <i class="bi bi-file-earmark-pdf-fill text-danger me-2"></i> {{ __('site.perfil.curriculos') }}
                         </h4>
                     </div>
                     <div class="profile-card-body">
@@ -235,7 +235,7 @@
                                                     <small class="text-muted me-2">{{ $cv->created_at->format('d/m/Y') }}</small>
                                                     @if($cv->is_primary)
                                                         <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-2" style="font-size: 0.65rem;">
-                                                            <i class="bi bi-star-fill me-1"></i> Principal
+                                                            <i class="bi bi-star-fill me-1"></i> {{ __('site.perfil.principal') }}
                                                         </span>
                                                     @endif
                                                 </div>
@@ -258,19 +258,19 @@
                 <div class="profile-card sticky-lg-top" style="top: 90px;">
                     <div class="profile-card-header">
                         <h4 class="profile-card-title">
-                            <i class="bi bi-qr-code me-2"></i> Código QR
+                            <i class="bi bi-qr-code me-2"></i> {{ __('site.perfil.codigo_qr') }}
                         </h4>
                     </div>
                     <div class="profile-card-body text-center">
                         <div id="qrcode" class="d-inline-block mb-3"></div>
-                        <p class="text-muted small mb-0">Digitalize para aceder a este perfil</p>
+                        <p class="text-muted small mb-0">{{ __('site.perfil.qr_ajuda') }}</p>
                     </div>
                 </div>
 
                 {{-- CTA --}}
                 <div class="text-center mt-4">
                     <a href="{{ route('home') }}" class="btn btn-outline-secondary rounded-pill px-4">
-                        <i class="bi bi-house me-2"></i> Voltar ao Início
+                        <i class="bi bi-house me-2"></i> {{ __('site.perfil.voltar_inicio') }}
                     </a>
                 </div>
             </div>

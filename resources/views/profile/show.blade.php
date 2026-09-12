@@ -1,7 +1,7 @@
 @extends('templates.app')
 
-@section('title', 'Meu Perfil Profissional')
-@section('description', 'Gerencie o seu CV e preferências de carreira.')
+@section('title', __('site.perfil.meta_titulo'))
+@section('description', __('site.perfil.meta_descricao'))
 
 @section('content')
 {{-- Profile Hero --}}
@@ -18,7 +18,7 @@
                             {{ substr(Auth::user()->name, 0, 1) }}
                         </div>
                     @endif
-                    <a href="{{ route('auth.google') }}" class="profile-mgmt-avatar-sync" title="Sincronizar Avatar via Google">
+                    <a href="{{ route('auth.google') }}" class="profile-mgmt-avatar-sync" title="{{ __('site.perfil.sincronizar_google') }}">
                         <i class="bi bi-google"></i>
                     </a>
                 </div>
@@ -32,10 +32,10 @@
             </div>
             <div class="col-auto d-none d-md-flex align-items-end gap-2 pb-2">
                 <a href="{{ route('profile.public', Auth::user()->username) }}" target="_blank" class="btn btn-sm btn-light rounded-pill px-3 shadow-sm">
-                    <i class="bi bi-box-arrow-up-right me-1"></i> Ver Perfil Público
+                    <i class="bi bi-box-arrow-up-right me-1"></i> {{ __('site.perfil.ver_publico') }}
                 </a>
                 <button type="button" class="btn btn-sm btn-light rounded-pill px-3 shadow-sm" onclick="copyPublicLink()">
-                    <i class="bi bi-clipboard me-1"></i> Copiar Link
+                    <i class="bi bi-clipboard me-1"></i> {{ __('site.perfil.copiar_link') }}
                 </button>
                 <input type="hidden" id="publicProfileLink" value="{{ route('profile.public', Auth::user()->username) }}">
             </div>
@@ -49,7 +49,7 @@
         @if(session('success'))
             <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4" role="alert" style="background: linear-gradient(135deg, #dcfce7, #d1fae5); border-left: 4px solid #22c55e !important;">
                 <i class="bi bi-check-circle-fill text-success me-2"></i> {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ __('site.perfil.fechar') }}"></button>
             </div>
         @endif
 
@@ -58,22 +58,22 @@
             <ul class="nav nav-pills" id="profileTabs" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="personal-tab" data-bs-toggle="tab" data-bs-target="#personal" type="button" role="tab" aria-controls="personal" aria-selected="true">
-                        <i class="bi bi-person"></i> <span>Dados Pessoais</span>
+                        <i class="bi bi-person"></i> <span>{{ __('site.perfil.dados_pessoais') }}</span>
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="cvs-tab" data-bs-toggle="tab" data-bs-target="#cvs" type="button" role="tab" aria-controls="cvs" aria-selected="false">
-                        <i class="bi bi-file-earmark-pdf"></i> <span>Currículos</span>
+                        <i class="bi bi-file-earmark-pdf"></i> <span>{{ __('site.perfil.curriculos') }}</span>
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="preferences-tab" data-bs-toggle="tab" data-bs-target="#preferences" type="button" role="tab" aria-controls="preferences" aria-selected="false">
-                        <i class="bi bi-tags"></i> <span>Preferências</span>
+                        <i class="bi bi-tags"></i> <span>{{ __('site.perfil.preferencias') }}</span>
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="extended-tab" data-bs-toggle="tab" data-bs-target="#extended" type="button" role="tab" aria-controls="extended" aria-selected="false">
-                        <i class="bi bi-person-vcard"></i> <span>Perfil Público</span>
+                        <i class="bi bi-person-vcard"></i> <span>{{ __('site.perfil.perfil_publico') }}</span>
                     </button>
                 </li>
             </ul>
@@ -96,33 +96,33 @@
                                         <i class="bi bi-person-fill"></i>
                                     </div>
                                     <div>
-                                        <h5 class="mgmt-card-title">Informações Pessoais</h5>
-                                        <p class="mgmt-card-subtitle">Atualize os seus dados pessoais</p>
+                                        <h5 class="mgmt-card-title">{{ __('site.perfil.informacoes') }}</h5>
+                                        <p class="mgmt-card-subtitle">{{ __('site.perfil.informacoes_subtitulo') }}</p>
                                     </div>
                                 </div>
                                 <div class="mgmt-card-body">
                                     <div class="row g-3">
                                         <div class="col-md-6">
-                                            <label for="name" class="mgmt-label">Nome Completo</label>
+                                            <label for="name" class="mgmt-label">{{ __('site.perfil.nome_completo') }}</label>
                                             <input type="text" class="form-control mgmt-input" id="name" name="name" value="{{ old('name', $user->name) }}" required>
                                         </div>
                                         <div class="col-md-6">
-                                            <label for="mobile" class="mgmt-label">Telefone</label>
+                                            <label for="mobile" class="mgmt-label">{{ __('site.perfil.telefone') }}</label>
                                             <div class="input-group">
                                                 <span class="input-group-text mgmt-input-icon"><i class="bi bi-telephone"></i></span>
-                                                <input type="text" class="form-control mgmt-input" id="mobile" name="mobile" value="{{ old('mobile', $user->mobile) }}" placeholder="+244 9XX XXX XXX">
+                                                <input type="text" class="form-control mgmt-input" id="mobile" name="mobile" value="{{ old('mobile', $user->mobile) }}" placeholder="{{ __('site.perfil.telefone_exemplo') }}">
                                             </div>
                                         </div>
                                         <div class="col-md-6">
-                                            <label for="sex" class="mgmt-label">Gênero</label>
+                                            <label for="sex" class="mgmt-label">{{ __('site.perfil.genero') }}</label>
                                             <select class="form-select mgmt-input" id="sex" name="sex">
-                                                <option value="" disabled {{ !$user->sex ? 'selected' : '' }}>Selecione</option>
-                                                <option value="Masculino" {{ $user->sex === 'Masculino' ? 'selected' : '' }}>Masculino</option>
-                                                <option value="Feminino" {{ $user->sex === 'Feminino' ? 'selected' : '' }}>Feminino</option>
+                                                <option value="" disabled {{ !$user->sex ? 'selected' : '' }}>{{ __('site.perfil.selecione') }}</option>
+                                                <option value="Masculino" {{ $user->sex === 'Masculino' ? 'selected' : '' }}>{{ __('site.perfil.masculino') }}</option>
+                                                <option value="Feminino" {{ $user->sex === 'Feminino' ? 'selected' : '' }}>{{ __('site.perfil.feminino') }}</option>
                                             </select>
                                         </div>
                                         <div class="col-md-6">
-                                            <label for="birth_date" class="mgmt-label">Data de Nascimento</label>
+                                            <label for="birth_date" class="mgmt-label">{{ __('site.perfil.nascimento') }}</label>
                                             <input type="date" class="form-control mgmt-input" id="birth_date" name="birth_date" value="{{ old('birth_date', optional($user->birth_date)->format('Y-m-d')) }}">
                                         </div>
                                     </div>
@@ -135,26 +135,26 @@
                                         <i class="bi bi-camera-fill"></i>
                                     </div>
                                     <div>
-                                        <h5 class="mgmt-card-title">Foto de Perfil</h5>
-                                        <p class="mgmt-card-subtitle">Carregue uma foto ou sincronize via Google</p>
+                                        <h5 class="mgmt-card-title">{{ __('site.perfil.foto') }}</h5>
+                                        <p class="mgmt-card-subtitle">{{ __('site.perfil.foto_subtitulo') }}</p>
                                     </div>
                                 </div>
                                 <div class="mgmt-card-body">
                                     <div class="avatar-upload-zone">
                                         <div class="avatar-upload-preview">
                                             @if(Auth::user()->avatar)
-                                                <img src="{{ Auth::user()->avatar }}" alt="Avatar" id="avatar-preview-img">
+                                                <img src="{{ Auth::user()->avatar }}" alt="{{ __('site.perfil.avatar') }}" id="avatar-preview-img">
                                             @else
                                                 <div class="avatar-upload-placeholder" id="avatar-preview-placeholder">
                                                     <i class="bi bi-cloud-arrow-up"></i>
-                                                    <span>Carregar foto</span>
+                                                    <span>{{ __('site.perfil.carregar_foto') }}</span>
                                                 </div>
                                             @endif
                                         </div>
                                         <div class="avatar-upload-info">
                                             <input class="form-control mgmt-input" type="file" id="avatar" name="avatar" accept="image/jpeg,image/png,image/jpg,image/webp">
                                             <div class="form-text mt-2">
-                                                <i class="bi bi-info-circle me-1"></i> Máximo 2MB · JPEG, PNG, WEBP · Redimensionado para 128×128px
+                                                <i class="bi bi-info-circle me-1"></i> {{ __('site.perfil.foto_ajuda') }}
                                             </div>
                                         </div>
                                     </div>
@@ -163,7 +163,7 @@
 
                             <div class="d-flex justify-content-end mt-4">
                                 <button type="submit" class="btn btn-primary px-4 py-2 rounded-pill mgmt-save-btn">
-                                    <i class="bi bi-check-lg me-2"></i> Guardar Alterações
+                                    <i class="bi bi-check-lg me-2"></i> {{ __('site.perfil.guardar_alteracoes') }}
                                 </button>
                             </div>
                         </div>
@@ -176,8 +176,8 @@
                                         <i class="bi bi-file-earmark-pdf-fill"></i>
                                     </div>
                                     <div>
-                                        <h5 class="mgmt-card-title">Os Meus Currículos</h5>
-                                        <p class="mgmt-card-subtitle">Faça upload e gerencie os seus CVs</p>
+                                        <h5 class="mgmt-card-title">{{ __('site.perfil.meus_cvs') }}</h5>
+                                        <p class="mgmt-card-subtitle">{{ __('site.perfil.meus_cvs_subtitulo') }}</p>
                                     </div>
                                 </div>
                                 <div class="mgmt-card-body">
@@ -197,7 +197,7 @@
                                                                 <small class="text-muted">{{ $cv->created_at->format('d/m/Y') }}</small>
                                                                 @if($cv->is_primary)
                                                                     <span class="cv-primary-badge">
-                                                                        <i class="bi bi-star-fill me-1"></i> Principal
+                                                                        <i class="bi bi-star-fill me-1"></i> {{ __('site.perfil.principal') }}
                                                                     </span>
                                                                 @endif
                                                             </div>
@@ -206,16 +206,16 @@
                                                             @if(!$cv->is_primary)
                                                                 <button type="button" class="btn btn-sm btn-light rounded-pill cv-action-btn" 
                                                                     onclick="event.preventDefault(); document.getElementById('set-primary-form-{{ $cv->id }}').submit();" 
-                                                                    title="Definir como Principal">
+                                                                    title="{{ __('site.perfil.definir_principal') }}">
                                                                     <i class="bi bi-star text-warning"></i>
                                                                 </button>
                                                             @endif
-                                                            <a href="{{ asset('storage/' . $cv->path) }}" target="_blank" class="btn btn-sm btn-light rounded-pill cv-action-btn" title="Visualizar">
+                                                            <a href="{{ asset('storage/' . $cv->path) }}" target="_blank" class="btn btn-sm btn-light rounded-pill cv-action-btn" title="{{ __('site.perfil.visualizar') }}">
                                                                 <i class="bi bi-eye text-primary"></i>
                                                             </a>
                                                             <button type="button" class="btn btn-sm btn-light rounded-pill cv-action-btn" 
-                                                                onclick="event.preventDefault(); if(confirm('Tem certeza que deseja eliminar este CV?')) document.getElementById('delete-cv-form-{{ $cv->id }}').submit();" 
-                                                                title="Eliminar">
+                                                                onclick="event.preventDefault(); if(confirm('{{ __('site.perfil.confirmar_eliminar_cv') }}')) document.getElementById('delete-cv-form-{{ $cv->id }}').submit();" 
+                                                                title="{{ __('site.perfil.eliminar') }}">
                                                                 <i class="bi bi-trash text-danger"></i>
                                                             </button>
                                                         </div>
@@ -226,17 +226,17 @@
                                     @else
                                         <div class="empty-state mb-4">
                                             <i class="bi bi-file-earmark-plus"></i>
-                                            <p>Nenhum CV carregado. Faça upload do seu primeiro currículo.</p>
+                                            <p>{{ __('site.perfil.sem_cv') }}</p>
                                         </div>
                                     @endif
 
                                     <div class="upload-zone">
                                         <i class="bi bi-cloud-arrow-up"></i>
-                                        <p class="mb-1 fw-medium">Carregar Novo CV</p>
-                                        <p class="text-muted small mb-2">Arraste o ficheiro ou clique para selecionar</p>
+                                        <p class="mb-1 fw-medium">{{ __('site.perfil.carregar_cv') }}</p>
+                                        <p class="text-muted small mb-2">{{ __('site.perfil.arraste_ficheiro') }}</p>
                                         <input class="form-control mgmt-input" type="file" id="cv" name="cv" accept=".pdf" style="max-width: 400px;">
                                         <div class="form-text mt-2">
-                                            <i class="bi bi-info-circle me-1"></i> Apenas PDF · Máximo 2MB
+                                            <i class="bi bi-info-circle me-1"></i> {{ __('site.perfil.apenas_pdf') }}
                                         </div>
                                     </div>
                                 </div>
@@ -244,7 +244,7 @@
 
                             <div class="d-flex justify-content-end mt-4">
                                 <button type="submit" class="btn btn-primary px-4 py-2 rounded-pill mgmt-save-btn">
-                                    <i class="bi bi-check-lg me-2"></i> Guardar Alterações
+                                    <i class="bi bi-check-lg me-2"></i> {{ __('site.perfil.guardar_alteracoes') }}
                                 </button>
                             </div>
                         </div>
@@ -257,8 +257,8 @@
                                         <i class="bi bi-tags-fill"></i>
                                     </div>
                                     <div>
-                                        <h5 class="mgmt-card-title">Áreas de Interesse</h5>
-                                        <p class="mgmt-card-subtitle">Selecione categorias para receber recomendações de vagas</p>
+                                        <h5 class="mgmt-card-title">{{ __('site.perfil.areas_interesse') }}</h5>
+                                        <p class="mgmt-card-subtitle">{{ __('site.perfil.areas_interesse_subtitulo') }}</p>
                                     </div>
                                 </div>
                                 <div class="mgmt-card-body">
@@ -276,7 +276,7 @@
 
                             <div class="d-flex justify-content-end mt-4">
                                 <button type="submit" class="btn btn-primary px-4 py-2 rounded-pill mgmt-save-btn">
-                                    <i class="bi bi-check-lg me-2"></i> Guardar Alterações
+                                    <i class="bi bi-check-lg me-2"></i> {{ __('site.perfil.guardar_alteracoes') }}
                                 </button>
                             </div>
                         </div>
@@ -284,7 +284,7 @@
                         {{-- ═══ PERFIL PÚBLICO ═══ --}}
                         <div class="tab-pane fade" id="extended" role="tabpanel" aria-labelledby="extended-tab">
                             <p class="text-muted small mb-4">
-                                <i class="bi bi-info-circle me-1"></i> Estas informações são exibidas no seu perfil público para recrutadores e empregadores.
+                                <i class="bi bi-info-circle me-1"></i> {{ __('site.perfil.aviso_publico') }}
                             </p>
 
                             {{-- Sobre Mim --}}
@@ -294,16 +294,16 @@
                                         <i class="bi bi-chat-quote-fill"></i>
                                     </div>
                                     <div>
-                                        <h5 class="mgmt-card-title">Sobre Mim</h5>
-                                        <p class="mgmt-card-subtitle">Uma breve descrição sobre si</p>
+                                        <h5 class="mgmt-card-title">{{ __('site.perfil.sobre_mim') }}</h5>
+                                        <p class="mgmt-card-subtitle">{{ __('site.perfil.sobre_mim_subtitulo') }}</p>
                                     </div>
                                 </div>
                                 <div class="mgmt-card-body">
-                                    <textarea class="form-control mgmt-input" id="bio-textarea" rows="3" maxlength="1000" form="bio-form" name="bio" placeholder="Sou um profissional dedicado com experiência em...">{{ old('bio', $user->bio) }}</textarea>
+                                    <textarea class="form-control mgmt-input" id="bio-textarea" rows="3" maxlength="1000" form="bio-form" name="bio" placeholder="{{ __('site.perfil.sobre_mim_exemplo') }}">{{ old('bio', $user->bio) }}</textarea>
                                     <div class="d-flex justify-content-between align-items-center mt-2">
-                                        <div class="form-text"><span id="bio-count">{{ strlen($user->bio ?? '') }}</span>/1000 caracteres</div>
+                                        <div class="form-text"><span id="bio-count">{{ strlen($user->bio ?? '') }}</span>{{ __('site.perfil.caracteres') }}</div>
                                         <button type="submit" form="bio-form" class="btn btn-sm btn-primary rounded-pill px-3">
-                                            <i class="bi bi-save me-1"></i> Guardar
+                                            <i class="bi bi-save me-1"></i> {{ __('site.perfil.guardar') }}
                                         </button>
                                     </div>
                                 </div>
@@ -316,8 +316,8 @@
                                         <i class="bi bi-lightning-fill"></i>
                                     </div>
                                     <div>
-                                        <h5 class="mgmt-card-title">Habilidades</h5>
-                                        <p class="mgmt-card-subtitle">Competências técnicas e interpessoais</p>
+                                        <h5 class="mgmt-card-title">{{ __('site.perfil.habilidades') }}</h5>
+                                        <p class="mgmt-card-subtitle">{{ __('site.perfil.habilidades_subtitulo') }}</p>
                                     </div>
                                 </div>
                                 <div class="mgmt-card-body">
@@ -327,7 +327,7 @@
                                                 <span class="skill-tag">
                                                     {{ $skill->name }}
                                                     <button type="button" class="skill-tag-remove" 
-                                                        onclick="event.preventDefault(); if(confirm('Remover?')) document.getElementById('delete-skill-{{ $skill->id }}').submit();">
+                                                        onclick="event.preventDefault(); if(confirm('{{ __('site.perfil.confirmar_remover') }}')) document.getElementById('delete-skill-{{ $skill->id }}').submit();">
                                                         <i class="bi bi-x"></i>
                                                     </button>
                                                 </span>
@@ -335,7 +335,7 @@
                                         </div>
                                     @endif
                                     <div class="input-group" style="max-width: 420px;">
-                                        <input type="text" class="form-control mgmt-input" name="name" form="skill-form" placeholder="Ex: Laravel, Excel, Design Gráfico..." required>
+                                        <input type="text" class="form-control mgmt-input" name="name" form="skill-form" placeholder="{{ __('site.perfil.habilidades_exemplo') }}" required>
                                         <button type="submit" form="skill-form" class="btn btn-outline-primary rounded-end-pill px-3">
                                             <i class="bi bi-plus-lg"></i>
                                         </button>
@@ -350,8 +350,8 @@
                                         <i class="bi bi-mortarboard-fill"></i>
                                     </div>
                                     <div>
-                                        <h5 class="mgmt-card-title">Formação Académica</h5>
-                                        <p class="mgmt-card-subtitle">Escolas e universidades onde estudou</p>
+                                        <h5 class="mgmt-card-title">{{ __('site.perfil.formacao') }}</h5>
+                                        <p class="mgmt-card-subtitle">{{ __('site.perfil.formacao_subtitulo') }}</p>
                                     </div>
                                 </div>
                                 <div class="mgmt-card-body">
@@ -370,7 +370,7 @@
                                                         @endif
                                                     </div>
                                                     <button type="button" class="btn btn-sm btn-light rounded-circle entry-delete" 
-                                                        onclick="event.preventDefault(); if(confirm('Remover esta formação?')) document.getElementById('delete-education-{{ $edu->id }}').submit();">
+                                                        onclick="event.preventDefault(); if(confirm('{{ __('site.perfil.confirmar_remover_formacao') }}')) document.getElementById('delete-education-{{ $edu->id }}').submit();">
                                                         <i class="bi bi-trash text-danger"></i>
                                                     </button>
                                                 </div>
@@ -380,22 +380,22 @@
                                     <div class="add-entry-form">
                                         <div class="row g-2">
                                             <div class="col-12">
-                                                <input type="text" class="form-control form-control-sm mgmt-input" name="institution" form="education-form" placeholder="Instituição *" required>
+                                                <input type="text" class="form-control form-control-sm mgmt-input" name="institution" form="education-form" placeholder="{{ __('site.perfil.instituicao') }}" required>
                                             </div>
                                             <div class="col-md-6">
-                                                <input type="text" class="form-control form-control-sm mgmt-input" name="degree" form="education-form" placeholder="Grau (ex: Licenciatura)">
+                                                <input type="text" class="form-control form-control-sm mgmt-input" name="degree" form="education-form" placeholder="{{ __('site.perfil.grau') }}">
                                             </div>
                                             <div class="col-md-6">
-                                                <input type="text" class="form-control form-control-sm mgmt-input" name="field_of_study" form="education-form" placeholder="Área de Estudo">
+                                                <input type="text" class="form-control form-control-sm mgmt-input" name="field_of_study" form="education-form" placeholder="{{ __('site.perfil.area_estudo') }}">
                                             </div>
                                             <div class="col-6">
-                                                <input type="text" class="form-control form-control-sm mgmt-input" name="start_year" form="education-form" placeholder="Ano Início" maxlength="4">
+                                                <input type="text" class="form-control form-control-sm mgmt-input" name="start_year" form="education-form" placeholder="{{ __('site.perfil.ano_inicio') }}" maxlength="4">
                                             </div>
                                             <div class="col-6">
-                                                <input type="text" class="form-control form-control-sm mgmt-input" name="end_year" form="education-form" placeholder="Ano Fim" maxlength="4">
+                                                <input type="text" class="form-control form-control-sm mgmt-input" name="end_year" form="education-form" placeholder="{{ __('site.perfil.ano_fim') }}" maxlength="4">
                                             </div>
                                             <div class="col-12">
-                                                <button type="submit" form="education-form" class="btn btn-sm btn-outline-primary rounded-pill"><i class="bi bi-plus-lg me-1"></i> Adicionar</button>
+                                                <button type="submit" form="education-form" class="btn btn-sm btn-outline-primary rounded-pill"><i class="bi bi-plus-lg me-1"></i> {{ __('site.perfil.adicionar') }}</button>
                                             </div>
                                         </div>
                                     </div>
@@ -409,8 +409,8 @@
                                         <i class="bi bi-briefcase-fill"></i>
                                     </div>
                                     <div>
-                                        <h5 class="mgmt-card-title">Experiência Profissional</h5>
-                                        <p class="mgmt-card-subtitle">Historial de emprego e projectos</p>
+                                        <h5 class="mgmt-card-title">{{ __('site.perfil.experiencia') }}</h5>
+                                        <p class="mgmt-card-subtitle">{{ __('site.perfil.experiencia_subtitulo') }}</p>
                                     </div>
                                 </div>
                                 <div class="mgmt-card-body">
@@ -431,7 +431,7 @@
                                                         @endif
                                                     </div>
                                                     <button type="button" class="btn btn-sm btn-light rounded-circle entry-delete" 
-                                                        onclick="event.preventDefault(); if(confirm('Remover esta experiência?')) document.getElementById('delete-experience-{{ $exp->id }}').submit();">
+                                                        onclick="event.preventDefault(); if(confirm('{{ __('site.perfil.confirmar_remover_experiencia') }}')) document.getElementById('delete-experience-{{ $exp->id }}').submit();">
                                                         <i class="bi bi-trash text-danger"></i>
                                                     </button>
                                                 </div>
@@ -441,24 +441,24 @@
                                     <div class="add-entry-form">
                                         <div class="row g-2">
                                             <div class="col-md-6">
-                                                <input type="text" class="form-control form-control-sm mgmt-input" name="company" form="experience-form" placeholder="Empresa *" required>
+                                                <input type="text" class="form-control form-control-sm mgmt-input" name="company" form="experience-form" placeholder="{{ __('site.perfil.empresa') }}" required>
                                             </div>
                                             <div class="col-md-6">
-                                                <input type="text" class="form-control form-control-sm mgmt-input" name="position" form="experience-form" placeholder="Cargo *" required>
+                                                <input type="text" class="form-control form-control-sm mgmt-input" name="position" form="experience-form" placeholder="{{ __('site.perfil.cargo') }}" required>
                                             </div>
                                             <div class="col-12">
-                                                <textarea class="form-control form-control-sm mgmt-input" name="description" form="experience-form" rows="2" placeholder="Descrição das responsabilidades (opcional)"></textarea>
+                                                <textarea class="form-control form-control-sm mgmt-input" name="description" form="experience-form" rows="2" placeholder="{{ __('site.perfil.descricao_responsabilidades') }}"></textarea>
                                             </div>
                                             <div class="col-6">
-                                                <label class="form-label small text-muted mb-1">Início</label>
+                                                <label class="form-label small text-muted mb-1">{{ __('site.perfil.inicio') }}</label>
                                                 <input type="date" class="form-control form-control-sm mgmt-input" name="start_date" form="experience-form">
                                             </div>
                                             <div class="col-6">
-                                                <label class="form-label small text-muted mb-1">Fim <span class="text-muted">(vazio = actual)</span></label>
+                                                <label class="form-label small text-muted mb-1">{{ __('site.perfil.fim') }} <span class="text-muted">{{ __('site.perfil.vazio_actual') }}</span></label>
                                                 <input type="date" class="form-control form-control-sm mgmt-input" name="end_date" form="experience-form">
                                             </div>
                                             <div class="col-12">
-                                                <button type="submit" form="experience-form" class="btn btn-sm btn-outline-primary rounded-pill"><i class="bi bi-plus-lg me-1"></i> Adicionar</button>
+                                                <button type="submit" form="experience-form" class="btn btn-sm btn-outline-primary rounded-pill"><i class="bi bi-plus-lg me-1"></i> {{ __('site.perfil.adicionar') }}</button>
                                             </div>
                                         </div>
                                     </div>
@@ -472,8 +472,8 @@
                                         <i class="bi bi-translate"></i>
                                     </div>
                                     <div>
-                                        <h5 class="mgmt-card-title">Idiomas</h5>
-                                        <p class="mgmt-card-subtitle">Línguas que domina</p>
+                                        <h5 class="mgmt-card-title">{{ __('site.perfil.idiomas') }}</h5>
+                                        <p class="mgmt-card-subtitle">{{ __('site.perfil.idiomas_subtitulo') }}</p>
                                     </div>
                                 </div>
                                 <div class="mgmt-card-body">
@@ -486,7 +486,7 @@
                                                         <span class="language-level-badge level-{{ \Illuminate\Support\Str::slug($lang->level) }}">{{ $lang->level }}</span>
                                                     </div>
                                                     <button type="button" class="btn btn-sm btn-light rounded-circle entry-delete" 
-                                                        onclick="event.preventDefault(); if(confirm('Remover?')) document.getElementById('delete-language-{{ $lang->id }}').submit();">
+                                                        onclick="event.preventDefault(); if(confirm('{{ __('site.perfil.confirmar_remover') }}')) document.getElementById('delete-language-{{ $lang->id }}').submit();">
                                                         <i class="bi bi-trash text-danger"></i>
                                                     </button>
                                                 </div>
@@ -496,20 +496,20 @@
                                     <div class="add-entry-form">
                                         <div class="row g-2">
                                             <div class="col-md-6">
-                                                <input type="text" class="form-control form-control-sm mgmt-input" name="language" form="language-form" placeholder="Ex: Português, Inglês..." required>
+                                                <input type="text" class="form-control form-control-sm mgmt-input" name="language" form="language-form" placeholder="{{ __('site.perfil.idioma_exemplo') }}" required>
                                             </div>
                                             <div class="col-md-6">
                                                 <select class="form-select form-select-sm mgmt-input" name="level" form="language-form" required>
-                                                    <option value="" disabled selected>Nível *</option>
-                                                    <option value="Básico">Básico</option>
-                                                    <option value="Intermediário">Intermediário</option>
-                                                    <option value="Avançado">Avançado</option>
-                                                    <option value="Fluente">Fluente</option>
-                                                    <option value="Nativo">Nativo</option>
+                                                    <option value="" disabled selected>{{ __('site.perfil.nivel') }}</option>
+                                                    <option value="Básico">{{ __('site.perfil.basico') }}</option>
+                                                    <option value="Intermediário">{{ __('site.perfil.intermediario') }}</option>
+                                                    <option value="Avançado">{{ __('site.perfil.avancado') }}</option>
+                                                    <option value="Fluente">{{ __('site.perfil.fluente') }}</option>
+                                                    <option value="Nativo">{{ __('site.perfil.nativo') }}</option>
                                                 </select>
                                             </div>
                                             <div class="col-12">
-                                                <button type="submit" form="language-form" class="btn btn-sm btn-outline-primary rounded-pill"><i class="bi bi-plus-lg me-1"></i> Adicionar</button>
+                                                <button type="submit" form="language-form" class="btn btn-sm btn-outline-primary rounded-pill"><i class="bi bi-plus-lg me-1"></i> {{ __('site.perfil.adicionar') }}</button>
                                             </div>
                                         </div>
                                     </div>
@@ -527,10 +527,10 @@
                 <div class="mgmt-card mb-4 d-md-none">
                     <div class="mgmt-card-body text-center py-3">
                         <a href="{{ route('profile.public', Auth::user()->username) }}" target="_blank" class="btn btn-sm btn-outline-primary rounded-pill px-3 me-2">
-                            <i class="bi bi-box-arrow-up-right me-1"></i> Ver Perfil
+                            <i class="bi bi-box-arrow-up-right me-1"></i> {{ __('site.perfil.ver_perfil') }}
                         </a>
                         <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3" onclick="copyPublicLink()">
-                            <i class="bi bi-clipboard me-1"></i> Copiar Link
+                            <i class="bi bi-clipboard me-1"></i> {{ __('site.perfil.copiar_link') }}
                         </button>
                     </div>
                 </div>
@@ -538,10 +538,10 @@
                 {{-- Public Profile Share --}}
                 <div class="mgmt-card mb-4">
                     <div class="mgmt-card-body">
-                        <h6 class="fw-bold mb-3"><i class="bi bi-share me-2 text-primary"></i>Partilhar Perfil</h6>
+                        <h6 class="fw-bold mb-3"><i class="bi bi-share me-2 text-primary"></i>{{ __('site.perfil.partilhar') }}</h6>
                         <div class="share-link-box mb-3">
                             <span class="share-link-url">{{ route('profile.public', Auth::user()->username) }}</span>
-                            <button type="button" class="share-link-copy" id="copyLinkBtn" onclick="copyPublicLink()" title="Copiar">
+                            <button type="button" class="share-link-copy" id="copyLinkBtn" onclick="copyPublicLink()" title="{{ __('site.perfil.copiar') }}">
                                 <i class="bi bi-clipboard"></i>
                             </button>
                         </div>
@@ -563,7 +563,7 @@
                 @if($user->completed_courses->count() > 0)
                 <div class="mgmt-card mb-4">
                     <div class="mgmt-card-body">
-                        <h6 class="fw-bold mb-3"><i class="bi bi-mortarboard me-2 text-primary"></i>Cursos Concluídos</h6>
+                        <h6 class="fw-bold mb-3"><i class="bi bi-mortarboard me-2 text-primary"></i>{{ __('site.perfil.cursos_concluidos') }}</h6>
                         @foreach($user->completed_courses as $course)
                             <div class="course-mini-item">
                                 <div class="course-mini-icon">
@@ -585,9 +585,9 @@
                 @if($user->cvs->count() > 0 || $user->cv_path)
                 <div class="mgmt-card">
                     <div class="mgmt-card-body">
-                        <h6 class="fw-bold mb-3"><i class="bi bi-file-earmark-pdf me-2 text-danger"></i>CV Principal</h6>
+                        <h6 class="fw-bold mb-3"><i class="bi bi-file-earmark-pdf me-2 text-danger"></i>{{ __('site.perfil.cv_principal') }}</h6>
                         <a href="{{ $user->cv_url }}" target="_blank" class="btn btn-outline-danger btn-sm rounded-pill w-100">
-                            <i class="bi bi-eye me-1"></i> Visualizar CV
+                            <i class="bi bi-eye me-1"></i> {{ __('site.perfil.visualizar_cv') }}
                         </a>
                     </div>
                 </div>

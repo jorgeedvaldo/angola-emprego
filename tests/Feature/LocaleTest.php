@@ -6,6 +6,7 @@ use App\Http\Middleware\SetLocale;
 use App\Models\Company;
 use App\Models\Course;
 use App\Models\Post;
+use App\Models\User;
 use App\Models\Job;
 use App\Models\JobApplication;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -506,6 +507,46 @@ class LocaleTest extends TestCase
             ->assertDontSee('Descrição da vaga');
     }
 
+    public function test_the_profile_page_translates()
+    {
+        $utilizador = User::factory()->create();
+
+        $this->actingAs($utilizador)->get(route('profile.show'))
+            ->assertOk()
+            ->assertSee('Dados Pessoais')
+            ->assertSee('Os Meus Currículos')
+            ->assertSee('Formação Académica')
+            ->assertSee('Guardar Alterações');
+
+        $this->get(route('locale.switch', 'en'));
+
+        $this->actingAs($utilizador)->get(route('profile.show'))
+            ->assertOk()
+            ->assertSee('Personal details')
+            ->assertSee('My CVs')
+            ->assertSee('Education')
+            ->assertSee('Save changes')
+            ->assertDontSee('Formação Académica');
+    }
+
+    public function test_the_public_profile_translates()
+    {
+        $utilizador = User::factory()->create(['username' => 'ana.nzuzi']);
+
+        $this->get('/@' . $utilizador->username)
+            ->assertOk()
+            ->assertSee('Código QR')
+            ->assertSee('Voltar ao Início');
+
+        $this->get(route('locale.switch', 'en'));
+
+        $this->get('/@' . $utilizador->username)
+            ->assertOk()
+            ->assertSee('QR code')
+            ->assertSee('Back to home')
+            ->assertDontSee('Voltar ao Início');
+    }
+
     /**
      * Uma chave em falta rende como o próprio nome da chave ("site.home.novo"),
      * que passa despercebido numa página cheia. Nas páginas que já traduzimos,
@@ -542,6 +583,7 @@ class LocaleTest extends TestCase
                     ->assertDontSee('site.cursos.')
                     ->assertDontSee('site.noticias.')
                     ->assertDontSee('site.empresas.')
+                    ->assertDontSee('site.perfil.')
                     ->assertDontSee('site.recrutadores.');
             }
         }

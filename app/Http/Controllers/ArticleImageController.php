@@ -5,14 +5,24 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Str;
 
 /**
- * Generates a branded cover image for a post/job title entirely in pure PHP
- * via the GD extension — no system binaries, headless browsers, or external
- * services required. Mirrors the ToolPDF cover-image generator.
+ * Desenha o cartão que representa cada vaga e cada notícia nas redes sociais.
+ *
+ * É tudo feito em PHP com o GD: sem binários do sistema, sem browser e sem
+ * serviços externos, que é o que o alojamento partilhado permite.
+ *
+ * O logótipo entra como PNG (assets/img/logo-og.png) porque o GD não lê SVG.
+ * É o mesmo logótipo do menu, só com o "ANGOLA" a branco em vez de preto — em
+ * cima deste azul-escuro o preto não se via. Para o refazer a partir do
+ * assets/img/logo.svg: trocar fill="#070707" por branco e fill="#2677b6" pelo
+ * azul claro, e exportar em 1138x406 com fundo transparente.
  */
 class ArticleImageController extends Controller
 {
     private const WIDTH = 1200;
     private const HEIGHT = 630;
+
+    /** Altura a que o logótipo é desenhado; a largura sai da proporção do ficheiro. */
+    private const LOGO_HEIGHT = 86;
 
     /**
      * Render a branded cover card for the given title and store it.
@@ -119,23 +129,36 @@ class ArticleImageController extends Controller
         $padX = 70;
         $topY = 70;
 
-        // Logo + brand wordmark
-        $logoSize = 92;
-        $logoPath = public_path('assets/img/logo.png');
+        // Logótipo do site. É o mesmo do menu, mas com o "ANGOLA" a branco em vez
+        // de preto — sobre este azul-escuro o original não se via. A imagem vem
+        // pronta em PNG porque o GD não sabe ler SVG.
+        $logoH = self::LOGO_HEIGHT;
+        $logoW = 0;
+        $logoPath = public_path('assets/img/logo-og.png');
+
         if (is_file($logoPath)) {
             $logo = @imagecreatefrompng($logoPath);
+
             if ($logo) {
+                $logoW = (int) round($logoH * imagesx($logo) / imagesy($logo));
                 imagealphablending($im, true);
-                imagecopyresampled($im, $logo, $padX, $topY, 0, 0, $logoSize, $logoSize, imagesx($logo), imagesy($logo));
+                imagecopyresampled($im, $logo, $padX, $topY, 0, 0, $logoW, $logoH, imagesx($logo), imagesy($logo));
                 imagedestroy($logo);
             }
         }
-        $brand = config('app.name', 'Angola Emprego');
-        $host = parse_url((string) config('app.url'), PHP_URL_HOST);
-        $subtitle = ($host && $host !== 'localhost') ? $host : 'Angola Emprego';
 
-        imagettftext($im, 30, 0, $padX + $logoSize + 22, $topY + (int) round($logoSize * 0.42), $white, $font, $brand);
-        imagettftext($im, 15, 0, $padX + $logoSize + 23, $topY + (int) round($logoSize * 0.78), $muted, $font, $subtitle);
+        // Sem o logótipo o cartão ficaria sem marca nenhuma; nesse caso escreve-se
+        // o nome do site, que era o que se fazia antes.
+        if ($logoW === 0) {
+            $marca = config('app.name', 'Angola Emprego');
+            imagettftext($im, 30, 0, $padX, $topY + (int) round($logoH * 0.62), $white, $font, $marca);
+            $logoW = (int) abs(imagettfbbox(30, 0, $font, $marca)[2] - imagettfbbox(30, 0, $font, $marca)[0]);
+        }
+
+        $host = parse_url((string) config('app.url'), PHP_URL_HOST);
+        $dominio = ($host && $host !== 'localhost') ? $host : 'angolaemprego.com';
+
+        imagettftext($im, 15, 0, $padX + 2, $topY + $logoH + 30, $muted, $font, $dominio);
 
         // Title — wrapped and auto-shrunk to fit at most 4 lines
         $titleSize = 54;
@@ -149,7 +172,7 @@ class ArticleImageController extends Controller
 
         $lineH = (int) round($titleSize * 1.32);
         $blockH = count($lines) * $lineH;
-        $regionTop = $topY + $logoSize;
+        $regionTop = $topY + $logoH + 30;
         $startY = (int) round($regionTop + (($h - $regionTop - $blockH) / 2));
         $y = $startY + $titleSize;
         foreach ($lines as $line) {

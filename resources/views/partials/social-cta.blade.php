@@ -3,8 +3,8 @@
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-lg-8">
-                    <h2 class="fw-bold mb-3 text-primary">Junte-se à nossa Comunidade!</h2>
-                    <p class="lead text-muted mb-4">Siga-nos nas redes sociais para receber as últimas vagas, dicas de carreira e novidades em primeira mão.</p>
+                    <h2 class="fw-bold mb-3 text-primary">{{ __('site.home.comunidade_titulo') }}</h2>
+                    <p class="lead text-muted mb-4">{{ __('site.home.comunidade_texto') }}</p>
                     <div class="d-flex justify-content-center gap-3 flex-wrap">
                         <a href="https://www.linkedin.com/company/angola-emprego/" target="_blank" class="btn btn-primary btn-lg px-4 gap-2 rounded-pill d-flex align-items-center">
                             <i class="bi bi-linkedin fs-4"></i> LinkedIn

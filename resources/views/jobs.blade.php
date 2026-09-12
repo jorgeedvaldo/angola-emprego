@@ -1,6 +1,6 @@
 @extends('templates.app')
-@section('title', 'Vagas de Emprego em Angola 2026')
-@section('description', 'Encontre as melhores vagas de emprego em Angola. Pesquise por cargo, empresa ou localização. Milhares de oportunidades em Luanda, Benguela, Huíla e todo o país.')
+@section('title', __('site.vagas.meta_titulo'))
+@section('description', __('site.vagas.meta_descricao'))
 @section('canonical_link', url('/vagas'))
 
 @section('head-scripts')
@@ -11,7 +11,7 @@
   "name": "Vagas de Emprego em Angola",
   "description": "Listagem completa de vagas de emprego em Angola.",
   "url": "{{ url('/vagas') }}",
-  "inLanguage": "pt-AO",
+  "inLanguage": "{{ app()->getLocale() === 'pt' ? 'pt-AO' : app()->getLocale() }}",
   "mainEntity": {
     "@type": "ItemList",
     "itemListOrder": "https://schema.org/ItemListOrderDescending",
@@ -36,12 +36,12 @@
   "itemListElement": [{
     "@type": "ListItem",
     "position": 1,
-    "name": "Início",
+    "name": "{{ __('site.vagas.inicio') }}",
     "item": "{{ url('/') }}"
   },{
     "@type": "ListItem",
     "position": 2,
-    "name": "Vagas de Emprego",
+    "name": "{{ __('site.vagas.titulo') }}",
     "item": "{{ url('/vagas') }}"
   }]
 }
@@ -54,14 +54,14 @@
       <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-8">
-                 <h1 class="fw-bold mb-2 text-dark">Vagas de Emprego</h1>
-                 <p class="text-muted mb-0">Explore as melhores oportunidades de carreira em Angola.</p>
+                 <h1 class="fw-bold mb-2 text-dark">{{ __('site.vagas.titulo') }}</h1>
+                 <p class="text-muted mb-0">{{ __('site.vagas.subtitulo') }}</p>
             </div>
             <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
                  <nav aria-label="breadcrumb">
                   <ol class="breadcrumb justify-content-lg-end mb-0">
-                    <li class="breadcrumb-item"><a href="{{url('/')}}">Início</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Vagas</li>
+                    <li class="breadcrumb-item"><a href="{{url('/')}}">{{ __('site.vagas.inicio') }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ __('site.nav.vagas') }}</li>
                   </ol>
                 </nav>
             </div>
@@ -79,25 +79,25 @@
                     <!-- Search Widget -->
                     <div class="card border-0 shadow-sm mb-4">
                         <div class="card-body p-4">
-                            <h5 class="fw-bold mb-3">Pesquisar</h5>
+                            <h5 class="fw-bold mb-3">{{ __('site.vagas.pesquisar') }}</h5>
                             <form action="{{ url('/vagas') }}" method="GET">
                                 <div class="mb-3">
-                                    <label class="form-label small text-muted">O que procura?</label>
+                                    <label class="form-label small text-muted">{{ __('site.vagas.o_que_procura') }}</label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
-                                        <input type="text" name="q" class="form-control border-start-0" placeholder="Cargo, empresa..." value="{{ request('q') }}">
+                                        <input type="text" name="q" class="form-control border-start-0" placeholder="{{ __('site.vagas.exemplo_cargo') }}" value="{{ request('q') }}">
                                     </div>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label small text-muted">Localização</label>
+                                    <label class="form-label small text-muted">{{ __('site.vagas.localizacao') }}</label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-white border-end-0"><i class="bi bi-geo-alt"></i></span>
-                                        <input type="text" name="location" class="form-control border-start-0" placeholder="Cidade ou Província" value="{{ request('location') }}">
+                                        <input type="text" name="location" class="form-control border-start-0" placeholder="{{ __('site.vagas.exemplo_local') }}" value="{{ request('location') }}">
                                     </div>
                                 </div>
-                                <button type="submit" class="btn btn-primary w-100 fw-bold">Filtrar Vagas</button>
+                                <button type="submit" class="btn btn-primary w-100 fw-bold">{{ __('site.vagas.filtrar') }}</button>
                                 @if(request()->hasAny(['q', 'location', 'category']))
-                                    <a href="{{ url('/vagas') }}" class="btn btn-link text-decoration-none w-100 mt-2 small">Limpar Filtros</a>
+                                    <a href="{{ url('/vagas') }}" class="btn btn-link text-decoration-none w-100 mt-2 small">{{ __('site.vagas.limpar') }}</a>
                                 @endif
                             </form>
                         </div>
@@ -106,7 +106,7 @@
                     <!-- Categories Widget -->
                     <div class="card border-0 shadow-sm mb-4 d-none d-lg-block">
                         <div class="card-body p-4">
-                            <h5 class="fw-bold mb-3">Categorias</h5>
+                            <h5 class="fw-bold mb-3">{{ __('site.vagas.categorias') }}</h5>
                             <ul class="list-unstyled mb-0 filter-list">
                                 @foreach($categories as $category)
                                     <li class="mb-2">
@@ -123,7 +123,7 @@
                     <!-- Top Companies Widget -->
                     <div class="card border-0 shadow-sm">
                         <div class="card-body p-4">
-                            <h5 class="fw-bold mb-3">Principais Empresas</h5>
+                            <h5 class="fw-bold mb-3">{{ __('site.vagas.principais_empresas') }}</h5>
                             <div class="d-flex flex-wrap gap-2">
                                 @foreach($topCompanies as $companyJob)
                                     <a href="{{ url('/vagas?q=' . $companyJob->company) }}" class="badge bg-light text-dark border text-decoration-none p-2 mb-1 company-badge">
@@ -139,8 +139,8 @@
                 <div class="col-lg-8">
                      @if(request('q') || request('location') || request('category'))
                         <div class="mb-4">
-                            <h5 class="fw-bold">Resultados da pesquisa</h5>
-                            <p class="text-muted small">Encontrados {{ $jobs->total() }} resultados</p>
+                            <h5 class="fw-bold">{{ __('site.vagas.resultados') }}</h5>
+                            <p class="text-muted small">{{ __('site.vagas.encontrados', ['total' => $jobs->total()]) }}</p>
                         </div>
                     @endif
 
@@ -155,7 +155,7 @@
                                           <div class="text-muted small mb-2"><i class="bi bi-building me-1"></i> {{ $job->company }}</div>
                                           <div class="mb-2">
                                               <span class="badge bg-light text-dark border me-1"><i class="bi bi-geo-alt me-1"></i> {{ $job->location }}</span>
-                                              <span class="badge bg-light text-dark border"><i class="bi bi-clock me-1"></i> Integral</span>
+                                              <span class="badge bg-light text-dark border"><i class="bi bi-clock me-1"></i> {{ __('site.vagas.integral') }}</span>
                                           </div>
                                            <div class="text-muted small description-truncate" style="max-height: 44px; overflow: hidden;">
                                             {!! \Illuminate\Support\Str::limit(strip_tags($job->description), 140, $end='...') !!}
@@ -163,7 +163,7 @@
                                       </div>
                                       <div class="text-md-end ms-md-4 mt-3 mt-md-0 d-flex flex-column align-items-md-end w-100 w-md-auto">
                                             <span class="text-muted x-small mb-2 text-nowrap"><i class="bi bi-calendar3 me-1"></i> {{ date_format(new DateTime($job->created_at), 'd/m/Y') }}</span>
-                                           <span class="btn btn-outline-primary btn-sm fw-bold rounded-pill text-nowrap px-3">Ver Detalhes</span>
+                                           <span class="btn btn-outline-primary btn-sm fw-bold rounded-pill text-nowrap px-3">{{ __('site.vagas.ver_detalhes') }}</span>
                                       </div>
                                   </div>
                               </div>
@@ -174,9 +174,9 @@
                       @if($jobs->count() == 0)
                         <div class="col-12 text-center py-5">
                             <i class="bi bi-search fs-1 text-muted opacity-50"></i>
-                            <h4 class="mt-3 text-muted">Nenhuma vaga encontrada</h4>
-                            <p class="text-muted mb-0">Tente ajustar os filtros ou limpar a pesquisa.</p>
-                            <a href="{{ url('/vagas') }}" class="btn btn-primary mt-3">Ver Todas as Vagas</a>
+                            <h4 class="mt-3 text-muted">{{ __('site.vagas.sem_resultados') }}</h4>
+                            <p class="text-muted mb-0">{{ __('site.vagas.sem_resultados_dica') }}</p>
+                            <a href="{{ url('/vagas') }}" class="btn btn-primary mt-3">{{ __('site.vagas.ver_todas') }}</a>
                         </div>
                       @endif
                     </div>

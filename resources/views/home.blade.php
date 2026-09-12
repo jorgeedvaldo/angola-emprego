@@ -1,6 +1,6 @@
 @extends('templates.app')
-@section('title', 'Início')
-@section('description', 'Angola Emprego é o maior portal de emprego em Angola, comprometido em ajudar milhares de angolanos a encontrar as melhores oportunidades de trabalho diariamente')
+@section('title', __('site.home.meta_titulo'))
+@section('description', __('site.home.meta_descricao'))
 @section('canonical_link', url('/'))
 
 @section('head-scripts')
@@ -11,7 +11,7 @@
       "name": "Angola Emprego — Vagas de Emprego, Notícias e Cursos",
       "description": "Angola Emprego é o maior portal de emprego em Angola. Encontre vagas de trabalho, cursos gratuitos e notícias de carreira.",
       "url": "{{ url('/') }}",
-      "inLanguage": "pt-AO",
+      "inLanguage": "{{ app()->getLocale() === 'pt' ? 'pt-AO' : app()->getLocale() }}",
       "isPartOf": {
         "@type": "WebSite",
         "name": "Angola Emprego",
@@ -53,9 +53,8 @@
         <div class="container">
             <div class="row justify-content-center text-center">
                 <div class="col-lg-8">
-                    <h1 class="display-4 fw-bold text-dark mb-4">Somos o maior portal de empregos em Angola</h1>
-                    <p class="lead text-muted mb-5">Milhares de oportunidades de emprego e formação em Angola à sua espera.
-                    </p>
+                    <h1 class="display-4 fw-bold text-dark mb-4">{{ __('site.home.hero_titulo') }}</h1>
+                    <p class="lead text-muted mb-5">{{ __('site.home.hero_subtitulo') }}</p>
 
                     <div class="bg-white p-4 rounded-3 shadow-sm border">
                         <form action="{{ url('/vagas') }}" method="GET" class="row g-3">
@@ -64,7 +63,7 @@
                                     <span class="input-group-text bg-white border-end-0"><i
                                             class="bi bi-search text-muted"></i></span>
                                     <input type="text" name="q" class="form-control border-start-0 ps-0"
-                                        placeholder="Cargo, empresa ou competências">
+                                        placeholder="{{ __('site.home.pesquisa_cargo') }}">
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -72,23 +71,23 @@
                                     <span class="input-group-text bg-white border-end-0"><i
                                             class="bi bi-geo-alt text-muted"></i></span>
                                     <input type="text" name="location" class="form-control border-start-0 ps-0"
-                                        placeholder="Cidade ou Província">
+                                        placeholder="{{ __('site.home.pesquisa_local') }}">
                                 </div>
                             </div>
                             <div class="col-md-3">
-                                <button type="submit" class="btn btn-primary w-100 fw-bold">Pesquisar Vagas</button>
+                                <button type="submit" class="btn btn-primary w-100 fw-bold">{{ __('site.home.pesquisar') }}</button>
                             </div>
                         </form>
                     </div>
 
                     <div class="mt-4 text-muted small">
-                        <span class="me-2">Tendências:</span>
+                        <span class="me-2">{{ __('site.home.tendencias') }}</span>
                         <a href="#"
-                            class="text-decoration-none text-muted me-2 bg-light px-2 py-1 rounded border">Tecnologia</a>
+                            class="text-decoration-none text-muted me-2 bg-light px-2 py-1 rounded border">{{ __('site.home.tendencia_tecnologia') }}</a>
                         <a href="#"
-                            class="text-decoration-none text-muted me-2 bg-light px-2 py-1 rounded border">Vendas</a>
+                            class="text-decoration-none text-muted me-2 bg-light px-2 py-1 rounded border">{{ __('site.home.tendencia_vendas') }}</a>
                         <a href="#"
-                            class="text-decoration-none text-muted me-2 bg-light px-2 py-1 rounded border">Construção</a>
+                            class="text-decoration-none text-muted me-2 bg-light px-2 py-1 rounded border">{{ __('site.home.tendencia_construcao') }}</a>
                     </div>
                 </div>
             </div>
@@ -106,26 +105,20 @@
                             <div class="col-lg-7 p-4 p-lg-5">
                                 <div class="d-flex align-items-center gap-2 mb-3">
                                     <span class="badge bg-danger rounded-pill px-3 py-2 fw-bold cv-ai-badge-pulse">
-                                        <i class="bi bi-stars me-1"></i> NOVO
+                                        <i class="bi bi-stars me-1"></i> {{ __('site.home.ia_novo') }}
                                     </span>
-                                    <span class="text-muted small">Serviço gratuito para empresas</span>
+                                    <span class="text-muted small">{{ __('site.home.ia_gratuito') }}</span>
                                 </div>
-                                <h2 class="fw-bold text-dark mb-3" style="line-height: 1.3;">
-                                    Análise de candidatos por inteligência artificial
-                                </h2>
-                                <p class="text-muted mb-4">
-                                    Cadastre a sua empresa, publique a vaga e deixe o nosso sistema ler os currículos
-                                    por si. Em poucos segundos, veja quais candidatos mais combinam com o que procura —
-                                    sem abrir um PDF de cada vez.
-                                </p>
+                                <h2 class="fw-bold text-dark mb-3" style="line-height: 1.3;">{{ __('site.home.ia_titulo') }}</h2>
+                                <p class="text-muted mb-4">{{ __('site.home.ia_texto') }}</p>
                                 <div class="d-flex flex-wrap gap-3 mb-4">
                                     <div class="d-flex align-items-center gap-2">
                                         <div class="cv-ai-stat-mini bg-primary bg-opacity-10 text-primary">
                                             <i class="bi bi-building"></i>
                                         </div>
                                         <div>
-                                            <div class="fw-bold small">Cadastro grátis</div>
-                                            <div class="text-muted" style="font-size:0.7rem;">Sem mensalidade</div>
+                                            <div class="fw-bold small">{{ __('site.home.ia_cadastro') }}</div>
+                                            <div class="text-muted" style="font-size:0.7rem;">{{ __('site.home.ia_cadastro_nota') }}</div>
                                         </div>
                                     </div>
                                     <div class="d-flex align-items-center gap-2">
@@ -133,8 +126,8 @@
                                             <i class="bi bi-file-earmark-text-fill"></i>
                                         </div>
                                         <div>
-                                            <div class="fw-bold small">Leitura automática</div>
-                                            <div class="text-muted" style="font-size:0.7rem;">de cada currículo</div>
+                                            <div class="fw-bold small">{{ __('site.home.ia_leitura') }}</div>
+                                            <div class="text-muted" style="font-size:0.7rem;">{{ __('site.home.ia_leitura_nota') }}</div>
                                         </div>
                                     </div>
                                     <div class="d-flex align-items-center gap-2">
@@ -142,18 +135,18 @@
                                             <i class="bi bi-bar-chart-fill"></i>
                                         </div>
                                         <div>
-                                            <div class="fw-bold small">Ranking</div>
-                                            <div class="text-muted" style="font-size:0.7rem;">por compatibilidade</div>
+                                            <div class="fw-bold small">{{ __('site.home.ia_ranking') }}</div>
+                                            <div class="text-muted" style="font-size:0.7rem;">{{ __('site.home.ia_ranking_nota') }}</div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="d-flex flex-wrap gap-3 align-items-center">
                                     <a href="{{ route('register.company') }}"
                                         class="btn btn-primary btn-lg rounded-pill fw-bold px-4 shadow-sm">
-                                        <i class="bi bi-building-add me-2"></i> Cadastrar a minha empresa
+                                        <i class="bi bi-building-add me-2"></i> {{ __('site.home.ia_cadastrar') }}
                                     </a>
                                     <a href="{{ route('cv-analysis.info') }}" class="fw-bold text-decoration-none">
-                                        Ver como funciona <i class="bi bi-arrow-right"></i>
+                                        {{ __('site.home.ia_como_funciona') }} <i class="bi bi-arrow-right"></i>
                                     </a>
                                 </div>
                             </div>
@@ -163,13 +156,13 @@
                                     <i class="bi bi-robot"></i>
                                 </div>
                                 <div class="cv-ai-visual-badge badge-1">
-                                    <i class="bi bi-check-circle-fill text-success me-1"></i> 92% compatível
+                                    <i class="bi bi-check-circle-fill text-success me-1"></i> {{ __('site.home.ia_visual_compativel') }}
                                 </div>
                                 <div class="cv-ai-visual-badge badge-2">
-                                    <i class="bi bi-file-earmark-check-fill text-primary me-1"></i> CV lido
+                                    <i class="bi bi-file-earmark-check-fill text-primary me-1"></i> {{ __('site.home.ia_visual_lido') }}
                                 </div>
                                 <div class="cv-ai-visual-badge badge-3">
-                                    <i class="bi bi-list-ol text-info me-1"></i> Ranking pronto
+                                    <i class="bi bi-list-ol text-info me-1"></i> {{ __('site.home.ia_visual_ranking') }}
                                 </div>
                             </div>
                         </div>
@@ -288,26 +281,23 @@
                 <div class="col-md-4">
                     <div class="p-4 border rounded-3 h-100 bg-light-hover transition-all">
                         <i class="bi bi-file-earmark-person text-primary fs-2 mb-3"></i>
-                        <h5 class="fw-bold text-dark">Melhore o seu CV</h5>
-                        <p class="text-muted small">Receba dicas para tornar o seu currículo mais atraente para os
-                            recrutadores.</p>
+                        <h5 class="fw-bold text-dark">{{ __('site.home.cv_titulo') }}</h5>
+                        <p class="text-muted small">{{ __('site.home.cv_texto') }}</p>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="p-4 border rounded-3 h-100 bg-light-hover transition-all">
                         <i class="bi bi-bell text-primary fs-2 mb-3"></i>
-                        <h5 class="fw-bold text-dark">Alertas de Vagas</h5>
-                        <p class="text-muted small">Seja notificado assim que novas vagas compatíveis com seu perfil forem
-                            publicadas.</p>
+                        <h5 class="fw-bold text-dark">{{ __('site.home.alertas_titulo') }}</h5>
+                        <p class="text-muted small">{{ __('site.home.alertas_texto') }}</p>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="p-4 border rounded-3 h-100 bg-light-hover transition-all">
                         <i class="bi bi-mortarboard text-primary fs-2 mb-3"></i>
-                        <h5 class="fw-bold text-dark">Desenvolvimento</h5>
-                        <p class="text-muted small">Aceda aos nossos cursos gratuitos e desenvolva novas competências.</p>
-                        <a href="{{ route('courses.index') }}" class="small fw-bold text-primary text-decoration-none">Ver
-                            Cursos <i class="bi bi-arrow-right"></i></a>
+                        <h5 class="fw-bold text-dark">{{ __('site.home.formacao_titulo') }}</h5>
+                        <p class="text-muted small">{{ __('site.home.formacao_texto') }}</p>
+                        <a href="{{ route('courses.index') }}" class="small fw-bold text-primary text-decoration-none">{{ __('site.home.ver_cursos') }} <i class="bi bi-arrow-right"></i></a>
                     </div>
                 </div>
             </div>
@@ -319,8 +309,8 @@
 
         <!-- Section Title -->
         <div class="container section-title mb-5 text-center">
-            <h2 class="fw-bold text-dark">Destaques</h2>
-            <p class="text-muted">As vagas mais recentes em Angola</p>
+            <h2 class="fw-bold text-dark">{{ __('site.home.destaques') }}</h2>
+            <p class="text-muted">{{ __('site.home.destaques_subtitulo') }}</p>
         </div><!-- End Section Title -->
 
         <div class="container">
@@ -336,7 +326,7 @@
                                     <div class="d-flex justify-content-between align-items-start mb-3">
                                         <h5 class="card-title fw-bold text-dark mb-0">{{ $job->title }}</h5>
                                         @if($loop->iteration <= 3)
-                                            <span class="badge bg-success bg-opacity-10 text-success rounded-pill small">Novo</span>
+                                            <span class="badge bg-success bg-opacity-10 text-success rounded-pill small">{{ __('site.home.novo') }}</span>
                                         @endif
                                     </div>
                                     <h6 class="card-subtitle mb-3 text-muted small"><i class="bi bi-building me-1"></i>
@@ -344,15 +334,14 @@
                                     <div class="mb-3">
                                         <span class="badge bg-light text-dark border me-1"><i class="bi bi-geo-alt me-1"></i>
                                             {{ $job->location }}</span>
-                                        <span class="badge bg-light text-dark border"><i class="bi bi-clock me-1"></i>
-                                            Integral</span>
+                                        <span class="badge bg-light text-dark border"><i class="bi bi-clock me-1"></i> {{ __('site.vagas.integral') }}</span>
                                     </div>
                                     <p class="card-text text-muted small description-truncate">
                                         {!! \Illuminate\Support\Str::limit(strip_tags($job->description), 100, $end = '...') !!}
                                     </p>
                                 </div>
                                 <div class="card-footer bg-white border-0 pt-0 text-muted small">
-                                    Publicado em {{ date_format(new DateTime($job->created_at), 'd-m-Y') }}
+                                    {{ __('site.home.publicado_em', ['data' => date_format(new DateTime($job->created_at), 'd-m-Y')]) }}
                                 </div>
                             </div>
                         </a>
@@ -360,8 +349,7 @@
                 @endforeach
 
                 <div class="col-12 text-center mt-5">
-                    <a href="{{url('/vagas')}}" class="btn btn-primary btn-lg fw-bold px-5 rounded-pill">Ver Todas as
-                        Vagas</a>
+                    <a href="{{url('/vagas')}}" class="btn btn-primary btn-lg fw-bold px-5 rounded-pill">{{ __('site.home.ver_todas_vagas') }}</a>
                 </div>
 
             </div>
@@ -373,8 +361,8 @@
     <!-- Recent Articles Section -->
     <section id="blog" class="blog section py-5 bg-light">
         <div class="container section-title mb-5 text-center">
-            <h2 class="fw-bold text-dark">Últimas Notícias</h2>
-            <p class="text-muted">Notícias e dicas de carreira para impulsionar o seu sucesso</p>
+            <h2 class="fw-bold text-dark">{{ __('site.home.noticias') }}</h2>
+            <p class="text-muted">{{ __('site.home.noticias_subtitulo') }}</p>
         </div>
         <div class="container">
             <div class="row gy-4">
@@ -402,8 +390,7 @@
                                     </p>
                                 </div>
                                 <div class="card-footer bg-white border-0 px-4 pb-4 pt-0">
-                                    <span class="text-primary fw-bold small">Ler mais <i
-                                            class="bi bi-arrow-right ms-1"></i></span>
+                                    <span class="text-primary fw-bold small">{{ __('site.home.ler_mais') }} <i class="bi bi-arrow-right ms-1"></i></span>
                                 </div>
                             </a>
                         </article>
@@ -411,8 +398,7 @@
                 @endforeach
 
                 <div class="col-12 text-center mt-5">
-                    <a href="{{url('/noticias')}}" class="btn btn-outline-primary btn-lg fw-bold px-5 rounded-pill">Ver Mais
-                        Notícias</a>
+                    <a href="{{url('/noticias')}}" class="btn btn-outline-primary btn-lg fw-bold px-5 rounded-pill">{{ __('site.home.ver_mais_noticias') }}</a>
                 </div>
             </div>
         </div>

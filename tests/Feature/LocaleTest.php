@@ -98,6 +98,67 @@ class LocaleTest extends TestCase
         $this->get(route('recruiters.index'))->assertSee('Empresas e Recrutadores');
     }
 
+    public function test_the_home_page_translates()
+    {
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('Somos o maior portal de empregos em Angola')
+            ->assertSee('Pesquisar Vagas')
+            ->assertSee('Últimas Notícias')
+            ->assertSee('Junte-se à nossa Comunidade!');
+
+        $this->get(route('locale.switch', 'en'));
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('The largest jobs portal in Angola')
+            ->assertSee('Search jobs')
+            ->assertSee('Latest news')
+            ->assertSee('Join our community!')
+            ->assertDontSee('Últimas Notícias');
+    }
+
+    public function test_the_jobs_listing_translates()
+    {
+        $this->get('/vagas')
+            ->assertOk()
+            ->assertSee('Explore as melhores oportunidades de carreira em Angola.')
+            ->assertSee('Filtrar Vagas')
+            ->assertSee('Principais Empresas');
+
+        $this->get(route('locale.switch', 'en'));
+
+        $this->get('/vagas')
+            ->assertOk()
+            ->assertSee('Explore the best career opportunities in Angola.')
+            ->assertSee('Filter jobs')
+            ->assertSee('Top employers')
+            ->assertDontSee('Filtrar Vagas');
+    }
+
+    /**
+     * Uma chave em falta rende como o próprio nome da chave ("site.home.novo"),
+     * que passa despercebido numa página cheia. Nas páginas que já traduzimos,
+     * isso é um erro.
+     */
+    public function test_no_translation_key_leaks_into_the_page()
+    {
+        foreach (['pt', 'en'] as $idioma) {
+            $this->get(route('locale.switch', $idioma));
+
+            foreach (['/', '/vagas', route('recruiters.index'), route('cv-analyzer.index')] as $pagina) {
+                $this->get($pagina)
+                    ->assertOk()
+                    ->assertDontSee('site.home.')
+                    ->assertDontSee('site.vagas.')
+                    ->assertDontSee('site.nav.')
+                    ->assertDontSee('site.footer.')
+                    ->assertDontSee('site.analisador.')
+                    ->assertDontSee('site.recrutadores.');
+            }
+        }
+    }
+
     public function test_every_key_exists_in_both_languages()
     {
         $pt = $this->achatar(require lang_path('pt/site.php'));

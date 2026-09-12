@@ -196,6 +196,71 @@ class LocaleTest extends TestCase
             ->assertSee('attach up to <strong>3</strong> files (', false);
     }
 
+    public function test_the_sign_in_and_sign_up_pages_translate()
+    {
+        $this->get(route('login'))
+            ->assertOk()
+            ->assertSee('Bem-vindo de volta! Entre para continuar.')
+            ->assertSee('Esqueceu a senha?');
+
+        $this->get(route('register'))
+            ->assertOk()
+            ->assertSee('Junte-se à nossa comunidade de profissionais.')
+            ->assertSee('Nome Completo');
+
+        $this->get(route('locale.switch', 'en'));
+
+        $this->get(route('login'))
+            ->assertOk()
+            ->assertSee('Welcome back! Sign in to carry on.')
+            ->assertSee('Forgot your password?')
+            ->assertDontSee('Bem-vindo de volta');
+
+        $this->get(route('register'))
+            ->assertOk()
+            ->assertSee('Join our community of professionals.')
+            ->assertSee('Full name')
+            ->assertDontSee('Nome Completo');
+    }
+
+    public function test_the_company_and_password_pages_translate()
+    {
+        $this->get(route('register.company'))
+            ->assertOk()
+            ->assertSee('Identidade visual da página')
+            ->assertSee('Foto de capa');
+
+        $this->get(route('password.request'))
+            ->assertOk()
+            ->assertSee('Voltar ao login');
+
+        $this->get(route('locale.switch', 'en'));
+
+        $this->get(route('register.company'))
+            ->assertOk()
+            ->assertSee('Look of your page')
+            ->assertSee('Cover photo')
+            ->assertDontSee('Foto de capa');
+
+        $this->get(route('password.request'))
+            ->assertOk()
+            ->assertSee('Back to sign in')
+            ->assertDontSee('Voltar ao login');
+    }
+
+    /**
+     * Os erros de validação vêm do Laravel, não das nossas traduções. Com o
+     * idioma por omissão a passar para 'pt' era preciso lang/pt/validation.php,
+     * sem o qual o formulário respondia em inglês a quem o preencheu em
+     * português.
+     */
+    public function test_validation_errors_come_back_in_portuguese()
+    {
+        $this->from(route('register'))
+            ->post(route('register'), ['email' => 'nao-e-um-email'])
+            ->assertSessionHasErrors(['email' => 'O campo email deve ser um email válido.']);
+    }
+
     /**
      * Uma chave em falta rende como o próprio nome da chave ("site.home.novo"),
      * que passa despercebido numa página cheia. Nas páginas que já traduzimos,
@@ -208,6 +273,10 @@ class LocaleTest extends TestCase
 
             $paginas = ['/', '/vagas', route('recruiters.index'), route('cv-analyzer.index')];
             $paginas[] = '/vagas/' . Job::factory()->create()->slug;
+            $paginas[] = route('login');
+            $paginas[] = route('register');
+            $paginas[] = route('register.company');
+            $paginas[] = route('password.request');
 
             foreach ($paginas as $pagina) {
                 $this->get($pagina)
@@ -218,6 +287,7 @@ class LocaleTest extends TestCase
                     ->assertDontSee('site.footer.')
                     ->assertDontSee('site.analisador.')
                     ->assertDontSee('site.vaga.')
+                    ->assertDontSee('site.auth.')
                     ->assertDontSee('site.recrutadores.');
             }
         }

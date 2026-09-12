@@ -110,6 +110,27 @@ return [
         'ver_todas' => 'See all jobs',
     ],
 
+    'vaga' => [
+        'inicio' => 'Home',
+        'candidatar' => 'Apply',
+        'imprimir' => 'Print',
+        'descricao' => 'Job description',
+        'enviar_candidatura' => 'Send your application',
+        'anexos_ajuda' => 'Fill in the subject and the message, and attach up to <strong>:count</strong> file (PDF, DOC or DOCX, 5 MB each at most).|Fill in the subject and the message, and attach up to <strong>:count</strong> files (PDF, DOC or DOCX, 5 MB each at most).',
+        'nome' => 'Name',
+        'email' => 'Email',
+        'telefone' => 'Phone',
+        'assunto' => 'Subject',
+        'assunto_predefinido' => 'Application — :vaga',
+        'mensagem' => 'Message',
+        'anexos' => 'Attachments',
+        'anexo_obrigatorio' => 'Required (CV)',
+        'anexo_opcional' => 'Optional (certificate, cover letter, etc.)',
+        'partilhar' => 'Share:',
+        'categorias' => 'Categories',
+        'vagas_recentes' => 'Recent jobs',
+    ],
+
     'recrutadores' => [
         'titulo' => 'Companies & Recruiters',
         'intro' => 'Everything you need to hire, in one place: build your company page, see who else is posting jobs, and analyse the CVs you have received.',

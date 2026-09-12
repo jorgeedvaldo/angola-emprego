@@ -46,12 +46,12 @@
     "itemListElement": [{
       "@type": "ListItem",
       "position": 1,
-      "name": "Início",
+      "name": "{{ __('site.vaga.inicio') }}",
       "item": "{{ url('/') }}"
     },{
       "@type": "ListItem",
       "position": 2,
-      "name": "Vagas",
+      "name": "{{ __('site.nav.vagas') }}",
       "item": "{{ url('/vagas') }}"
     },{
       "@type": "ListItem",
@@ -69,8 +69,8 @@
     <div class="container">
       <nav aria-label="breadcrumb">
         <ol class="breadcrumb mb-4">
-          <li class="breadcrumb-item"><a href="{{url('/')}}">Início</a></li>
-          <li class="breadcrumb-item"><a href="{{url('/vagas')}}">Vagas</a></li>
+          <li class="breadcrumb-item"><a href="{{url('/')}}">{{ __('site.vaga.inicio') }}</a></li>
+          <li class="breadcrumb-item"><a href="{{url('/vagas')}}">{{ __('site.nav.vagas') }}</a></li>
           <li class="breadcrumb-item active" aria-current="page">{{$job->title}}</li>
         </ol>
       </nav>
@@ -96,19 +96,18 @@
           <div class="col-lg-3 text-lg-end">
             @if($job->acceptsOnlineApplications())
               <a href="#candidatura" class="btn btn-primary fw-bold py-2 px-4 rounded-pill">
-                <i class="bi bi-send-fill me-2"></i> Candidatar-se
+                <i class="bi bi-send-fill me-2"></i> {{ __('site.vaga.candidatar') }}
               </a>
             @elseif(filter_var($job->email_or_link, FILTER_VALIDATE_EMAIL))
               <a href="mailto:{{ $job->email_or_link }}" class="btn btn-primary fw-bold py-2 px-4 rounded-pill">
-                <i class="bi bi-envelope-fill me-2"></i> Candidatar-se
+                <i class="bi bi-envelope-fill me-2"></i> {{ __('site.vaga.candidatar') }}
               </a>
             @else
               <a href="{{ $job->email_or_link }}" target="_blank" class="btn btn-primary fw-bold py-2 px-4 rounded-pill">
-                <i class="bi bi-box-arrow-up-right me-2"></i> Candidatar-se
+                <i class="bi bi-box-arrow-up-right me-2"></i> {{ __('site.vaga.candidatar') }}
               </a>
             @endif
-            <button class="btn btn-outline-secondary rounded-pill m-3" onclick="window.print()"><i
-                class="bi bi-printer me-1"></i> Imprimir</button>
+            <button class="btn btn-outline-secondary rounded-pill m-3" onclick="window.print()"><i class="bi bi-printer me-1"></i> {{ __('site.vaga.imprimir') }}</button>
           </div>
         </div>
       </div>
@@ -126,7 +125,7 @@
         <div class="col-lg-8">
 
           <div class="bg-white p-4 rounded-3 shadow-sm border mb-4">
-            <h4 class="fw-bold mb-4 border-bottom pb-2">Descrição da Vaga</h4>
+            <h4 class="fw-bold mb-4 border-bottom pb-2">{{ __('site.vaga.descricao') }}</h4>
             <div class="job-description text-dark" style="font-size: 1.05rem; line-height: 1.7;">
               {!!$job->description!!}
             </div>
@@ -137,12 +136,8 @@
             $maxAttachments = $job->companyRecord?->allowedAttachmentCount() ?? 1;
           @endphp
           <div id="candidatura" class="bg-white p-4 rounded-3 shadow-sm border mb-4">
-            <h4 class="fw-bold mb-3 border-bottom pb-2">Enviar candidatura</h4>
-            <p class="text-muted small">
-              Preencha o assunto, a mensagem e anexe até <strong>{{ $maxAttachments }}</strong>
-              {{ $maxAttachments === 1 ? 'ficheiro' : 'ficheiros' }}
-              (PDF, DOC ou DOCX, até 5 MB cada).
-            </p>
+            <h4 class="fw-bold mb-3 border-bottom pb-2">{{ __('site.vaga.enviar_candidatura') }}</h4>
+            <p class="text-muted small">{!! trans_choice('site.vaga.anexos_ajuda', $maxAttachments, ['count' => $maxAttachments]) !!}</p>
 
             @if(session('success'))
               <div class="alert alert-success">{{ session('success') }}</div>
@@ -155,31 +150,31 @@
               @csrf
               <div class="row g-3">
                 <div class="col-md-6">
-                  <label class="form-label fw-semibold">Nome</label>
+                  <label class="form-label fw-semibold">{{ __('site.vaga.nome') }}</label>
                   <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name', auth()->user()->name ?? '') }}" required>
                   @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
                 <div class="col-md-6">
-                  <label class="form-label fw-semibold">Email</label>
+                  <label class="form-label fw-semibold">{{ __('site.vaga.email') }}</label>
                   <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email', auth()->user()->email ?? '') }}" required>
                   @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
                 <div class="col-md-6">
-                  <label class="form-label fw-semibold">Telefone</label>
+                  <label class="form-label fw-semibold">{{ __('site.vaga.telefone') }}</label>
                   <input type="text" name="phone" class="form-control" value="{{ old('phone', auth()->user()->mobile ?? '') }}">
                 </div>
                 <div class="col-md-6">
-                  <label class="form-label fw-semibold">Assunto</label>
-                  <input type="text" name="subject" class="form-control @error('subject') is-invalid @enderror" value="{{ old('subject', 'Candidatura — ' . $job->title) }}" required>
+                  <label class="form-label fw-semibold">{{ __('site.vaga.assunto') }}</label>
+                  <input type="text" name="subject" class="form-control @error('subject') is-invalid @enderror" value="{{ old('subject', __('site.vaga.assunto_predefinido', ['vaga' => $job->title])) }}" required>
                   @error('subject')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
                 <div class="col-12">
-                  <label class="form-label fw-semibold">Mensagem</label>
+                  <label class="form-label fw-semibold">{{ __('site.vaga.mensagem') }}</label>
                   <textarea name="message" rows="5" class="form-control @error('message') is-invalid @enderror" required>{{ old('message') }}</textarea>
                   @error('message')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
                 <div class="col-12">
-                  <label class="form-label fw-semibold">Anexos</label>
+                  <label class="form-label fw-semibold">{{ __('site.vaga.anexos') }}</label>
                   @for($i = 0; $i < $maxAttachments; $i++)
                     <input type="file"
                       name="attachments[]"
@@ -187,7 +182,7 @@
                       accept=".pdf,.doc,.docx,application/pdf"
                       @if($i === 0) required @endif>
                     <small class="text-muted d-block mb-2">
-                      {{ $i === 0 ? 'Obrigatório (CV)' : 'Opcional (certificado, carta, etc.)' }}
+                      {{ $i === 0 ? __('site.vaga.anexo_obrigatorio') : __('site.vaga.anexo_opcional') }}
                     </small>
                   @endfor
                   @error('attachments')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
@@ -195,7 +190,7 @@
                 </div>
                 <div class="col-12">
                   <button type="submit" class="btn btn-primary fw-bold" style="background-color: #2557a7; border-color: #2557a7;">
-                    <i class="bi bi-send me-1"></i> Enviar candidatura
+                    <i class="bi bi-send me-1"></i> {{ __('site.vaga.enviar_candidatura') }}
                   </button>
                 </div>
               </div>
@@ -205,7 +200,7 @@
 
           <!-- Botões de compartilhamento -->
           <div class="bg-light p-3 rounded-3 mb-4 border">
-            <span class="fw-bold me-3">Partilhar:</span>
+            <span class="fw-bold me-3">{{ __('site.vaga.partilhar') }}</span>
             <a class="btn btn-sm btn-outline-primary me-1"
               href="https://www.facebook.com/sharer/sharer.php?u={{ url('/vagas/' . $job->slug) }}" target="_blank"><i
                 class="bi bi-facebook"></i></a>
@@ -248,7 +243,7 @@
           <div class="sticky-top" style="top: 100px;">
             <div class="card shadow-sm border-0 mb-4 rounded-3">
               <div class="card-header bg-white py-3 border-bottom-0">
-                <h5 class="fw-bold m-0 text-dark">Categorias</h5>
+                <h5 class="fw-bold m-0 text-dark">{{ __('site.vaga.categorias') }}</h5>
               </div>
               <div class="card-body">
                 <div class="d-flex flex-wrap gap-2">
@@ -262,7 +257,7 @@
 
             <div class="card shadow-sm border-0 rounded-3">
               <div class="card-header bg-white py-3 border-bottom-0">
-                <h5 class="fw-bold m-0 text-dark">Vagas Recentes</h5>
+                <h5 class="fw-bold m-0 text-dark">{{ __('site.vaga.vagas_recentes') }}</h5>
               </div>
               <div class="list-group list-group-flush">
                 @foreach($LastJobs as $item)

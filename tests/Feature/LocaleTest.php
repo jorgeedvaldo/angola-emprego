@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use App\Http\Middleware\SetLocale;
+use App\Models\Company;
+use App\Models\Job;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -136,6 +138,64 @@ class LocaleTest extends TestCase
             ->assertDontSee('Filtrar Vagas');
     }
 
+    public function test_the_job_detail_page_translates()
+    {
+        $vaga = Job::factory()->create(['title' => 'Técnico de Recursos Humanos']);
+
+        $this->get('/vagas/' . $vaga->slug)
+            ->assertOk()
+            ->assertSee('Descrição da Vaga')
+            ->assertSee('Candidatar-se')
+            ->assertSee('Vagas Recentes')
+            ->assertSee('Partilhar:');
+
+        $this->get(route('locale.switch', 'en'));
+
+        $this->get('/vagas/' . $vaga->slug)
+            ->assertOk()
+            ->assertSee('Job description')
+            ->assertSee('Apply')
+            ->assertSee('Recent jobs')
+            ->assertSee('Share:')
+            ->assertDontSee('Descrição da Vaga')
+            // O título da vaga é conteúdo do empregador: fica como foi escrito.
+            ->assertSee('Técnico de Recursos Humanos');
+    }
+
+    /**
+     * O texto dos anexos muda com o número permitido, e é o único sítio destas
+     * páginas onde o plural depende de um valor — em português e em inglês a
+     * regra é a mesma, mas é onde uma tradução se parte primeiro.
+     */
+    public function test_the_attachment_help_text_agrees_in_number()
+    {
+        $empresa = Company::factory()->create([
+            'approval_status' => 'approved',
+            'max_attachments' => 1,
+        ]);
+        $empresa->user->markEmailAsVerified();
+
+        $vaga = Job::factory()->create(['company_id' => $empresa->id]);
+
+        $this->get('/vagas/' . $vaga->slug)
+            ->assertOk()
+            ->assertSee('anexe até <strong>1</strong> ficheiro (', false)
+            ->assertDontSee('1</strong> ficheiros');
+
+        $empresa->update(['max_attachments' => 3]);
+        \Illuminate\Support\Facades\Cache::flush();
+
+        $this->get('/vagas/' . $vaga->slug)
+            ->assertOk()
+            ->assertSee('anexe até <strong>3</strong> ficheiros (', false);
+
+        $this->get(route('locale.switch', 'en'));
+
+        $this->get('/vagas/' . $vaga->slug)
+            ->assertOk()
+            ->assertSee('attach up to <strong>3</strong> files (', false);
+    }
+
     /**
      * Uma chave em falta rende como o próprio nome da chave ("site.home.novo"),
      * que passa despercebido numa página cheia. Nas páginas que já traduzimos,
@@ -146,7 +206,10 @@ class LocaleTest extends TestCase
         foreach (['pt', 'en'] as $idioma) {
             $this->get(route('locale.switch', $idioma));
 
-            foreach (['/', '/vagas', route('recruiters.index'), route('cv-analyzer.index')] as $pagina) {
+            $paginas = ['/', '/vagas', route('recruiters.index'), route('cv-analyzer.index')];
+            $paginas[] = '/vagas/' . Job::factory()->create()->slug;
+
+            foreach ($paginas as $pagina) {
                 $this->get($pagina)
                     ->assertOk()
                     ->assertDontSee('site.home.')
@@ -154,6 +217,7 @@ class LocaleTest extends TestCase
                     ->assertDontSee('site.nav.')
                     ->assertDontSee('site.footer.')
                     ->assertDontSee('site.analisador.')
+                    ->assertDontSee('site.vaga.')
                     ->assertDontSee('site.recrutadores.');
             }
         }

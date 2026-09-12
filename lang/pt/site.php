@@ -114,6 +114,29 @@ return [
         'ver_todas' => 'Ver Todas as Vagas',
     ],
 
+    'vaga' => [
+        'inicio' => 'Início',
+        'candidatar' => 'Candidatar-se',
+        'imprimir' => 'Imprimir',
+        'descricao' => 'Descrição da Vaga',
+        'enviar_candidatura' => 'Enviar candidatura',
+        // O :count vem de allowedAttachmentCount(), que é um inteiro entre 1 e 10;
+        // o <strong> obriga a render com {!! !!}, e não há aqui texto do utilizador.
+        'anexos_ajuda' => 'Preencha o assunto, a mensagem e anexe até <strong>:count</strong> ficheiro (PDF, DOC ou DOCX, até 5 MB cada).|Preencha o assunto, a mensagem e anexe até <strong>:count</strong> ficheiros (PDF, DOC ou DOCX, até 5 MB cada).',
+        'nome' => 'Nome',
+        'email' => 'Email',
+        'telefone' => 'Telefone',
+        'assunto' => 'Assunto',
+        'assunto_predefinido' => 'Candidatura — :vaga',
+        'mensagem' => 'Mensagem',
+        'anexos' => 'Anexos',
+        'anexo_obrigatorio' => 'Obrigatório (CV)',
+        'anexo_opcional' => 'Opcional (certificado, carta, etc.)',
+        'partilhar' => 'Partilhar:',
+        'categorias' => 'Categorias',
+        'vagas_recentes' => 'Vagas Recentes',
+    ],
+
     'recrutadores' => [
         'titulo' => 'Empresas e Recrutadores',
         'intro' => 'Tudo o que precisa para contratar num só sítio: criar a página da sua empresa, conhecer as empresas que já publicam vagas e analisar os CVs que recebeu.',

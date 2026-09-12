@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-AO">
+<html lang="{{ app()->getLocale() === 'pt' ? 'pt-AO' : app()->getLocale() }}">
 
 <head>
   <meta charset="utf-8">
@@ -289,34 +289,34 @@
       <nav id="navmenu" class="navmenu">
         <ul>
           <li><a href="{{url('/vagas')}}" class="{{ Request::is('vagas*') ? 'active' : '' }}"><i
-                class="bi bi-briefcase"></i> Vagas</a></li>
+                class="bi bi-briefcase"></i> {{ __('site.nav.vagas') }}</a></li>
           <li><a href="{{route('courses.index')}}" class="{{ Request::is('cursos*') ? 'active' : '' }}"><i
-                class="bi bi-journal-bookmark"></i> Cursos</a></li>
+                class="bi bi-journal-bookmark"></i> {{ __('site.nav.cursos') }}</a></li>
           <li><a href="{{url('/noticias')}}"
               class="{{ Request::is('noticias*') || Request::is('blog*') ? 'active' : '' }}"><i
-                class="bi bi-newspaper"></i> Notícias</a></li>
+                class="bi bi-newspaper"></i> {{ __('site.nav.noticias') }}</a></li>
           <li><a href="{{route('recruiters.index')}}"
               class="{{ Request::is('empresas*') || Request::is('company*') || Request::is('analisador-de-cv*') ? 'active' : '' }}"><i
-                class="bi bi-building"></i> Empresas e Recrutadores</a></li>
+                class="bi bi-building"></i> {{ __('site.nav.recrutadores') }}</a></li>
 
           <!-- Mobile Only Actions -->
-          <li class="d-xl-none"><a href="{{route('cv-analyzer.index')}}"><i class="bi bi-stars"></i> Analisar CVs</a></li>
+          <li class="d-xl-none"><a href="{{route('cv-analyzer.index')}}"><i class="bi bi-stars"></i> {{ __('site.nav.analisar_cvs') }}</a></li>
           @guest
-            <li class="d-xl-none"><a href="{{route('login')}}"><i class="bi bi-box-arrow-in-right"></i> Entrar</a></li>
-            <li class="d-xl-none"><a href="{{route('register')}}"><i class="bi bi-person-plus"></i> Criar Conta</a></li>
-            <li class="d-xl-none"><a href="{{route('register.company')}}"><i class="bi bi-building-add"></i> Sou empresa</a></li>
+            <li class="d-xl-none"><a href="{{route('login')}}"><i class="bi bi-box-arrow-in-right"></i> {{ __('site.nav.entrar') }}</a></li>
+            <li class="d-xl-none"><a href="{{route('register')}}"><i class="bi bi-person-plus"></i> {{ __('site.nav.criar_conta') }}</a></li>
+            <li class="d-xl-none"><a href="{{route('register.company')}}"><i class="bi bi-building-add"></i> {{ __('site.nav.sou_empresa') }}</a></li>
           @else
             @if(Auth::user()->isCompany())
-            <li class="d-xl-none"><a href="{{route('company.dashboard')}}"><i class="bi bi-building"></i> Painel Empresa</a></li>
+            <li class="d-xl-none"><a href="{{route('company.dashboard')}}"><i class="bi bi-building"></i> {{ __('site.nav.painel_empresa') }}</a></li>
             @else
-            <li class="d-xl-none"><a href="{{route('profile.show')}}"><i class="bi bi-person"></i> Meu Perfil</a></li>
-            <li class="d-xl-none"><a href="{{route('jobs.potential')}}"><i class="bi bi-stars"></i> Vagas Sugeridas</a>
+            <li class="d-xl-none"><a href="{{route('profile.show')}}"><i class="bi bi-person"></i> {{ __('site.nav.meu_perfil') }}</a></li>
+            <li class="d-xl-none"><a href="{{route('jobs.potential')}}"><i class="bi bi-stars"></i> {{ __('site.nav.vagas_sugeridas') }}</a>
             </li>
             @endif
             <li class="d-xl-none">
               <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
                 class="text-danger">
-                <i class="bi bi-box-arrow-right"></i> Sair
+                <i class="bi bi-box-arrow-right"></i> {{ __('site.nav.sair') }}
               </a>
             </li>
           @endguest
@@ -325,21 +325,21 @@
 
       <div class="header-actions">
         @guest
-          <a href="{{route('login')}}" class="btn-login d-none d-md-block">Entrar</a>
+          <a href="{{route('login')}}" class="btn-login d-none d-md-block">{{ __('site.nav.entrar') }}</a>
           <a href="{{route('register.company')}}" class="btn-create-cv d-none d-lg-flex" title="Para empresas">
-            <i class="bi bi-building"></i> Sou empresa
+            <i class="bi bi-building"></i> {{ __('site.nav.sou_empresa') }}
           </a>
           <a href="{{route('register')}}" class="btn-create-cv">
-            <i class="bi bi-person-plus"></i> Criar Conta
+            <i class="bi bi-person-plus"></i> {{ __('site.nav.criar_conta') }}
           </a>
         @else
           @if(Auth::user()->isCompany())
           <a href="{{route('company.dashboard')}}" class="btn-create-cv d-none d-md-flex" title="Painel da empresa">
-            <i class="bi bi-building"></i> Painel Empresa
+            <i class="bi bi-building"></i> {{ __('site.nav.painel_empresa') }}
           </a>
           @else
           <a href="{{route('profile.show')}}" class="btn-create-cv d-none d-md-flex" title="Ver Perfil">
-            <i class="bi bi-person-badge"></i> Meu Perfil
+            <i class="bi bi-person-badge"></i> {{ __('site.nav.meu_perfil') }}
           </a>
           @endif
 
@@ -360,25 +360,22 @@
                 <div class="text-muted small">{{ Auth::user()->email }}</div>
               </li>
               @if(Auth::user()->isCompany())
-              <li><a class="dropdown-item py-2" href="{{route('company.dashboard')}}"><i class="bi bi-building me-2"></i> Painel Empresa</a></li>
+              <li><a class="dropdown-item py-2" href="{{route('company.dashboard')}}"><i class="bi bi-building me-2"></i> {{ __('site.nav.painel_empresa') }}</a></li>
               @if(Auth::user()->company?->isPublic())
-              <li><a class="dropdown-item py-2" href="{{ url('/company/' . Auth::user()->company->slug) }}"><i class="bi bi-box-arrow-up-right me-2"></i> Ver página</a></li>
+              <li><a class="dropdown-item py-2" href="{{ url('/company/' . Auth::user()->company->slug) }}"><i class="bi bi-box-arrow-up-right me-2"></i> {{ __('site.nav.ver_pagina') }}</a></li>
               @endif
               @else
-              <li><a class="dropdown-item py-2" href="{{route('profile.show')}}"><i class="bi bi-person me-2"></i> Meu
-                  Perfil</a></li>
-              <li><a class="dropdown-item py-2" href="{{route('jobs.potential')}}"><i class="bi bi-stars me-2"></i> Vagas
-                  Sugeridas</a></li>
+              <li><a class="dropdown-item py-2" href="{{route('profile.show')}}"><i class="bi bi-person me-2"></i> {{ __('site.nav.meu_perfil') }}</a></li>
+              <li><a class="dropdown-item py-2" href="{{route('jobs.potential')}}"><i class="bi bi-stars me-2"></i> {{ __('site.nav.vagas_sugeridas') }}</a></li>
               @endif
-              <li><a class="dropdown-item py-2" href="{{route('cv-analyzer.index')}}"><i class="bi bi-stars me-2"></i>
-                  Analisar CVs</a></li>
+              <li><a class="dropdown-item py-2" href="{{route('cv-analyzer.index')}}"><i class="bi bi-stars me-2"></i> {{ __('site.nav.analisar_cvs') }}</a></li>
               <li>
                 <hr class="dropdown-divider">
               </li>
               <li>
                 <a class="dropdown-item py-2 text-danger" href="#"
                   onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                  <i class="bi bi-box-arrow-right me-2"></i> Sair
+                  <i class="bi bi-box-arrow-right me-2"></i> {{ __('site.nav.sair') }}
                 </a>
               </li>
             </ul>
@@ -409,45 +406,44 @@
               style="height: 48px; width: auto;">
           </a>
           <div class="footer-contact pt-3">
-            <p>Angola Emprego é o maior portal de emprego e notícias em Angola. Conectamos talentos às melhores
-              oportunidades em Angola.</p>
+            <p>{{ __('site.footer.sobre_o_site') }}</p>
             <p class="mt-3"><strong>Email:</strong> <span>geral@angolaemprego.com</span></p>
           </div>
         </div>
 
         <div class="col-lg-2 col-6 footer-links">
-          <h4>Links Úteis</h4>
+          <h4>{{ __('site.footer.links_uteis') }}</h4>
           <ul class="list-unstyled">
-            <li><a href="{{url('/')}}" class="text-decoration-none text-muted">Início</a></li>
-            <li><a href="{{url('/sobre')}}" class="text-decoration-none text-muted">Sobre</a></li>
-            <li><a href="{{url('/vagas')}}" class="text-decoration-none text-muted">Vagas</a></li>
-            <li><a href="{{route('companies.index')}}" class="text-decoration-none text-muted">Empresas</a></li>
-            <li><a href="{{route('recruiters.index')}}" class="text-decoration-none text-muted">Empresas e Recrutadores</a></li>
-            <li><a href="{{route('courses.index')}}" class="text-decoration-none text-muted">Cursos</a></li>
-            <li><a href="{{url('/noticias')}}" class="text-decoration-none text-muted">Notícias</a></li>
+            <li><a href="{{url('/')}}" class="text-decoration-none text-muted">{{ __('site.footer.inicio') }}</a></li>
+            <li><a href="{{url('/sobre')}}" class="text-decoration-none text-muted">{{ __('site.footer.sobre') }}</a></li>
+            <li><a href="{{url('/vagas')}}" class="text-decoration-none text-muted">{{ __('site.nav.vagas') }}</a></li>
+            <li><a href="{{route('companies.index')}}" class="text-decoration-none text-muted">{{ __('site.footer.empresas') }}</a></li>
+            <li><a href="{{route('recruiters.index')}}" class="text-decoration-none text-muted">{{ __('site.nav.recrutadores') }}</a></li>
+            <li><a href="{{route('courses.index')}}" class="text-decoration-none text-muted">{{ __('site.nav.cursos') }}</a></li>
+            <li><a href="{{url('/noticias')}}" class="text-decoration-none text-muted">{{ __('site.nav.noticias') }}</a></li>
           </ul>
         </div>
 
         <div class="col-lg-2 col-6 footer-links">
-          <h4>Candidatos</h4>
+          <h4>{{ __('site.footer.candidatos') }}</h4>
           <ul class="list-unstyled">
             @guest
-              <li><a href="{{route('register')}}" class="text-decoration-none text-muted">Criar Conta</a></li>
-              <li><a href="{{route('login')}}" class="text-decoration-none text-muted">Entrar</a></li>
+              <li><a href="{{route('register')}}" class="text-decoration-none text-muted">{{ __('site.nav.criar_conta') }}</a></li>
+              <li><a href="{{route('login')}}" class="text-decoration-none text-muted">{{ __('site.nav.entrar') }}</a></li>
             @else
               @if(Auth::user()->isCompany())
-                <li><a href="{{route('company.dashboard')}}" class="text-decoration-none text-muted">Painel Empresa</a></li>
+                <li><a href="{{route('company.dashboard')}}" class="text-decoration-none text-muted">{{ __('site.nav.painel_empresa') }}</a></li>
               @else
-                <li><a href="{{route('profile.show')}}" class="text-decoration-none text-muted">Meu Perfil</a></li>
-                <li><a href="{{route('jobs.potential')}}" class="text-decoration-none text-muted">Vagas Sugeridas</a></li>
+                <li><a href="{{route('profile.show')}}" class="text-decoration-none text-muted">{{ __('site.nav.meu_perfil') }}</a></li>
+                <li><a href="{{route('jobs.potential')}}" class="text-decoration-none text-muted">{{ __('site.nav.vagas_sugeridas') }}</a></li>
               @endif
             @endguest
           </ul>
         </div>
 
         <div class="col-lg-3 col-md-12">
-          <h4>Siga-nos</h4>
-          <p>Fique por dentro das novidades</p>
+          <h4>{{ __('site.footer.siga_nos') }}</h4>
+          <p>{{ __('site.footer.novidades') }}</p>
           <div class="social-links d-flex mt-2">
             <a href="https://www.linkedin.com/company/angola-emprego/" target="_blank"
               class="d-flex align-items-center justify-content-center bg-white text-primary border rounded-circle"
@@ -462,9 +458,27 @@
       </div>
     </div>
 
-    <div class="container copyright text-center mt-4 pt-4 border-top">
-      <p>&copy; <span>Copyright</span> <strong class="px-1">Angola Emprego - Notícias e Emprego</strong> <span>Todos os
-          direitos reservados</span></p>
+    <div class="container copyright mt-4 pt-4 border-top">
+      <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
+        <p class="mb-0 text-center text-md-start">&copy; <span>Copyright</span> <strong class="px-1">Angola Emprego -
+            Notícias e Emprego</strong> <span>{{ __('site.footer.direitos') }}</span></p>
+
+        {{-- Selector de idioma. Cada idioma escreve-se no seu próprio nome: quem
+             não lê a língua em que a página está tem de conseguir reconhecer a
+             sua. O idioma actual não é uma ligação, para não parecer que clicar
+             nele faz alguma coisa. --}}
+        <nav class="language-switcher d-flex align-items-center gap-2" aria-label="{{ __('site.footer.idioma') }}">
+          <span class="small text-muted"><i class="bi bi-translate me-1"></i>{{ __('site.footer.idioma') }}:</span>
+          @foreach(\App\Http\Middleware\SetLocale::suportados() as $codigo => $idioma)
+            @if($codigo === app()->getLocale())
+              <span class="badge bg-white text-dark border" aria-current="true">{{ $idioma['bandeira'] }} {{ $idioma['nativo'] }}</span>
+            @else
+              <a href="{{ route('locale.switch', $codigo) }}" class="badge bg-light text-muted border text-decoration-none"
+                 hreflang="{{ $codigo }}" rel="alternate">{{ $idioma['bandeira'] }} {{ $idioma['nativo'] }}</a>
+            @endif
+          @endforeach
+        </nav>
+      </div>
     </div>
 
   </footer>

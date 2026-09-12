@@ -549,10 +549,10 @@
                             <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(route('profile.public', Auth::user()->username)) }}" target="_blank" class="btn btn-sm share-social-btn share-fb flex-fill">
                                 <i class="bi bi-facebook me-1"></i> Facebook
                             </a>
-                            <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ urlencode(route('profile.public', Auth::user()->username)) }}&title={{ urlencode('Perfil Profissional de ' . Auth::user()->name) }}" target="_blank" class="btn btn-sm share-social-btn share-li flex-fill">
+                            <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ urlencode(route('profile.public', Auth::user()->username)) }}&title={{ urlencode(__('site.perfil.partilhar_titulo', ['nome' => Auth::user()->name])) }}" target="_blank" class="btn btn-sm share-social-btn share-li flex-fill">
                                 <i class="bi bi-linkedin me-1"></i> LinkedIn
                             </a>
-                            <a href="https://api.whatsapp.com/send?text={{ urlencode('Veja o meu perfil profissional: ' . route('profile.public', Auth::user()->username)) }}" target="_blank" class="btn btn-sm share-social-btn share-wa flex-fill">
+                            <a href="https://api.whatsapp.com/send?text={{ urlencode(__('site.perfil.partilhar_texto') . ' ' . route('profile.public', Auth::user()->username)) }}" target="_blank" class="btn btn-sm share-social-btn share-wa flex-fill">
                                 <i class="bi bi-whatsapp me-1"></i> WhatsApp
                             </a>
                         </div>

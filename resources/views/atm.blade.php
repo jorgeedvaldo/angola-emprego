@@ -1,6 +1,6 @@
 @extends('templates.app')
-@section('title', 'ATMs com Dinheiro Disponível em Angola')
-@section('description', 'Encontre caixas automáticos (ATMs) com dinheiro disponível perto de si em Angola. Veja o estado e a localização dos ATMs em tempo real.')
+@section('title', __('site.atm.meta_titulo'))
+@section('description', __('site.atm.meta_descricao'))
 @section('canonical_link', url('/atm-com-dinheiro'))
 
 @section('content')
@@ -9,14 +9,14 @@
       <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-8">
-                 <h1 class="fw-bold mb-2 text-dark">Localizador de ATMs</h1>
-                 <p class="text-muted mb-0">Encontre caixas automáticos com dinheiro disponíveis em tempo real.</p>
+                 <h1 class="fw-bold mb-2 text-dark">{{ __('site.atm.titulo') }}</h1>
+                 <p class="text-muted mb-0">{{ __('site.atm.subtitulo') }}</p>
             </div>
             <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
                  <nav aria-label="breadcrumb">
                   <ol class="breadcrumb justify-content-lg-end mb-0">
-                    <li class="breadcrumb-item"><a href="{{url('/')}}">Início</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">ATMs</li>
+                    <li class="breadcrumb-item"><a href="{{url('/')}}">{{ __('site.atm.inicio') }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ __('site.atm.atms') }}</li>
                   </ol>
                 </nav>
             </div>
@@ -31,16 +31,16 @@
         <div class="bg-white p-4 rounded-3 shadow-sm border mb-5">
             <div class="row g-3">
                 <div class="col-lg-4">
-                    <label class="form-label small fw-bold text-muted">Pesquisar</label>
+                    <label class="form-label small fw-bold text-muted">{{ __('site.atm.pesquisar') }}</label>
                     <div class="input-group">
                         <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
-                        <input type="text" id="search-input" class="form-control border-start-0 bg-light" placeholder="Nome ou endereço...">
+                        <input type="text" id="search-input" class="form-control border-start-0 bg-light" placeholder="{{ __('site.atm.pesquisar_exemplo') }}">
                     </div>
                 </div>
                 <div class="col-lg-3">
-                    <label class="form-label small fw-bold text-muted">Província</label>
+                    <label class="form-label small fw-bold text-muted">{{ __('site.atm.provincia') }}</label>
                     <select class="form-select bg-light border-0" id="filter-province">
-                        <option value="all">Todas as Províncias</option>
+                        <option value="all">{{ __('site.atm.todas_provincias') }}</option>
                         <option value="Luanda" selected>Luanda</option>
                         <option value="Benguela">Benguela</option>
                         <option value="Huíla">Huíla</option>
@@ -50,17 +50,17 @@
                     </select>
                 </div>
                 <div class="col-lg-3">
-                    <label class="form-label small fw-bold text-muted">Estado</label>
+                    <label class="form-label small fw-bold text-muted">{{ __('site.atm.estado') }}</label>
                     <select class="form-select bg-light border-0" id="filter-status">
-                        <option value="all" selected>Todos os Estados</option>
-                        <option value="com-dinheiro">Com Dinheiro</option>
-                        <option value="sem-dinheiro">Sem Dinheiro</option>
-                        <option value="indisponivel">Indisponível</option>
+                        <option value="all" selected>{{ __('site.atm.todos_estados') }}</option>
+                        <option value="com-dinheiro">{{ __('site.atm.com_dinheiro') }}</option>
+                        <option value="sem-dinheiro">{{ __('site.atm.sem_dinheiro') }}</option>
+                        <option value="indisponivel">{{ __('site.atm.indisponivel') }}</option>
                     </select>
                 </div>
                  <div class="col-lg-2 d-flex align-items-end">
                     <button class="btn btn-outline-secondary w-100" id="clear-filters-btn">
-                        <i class="bi bi-x-circle me-1"></i> Limpar
+                        <i class="bi bi-x-circle me-1"></i> {{ __('site.atm.limpar') }}
                     </button>
                 </div>
             </div>
@@ -69,9 +69,9 @@
         <!-- Loader -->
         <div id="loader" class="text-center py-5">
             <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Carregando...</span>
+                <span class="visually-hidden">{{ __('site.atm.carregando') }}</span>
             </div>
-            <p class="mt-3 text-muted">A atualizar dados dos ATMs...</p>
+            <p class="mt-3 text-muted">{{ __('site.atm.a_actualizar') }}</p>
         </div>
 
         <!-- Error Message -->
@@ -79,7 +79,7 @@
 
         <!-- Results Info -->
         <div class="d-flex justify-content-between align-items-center mb-4">
-             <span id="results-count" class="badge bg-light text-dark border p-2">A carregar...</span>
+             <span id="results-count" class="badge bg-light text-dark border p-2">{{ __('site.atm.a_carregar') }}</span>
         </div>
 
         <!-- ATM Grid -->
@@ -90,8 +90,8 @@
         <!-- No Results -->
         <div id="no-results-message" class="text-center py-5 d-none">
             <i class="bi bi-geo-alt-fill display-1 text-muted opacity-25"></i>
-            <h5 class="mt-3 text-muted">Nenhum ATM encontrado</h5>
-            <p class="text-muted small">Tente ajustar os filtros de pesquisa.</p>
+            <h5 class="mt-3 text-muted">{{ __('site.atm.sem_resultados') }}</h5>
+            <p class="text-muted small">{{ __('site.atm.sem_resultados_dica') }}</p>
         </div>
 
       </div>
@@ -99,6 +99,21 @@
 
     <script>
         const apiUrl = 'https://services.empregosyoyota.net/api/proxy/atms';
+
+        // Textos vindos do servidor, no idioma escolhido pelo visitante: os cartões
+        // são montados aqui no browser, por isso as frases têm de viajar com a página.
+        @php
+            $textos = [
+                'com_dinheiro' => __('site.atm.com_dinheiro'),
+                'sem_dinheiro' => __('site.atm.sem_dinheiro'),
+                'fora_servico' => __('site.atm.fora_servico'),
+                'desconhecido' => __('site.atm.desconhecido'),
+                'encontrados' => __('site.atm.encontrados', ['count' => ':count']),
+                'sem_endereco' => __('site.atm.sem_endereco'),
+                'erro_carregar' => __('site.atm.erro_carregar'),
+            ];
+        @endphp
+        const textos = @json($textos);
 
         // Elements
         const loader = document.getElementById('loader');
@@ -115,23 +130,23 @@
 
         function getAtmStatusDetails(atm) {
             const statusCode = atm.atmStatus.code;
-            let description = 'Desconhecido';
+            let description = textos.desconhecido;
             let className = 'bg-secondary text-white';
             let icon = 'bi-question-circle';
 
             switch (statusCode) {
                 case 4: case 2: // Money Available
-                    description = 'Com Dinheiro';
+                    description = textos.com_dinheiro;
                     className = 'bg-success text-white';
                     icon = 'bi-cash-coin';
                     break;
                 case 3: case 1: // No Money
-                    description = 'Sem Dinheiro';
+                    description = textos.sem_dinheiro;
                     className = 'bg-warning text-dark';
                     icon = 'bi-x-circle';
                     break;
                 case 0: // Inactive
-                    description = 'Fora de Serviço';
+                    description = textos.fora_servico;
                     className = 'bg-danger text-white';
                     icon = 'bi-exclamation-triangle';
                     break;
@@ -141,7 +156,7 @@
 
         function renderAtms(atms) {
             atmResultsContainer.innerHTML = '';
-            resultsCountElement.textContent = `${atms.length} ATMs encontrados`;
+            resultsCountElement.textContent = textos.encontrados.replace(':count', atms.length);
 
             if (atms.length === 0) {
                 noResultsMessage.classList.remove('d-none');
@@ -170,7 +185,7 @@
                                     </span>
                                 </div>
                                 <p class="card-text text-muted small mb-0 bg-light p-2 rounded">
-                                    <i class="bi bi-signpost-2 me-1"></i> ${atm.street || 'Endereço não disponível'}
+                                    <i class="bi bi-signpost-2 me-1"></i> ${atm.street || textos.sem_endereco}
                                 </p>
                             </div>
                         </div>
@@ -205,7 +220,7 @@
         async function init() {
             try {
                 const res = await fetch(apiUrl);
-                if (!res.ok) throw new Error('Falha na conexão');
+                if (!res.ok) throw new Error(res.status);
                 const data = await res.json();
                 allAtms = data.data.atmList.atmList || [];
                 
@@ -213,7 +228,7 @@
                 filterAtms(); // Initial render
             } catch (err) {
                 loader.classList.add('d-none');
-                errorMessageDiv.textContent = 'Erro ao carregar ATMs. Tente novamente.';
+                errorMessageDiv.textContent = textos.erro_carregar;
                 errorMessageDiv.classList.remove('d-none');
             }
         }

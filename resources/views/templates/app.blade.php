@@ -407,7 +407,7 @@
           </a>
           <div class="footer-contact pt-3">
             <p>{{ __('site.footer.sobre_o_site') }}</p>
-            <p class="mt-3"><strong>Email:</strong> <span>geral@angolaemprego.com</span></p>
+            <p class="mt-3"><strong>{{ __('site.footer.email') }}</strong> <span>geral@angolaemprego.com</span></p>
           </div>
         </div>
 
@@ -460,7 +460,7 @@
 
     <div class="container copyright mt-4 pt-4 border-top">
       <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
-        <p class="mb-0 text-center text-md-start">&copy; <span>Copyright</span> <strong class="px-1">Angola Emprego -
+        <p class="mb-0 text-center text-md-start">&copy; <span>{{ __('site.footer.copyright') }}</span> <strong class="px-1">Angola Emprego -
             Notícias e Emprego</strong> <span>{{ __('site.footer.direitos') }}</span></p>
 
         {{-- Selector de idioma. Cada idioma escreve-se no seu próprio nome: quem

@@ -112,11 +112,11 @@
                                 <div style="height: 25%;"></div> 
                                 
                                 <div style="font-size: 1.5em; line-height: 1.5;">
-                                    Este certificado é concedido a <br>
+                                    {{ __('site.cursos.cert_concedido') }} <br>
                                     <span class="cert-name">{{ $user->name }}</span><br>
-                                    pela conclusão bem-sucedida do curso/programa<br>
+                                    {{ __('site.cursos.cert_conclusao') }}<br>
                                     <span class="cert-course">{{ $course->title }}</span><br>
-                                    em <span class="cert-date">{{ $completionDate->format('d/m/Y') }}</span>.
+                                    {{ __('site.cursos.cert_em') }} <span class="cert-date">{{ $completionDate->format('d/m/Y') }}</span>.
                                 </div>
 
                                 <div class="cert-footer">
@@ -127,12 +127,12 @@
 
                         <div class="d-flex flex-column flex-md-row justify-content-center gap-3">
                             <a href="{{ route('courses.show', $course->slug) }}" class="btn btn-outline-secondary rounded-pill">
-                                <i class="bi bi-info-circle me-2"></i> Ver Detalhes do Curso
+                                <i class="bi bi-info-circle me-2"></i> {{ __('site.cursos.ver_detalhes_curso') }}
                             </a>
                             @auth
                                 @if(Auth::id() === $user->id)
                                 <a href="{{ route('courses.certificate', $course->slug) }}" class="btn btn-primary rounded-pill fw-bold">
-                                    <i class="bi bi-download me-2"></i> Baixar PDF
+                                    <i class="bi bi-download me-2"></i> {{ __('site.cursos.baixar_pdf') }}
                                 </a>
 
                                 @php
@@ -149,7 +149,7 @@
                                 @endphp
 
                                 <a href="{{ $linkedinButtonUrl }}" target="_blank" class="btn btn-primary rounded-pill fw-bold" style="background-color: #0077b5; border-color: #0077b5;">
-                                    <i class="bi bi-linkedin me-2"></i> Adicionar ao LinkedIn
+                                    <i class="bi bi-linkedin me-2"></i> {{ __('site.cursos.adicionar_linkedin') }}
                                 </a>
                                 @endif
                             @endauth
@@ -160,7 +160,7 @@
                             <div class="input-group mb-3 mx-auto" style="max-width: 600px;">
                                 <input type="text" class="form-control" value="{{ route('certificates.verify', ['user' => $user->id, 'course' => $course->slug]) }}" id="verifyLink" readonly>
                                 <button class="btn btn-outline-primary" type="button" onclick="copyLink()">
-                                    <i class="bi bi-clipboard"></i> Copiar
+                                    <i class="bi bi-clipboard"></i> {{ __('site.cursos.copiar') }}
                                 </button>
                             </div>
                         </div>

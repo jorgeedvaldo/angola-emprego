@@ -566,6 +566,9 @@ class LocaleTest extends TestCase
             $paginas[] = route('courses.index');
             $paginas[] = '/noticias';
             $paginas[] = route('companies.index');
+            $paginas[] = route('sobre');
+            $paginas[] = route('cv-analysis.info');
+            $paginas[] = '/atm-com-dinheiro';
 
             foreach ($paginas as $pagina) {
                 $this->get($pagina)
@@ -584,9 +587,102 @@ class LocaleTest extends TestCase
                     ->assertDontSee('site.noticias.')
                     ->assertDontSee('site.empresas.')
                     ->assertDontSee('site.perfil.')
-                    ->assertDontSee('site.recrutadores.');
+                    ->assertDontSee('site.recrutadores.')
+                    ->assertDontSee('site.sobre.')
+                    ->assertDontSee('site.ia_info.')
+                    ->assertDontSee('site.atm.');
             }
         }
+    }
+
+    public function test_the_about_page_follows_the_chosen_language()
+    {
+        $this->get(route('sobre'))
+            ->assertOk()
+            ->assertSee('Nossa História')
+            ->assertSee('Perguntas Frequentes');
+
+        $this->get(route('locale.switch', 'en'));
+
+        $this->get(route('sobre'))
+            ->assertOk()
+            ->assertSee('Our story')
+            ->assertSee('Frequently asked questions')
+            ->assertDontSee('Nossa História');
+    }
+
+    public function test_the_cv_analysis_explainer_follows_the_chosen_language()
+    {
+        $this->get(route('cv-analysis.info'))
+            ->assertOk()
+            ->assertSee('Passo a passo');
+
+        $this->get(route('locale.switch', 'en'));
+
+        $this->get(route('cv-analysis.info'))
+            ->assertOk()
+            ->assertSee('Step by step')
+            ->assertDontSee('Passo a passo');
+    }
+
+    /**
+     * O localizador de ATMs monta os cartões no browser: as frases que o script
+     * usa viajam com a página, por isso têm de mudar de idioma como o resto.
+     */
+    public function test_the_atm_page_hands_its_javascript_the_chosen_language()
+    {
+        $this->get('/atm-com-dinheiro')
+            ->assertOk()
+            ->assertSee('Localizador de ATMs')
+            ->assertSee('ATMs encontrados', false);
+
+        $this->get(route('locale.switch', 'en'));
+
+        $this->get('/atm-com-dinheiro')
+            ->assertOk()
+            ->assertSee('ATM finder')
+            ->assertSee('ATMs found', false)
+            ->assertDontSee('Localizador de ATMs');
+    }
+
+    /**
+     * As páginas de erro são servidas pelo handler de excepções, fora do fluxo
+     * normal — vale a pena confirmar que ainda apanham o idioma da sessão.
+     */
+    public function test_the_not_found_page_follows_the_chosen_language()
+    {
+        $this->get('/uma-pagina-que-nao-existe')
+            ->assertNotFound()
+            ->assertSee('Página Não Encontrada');
+
+        $this->get(route('locale.switch', 'en'));
+
+        $this->get('/uma-pagina-que-nao-existe')
+            ->assertNotFound()
+            ->assertSee('Page not found')
+            ->assertDontSee('Página Não Encontrada');
+    }
+
+    public function test_the_verification_email_follows_the_chosen_language()
+    {
+        $utilizador = User::factory()->company()->create();
+
+        $portugues = view('emails.company-verification', [
+            'user' => $utilizador,
+            'url' => 'https://exemplo.test/confirmar',
+        ])->render();
+
+        $this->assertStringContainsString('Confirme o email da sua empresa', $portugues);
+
+        $this->app->setLocale('en');
+
+        $ingles = view('emails.company-verification', [
+            'user' => $utilizador,
+            'url' => 'https://exemplo.test/confirmar',
+        ])->render();
+
+        $this->assertStringContainsString('Confirm your company email', $ingles);
+        $this->assertStringNotContainsString('Confirme o email', $ingles);
     }
 
     public function test_every_key_exists_in_both_languages()

@@ -24,20 +24,20 @@
                         @endif
                     </div>
                     <div>
-                        <p class="company-eyebrow mb-2">Carreiras na {{ $company->name }}</p>
-                        <h1 class="display-5 fw-bold mb-3">{{ $company->headline ?: 'Faça parte da nossa equipa' }}</h1>
+                        <p class="company-eyebrow mb-2">{{ __('site.empresas.carreiras_em', ['empresa' => $company->name]) }}</p>
+                        <h1 class="display-5 fw-bold mb-3">{{ $company->headline ?: __('site.empresas.faca_parte') }}</h1>
                         <div class="d-flex flex-wrap gap-3 company-meta">
                             @if($company->location)
                                 <span><i class="bi bi-geo-alt"></i> {{ $company->location }}</span>
                             @endif
-                            <span><i class="bi bi-briefcase"></i> {{ $jobs->total() }} {{ $jobs->total() === 1 ? 'vaga aberta' : 'vagas abertas' }}</span>
+                            <span><i class="bi bi-briefcase"></i> {{ trans_choice('site.empresas.contagem_abertas', $jobs->total(), ['count' => $jobs->total()]) }}</span>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-lg-4 text-lg-end">
                 <a href="#vagas" class="btn btn-light btn-lg rounded-pill fw-bold px-4">
-                    Ver vagas abertas <i class="bi bi-arrow-down ms-1"></i>
+                    {{ __('site.empresas.ver_vagas_abertas') }} <i class="bi bi-arrow-down ms-1"></i>
                 </a>
             </div>
         </div>
@@ -49,12 +49,12 @@
         <div class="row gy-5">
             <div class="col-lg-8">
                 <p class="company-section-label mb-2">{{ __('site.empresas.quem_somos') }}</p>
-                <h2 class="fw-bold mb-4">Sobre a {{ $company->name }}</h2>
+                <h2 class="fw-bold mb-4">{{ __('site.empresas.sobre_a_empresa', ['empresa' => $company->name]) }}</h2>
                 <div class="company-about">
                     @if($company->description)
                         {!! nl2br(e($company->description)) !!}
                     @else
-                        <p class="text-muted">Conheça as oportunidades disponíveis e encontre o seu próximo desafio profissional na {{ $company->name }}.</p>
+                        <p class="text-muted">{{ __('site.empresas.sem_descricao', ['empresa' => $company->name]) }}</p>
                     @endif
                 </div>
             </div>

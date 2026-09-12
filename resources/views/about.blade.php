@@ -1,6 +1,6 @@
 @extends('templates.app')
-@section('title', 'Sobre Nós')
-@section('description', 'Conheça o Angola Emprego, o maior portal de emprego em Angola. Desde 2019 a conectar profissionais angolanos às melhores oportunidades de trabalho em Luanda e todo o país.')
+@section('title', __('site.sobre.meta_titulo'))
+@section('description', __('site.sobre.meta_descricao'))
 @section('canonical_link', url('/sobre'))
 
 @section('head-scripts')
@@ -10,24 +10,24 @@
   "@type": "FAQPage",
   "mainEntity": [{
     "@type": "Question",
-    "name": "O que é o Angola Emprego?",
+    "name": @json(__('site.sobre.faq1_pergunta')),
     "acceptedAnswer": {
       "@type": "Answer",
-      "text": "O Angola Emprego é um site dedicado a anúncios de vagas de emprego em Angola. Nosso objetivo é conectar candidatos a oportunidades de trabalho e ajudar empresas a divulgar suas vagas de forma gratuita."
+      "text": @json(__('site.sobre.faq1_resposta'))
     }
   },{
     "@type": "Question",
-    "name": "O Angola Emprego cobra para divulgar vagas?",
+    "name": @json(__('site.sobre.faq2_pergunta')),
     "acceptedAnswer": {
       "@type": "Answer",
-      "text": "Não, o Angola Emprego não cobra para dar emprego ou para publicar vagas. Nosso serviço é totalmente gratuito."
+      "text": @json(__('site.sobre.faq2_resposta'))
     }
   },{
     "@type": "Question",
-    "name": "As vagas publicadas pertencem ao Angola Emprego?",
+    "name": @json(__('site.sobre.faq3_pergunta')),
     "acceptedAnswer": {
       "@type": "Answer",
-      "text": "Não, somos apenas uma plataforma que divulga oportunidades oferecidas por empresas e recrutadores terceiros."
+      "text": @json(__('site.sobre.faq3_resposta'))
     }
   }]
 }
@@ -38,8 +38,8 @@
     <!-- Page Header -->
     <div class="bg-light py-5">
       <div class="container text-center">
-         <h1 class="fw-bold mb-3 text-dark">Sobre Nós</h1>
-         <p class="text-muted mx-auto" style="max-width: 600px;">Conheça a nossa história, missão e o que nos move a conectar milhares de profissionais às melhores oportunidades em Angola.</p>
+         <h1 class="fw-bold mb-3 text-dark">{{ __('site.sobre.titulo') }}</h1>
+         <p class="text-muted mx-auto" style="max-width: 600px;">{{ __('site.sobre.intro') }}</p>
       </div>
     </div>
 
@@ -49,18 +49,18 @@
         <div class="row align-items-center gy-5">
           <div class="col-lg-6">
              <div class="pe-lg-5">
-                <span class="text-primary fw-bold text-uppercase small">Nossa História</span>
-                <h2 class="fw-bold text-dark mt-2 mb-4">O Maior portal de emprego em Angola</h2>
+                <span class="text-primary fw-bold text-uppercase small">{{ __('site.sobre.historia') }}</span>
+                <h2 class="fw-bold text-dark mt-2 mb-4">{{ __('site.sobre.historia_titulo') }}</h2>
                 <p class="text-muted lead mb-4">
-                    Criado em 2019, o nosso portal tem ajudado muita gente a sair do desemprego.
+                    {{ __('site.sobre.historia_subtitulo') }}
                 </p>
                 <p class="text-muted mb-4">
-                    Angola Emprego é o maior portal de emprego em Angola, comprometido em ajudar milhares de angolanos a encontrar as melhores oportunidades de trabalho diariamente. Nossa missão é ser a ponte entre os candidatos em busca de emprego e as empresas que desejam contratar os melhores talentos.
+                    {{ __('site.sobre.historia_texto') }}
                 </p>
                 
-                <h4 class="fw-bold text-dark mb-3">Nossa Missão</h4>
+                <h4 class="fw-bold text-dark mb-3">{{ __('site.sobre.missao') }}</h4>
                 <p class="text-muted mb-4">
-                    Nosso objetivo é fornecer uma plataforma abrangente e fácil de usar, onde os candidatos possam acessar as melhores vagas de emprego disponíveis no mercado angolano. Estamos dedicados a ajudar os angolanos a alcançar seus objetivos profissionais e a construir carreiras de sucesso.
+                    {{ __('site.sobre.missao_texto') }}
                 </p>
              </div>
           </div>
@@ -68,7 +68,7 @@
             <div class="position-relative">
                 <img src="{{asset('assets/img/about.jpg')}}" alt="About" class="img-fluid rounded-3 shadow-lg w-100">
                 <div class="position-absolute bottom-0 start-0 p-4 bg-primary text-white rounded-end m-4 d-none d-lg-block" style="max-width: 300px;">
-                    <p class="mb-0 fw-bold">"Conectando sonhos a oportunidades reais em todo o país."</p>
+                    <p class="mb-0 fw-bold">{{ __('site.sobre.citacao') }}</p>
                 </div>
             </div>
           </div>
@@ -76,27 +76,27 @@
         
         <div class="row mt-5 pt-5">
             <div class="col-12 text-center mb-5">
-                <h2 class="fw-bold">O Que Oferecemos</h2>
+                <h2 class="fw-bold">{{ __('site.sobre.oferecemos') }}</h2>
             </div>
             <div class="col-md-4 mb-4">
                 <div class="p-4 border rounded-3 h-100 bg-light">
                     <i class="bi bi-briefcase text-primary fs-1 mb-3"></i>
-                    <h5 class="fw-bold">Vagas Atualizadas</h5>
-                    <p class="text-muted small">Mantemos nosso portal atualizado com as mais recentes ofertas de emprego em diversas áreas e setores.</p>
+                    <h5 class="fw-bold">{{ __('site.sobre.vagas_titulo') }}</h5>
+                    <p class="text-muted small">{{ __('site.sobre.vagas_texto') }}</p>
                 </div>
             </div>
             <div class="col-md-4 mb-4">
                 <div class="p-4 border rounded-3 h-100 bg-light">
                     <i class="bi bi-search text-primary fs-1 mb-3"></i>
-                    <h5 class="fw-bold">Busca Avançada</h5>
-                    <p class="text-muted small">Filtre as vagas por localização, setor e nível de experiência para encontrar a vaga ideal.</p>
+                    <h5 class="fw-bold">{{ __('site.sobre.busca_titulo') }}</h5>
+                    <p class="text-muted small">{{ __('site.sobre.busca_texto') }}</p>
                 </div>
             </div>
             <div class="col-md-4 mb-4">
                 <div class="p-4 border rounded-3 h-100 bg-light">
                     <i class="bi bi-lightbulb text-primary fs-1 mb-3"></i>
-                    <h5 class="fw-bold">Dicas de Carreira</h5>
-                    <p class="text-muted small">Recursos, conselhos sobre entrevistas e orientações para elaboração de currículos eficazes.</p>
+                    <h5 class="fw-bold">{{ __('site.sobre.dicas_titulo') }}</h5>
+                    <p class="text-muted small">{{ __('site.sobre.dicas_texto') }}</p>
                 </div>
             </div>
         </div>
@@ -107,8 +107,8 @@
     <section class="section py-5 bg-light">
         <div class="container">
             <div class="text-center mb-5">
-                <h2 class="fw-bold text-dark">Perguntas Frequentes</h2>
-                <p class="text-muted">Tire suas dúvidas sobre o funcionamento do portal.</p>
+                <h2 class="fw-bold text-dark">{{ __('site.sobre.faq') }}</h2>
+                <p class="text-muted">{{ __('site.sobre.faq_intro') }}</p>
             </div>
             
             <div class="row justify-content-center">
@@ -117,33 +117,33 @@
                         <div class="accordion-item border mb-3 rounded shadow-sm overflow-hidden">
                             <h2 class="accordion-header">
                                 <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
-                                    O que é o Angola Emprego?
+                                    {{ __('site.sobre.faq1_pergunta') }}
                                 </button>
                             </h2>
                             <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body text-muted">O Angola Emprego é um site dedicado a anúncios de vagas de emprego em Angola. Nosso objetivo é conectar candidatos a oportunidades de trabalho e ajudar empresas a divulgar suas vagas de forma gratuita.</div>
+                                <div class="accordion-body text-muted">{{ __('site.sobre.faq1_resposta') }}</div>
                             </div>
                         </div>
                         
                         <div class="accordion-item border mb-3 rounded shadow-sm overflow-hidden">
                             <h2 class="accordion-header">
                                 <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
-                                    O Angola Emprego cobra para divulgar vagas?
+                                    {{ __('site.sobre.faq2_pergunta') }}
                                 </button>
                             </h2>
                             <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body text-muted">Não, o Angola Emprego não cobra para dar emprego ou para publicar vagas. Nosso serviço é totalmente gratuito.</div>
+                                <div class="accordion-body text-muted">{{ __('site.sobre.faq2_resposta') }}</div>
                             </div>
                         </div>
                         
                          <div class="accordion-item border mb-3 rounded shadow-sm overflow-hidden">
                             <h2 class="accordion-header">
                                 <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
-                                    As vagas publicadas pertencem ao Angola Emprego?
+                                    {{ __('site.sobre.faq3_pergunta') }}
                                 </button>
                             </h2>
                             <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body text-muted">Não, somos apenas uma plataforma que divulga oportunidades oferecidas por empresas e recrutadores terceiros.</div>
+                                <div class="accordion-body text-muted">{{ __('site.sobre.faq3_resposta') }}</div>
                             </div>
                         </div>
                     </div>
@@ -157,8 +157,8 @@
         <div class="container">
            <div class="row justify-content-center mb-5">
              <div class="col-lg-8 text-center">
-                <h2 class="fw-bold">Contactos</h2>
-                <p class="text-muted">Estamos aqui para ajudar. Entre em contacto connosco.</p>
+                <h2 class="fw-bold">{{ __('site.sobre.contactos') }}</h2>
+                <p class="text-muted">{{ __('site.sobre.contactos_intro') }}</p>
              </div>
            </div>
            
@@ -166,15 +166,15 @@
              <div class="col-lg-4">
                  <div class="text-center p-4 border rounded-3 h-100 shadow-sm">
                      <i class="bi bi-envelope fs-2 text-primary mb-3 d-block"></i>
-                     <h4 class="fw-bold">Email</h4>
+                     <h4 class="fw-bold">{{ __('site.sobre.email') }}</h4>
                      <p class="text-muted">geral@angolaemprego.com</p>
                  </div>
              </div>
              <div class="col-lg-4">
                  <div class="text-center p-4 border rounded-3 h-100 shadow-sm">
                      <i class="bi bi-geo-alt fs-2 text-primary mb-3 d-block"></i>
-                     <h4 class="fw-bold">Endereço</h4>
-                     <p class="text-muted">Luanda, Maianga, Rua Nkwame Nkrumah</p>
+                     <h4 class="fw-bold">{{ __('site.sobre.endereco') }}</h4>
+                     <p class="text-muted">{{ __('site.sobre.morada') }}</p>
                  </div>
              </div>
            </div>

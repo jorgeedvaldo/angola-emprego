@@ -110,7 +110,7 @@
                                 $percent = $totalLessons > 0 ? ($completedCount / $totalLessons) * 100 : 0;
                             @endphp
                             <div class="d-flex justify-content-between mb-2">
-                                <span class="small fw-bold text-muted">{{ $completedCount }} de {{ $totalLessons }} aulas</span>
+                                <span class="small fw-bold text-muted">{{ __('site.cursos.aulas_concluidas', ['feitas' => $completedCount, 'total' => $totalLessons]) }}</span>
                                 <span class="small fw-bold text-primary">{{ round($percent) }}%</span>
                             </div>
                             <div class="progress mb-4" style="height: 10px; border-radius: 5px;">

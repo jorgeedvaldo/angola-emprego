@@ -33,10 +33,10 @@
                     <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(route('profile.public', $user->username)) }}" target="_blank" class="btn share-btn share-facebook" title="{{ __('site.perfil.partilhar_facebook') }}">
                         <i class="bi bi-facebook"></i>
                     </a>
-                    <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ urlencode(route('profile.public', $user->username)) }}&title={{ urlencode('Perfil Profissional de ' . $user->name) }}" target="_blank" class="btn share-btn share-linkedin" title="{{ __('site.perfil.partilhar_linkedin') }}">
+                    <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ urlencode(route('profile.public', $user->username)) }}&title={{ urlencode(__('site.perfil.partilhar_titulo', ['nome' => $user->name])) }}" target="_blank" class="btn share-btn share-linkedin" title="{{ __('site.perfil.partilhar_linkedin') }}">
                         <i class="bi bi-linkedin"></i>
                     </a>
-                    <a href="https://api.whatsapp.com/send?text={{ urlencode('Veja o meu perfil profissional: ' . route('profile.public', $user->username)) }}" target="_blank" class="btn share-btn share-whatsapp" title="{{ __('site.perfil.partilhar_whatsapp') }}">
+                    <a href="https://api.whatsapp.com/send?text={{ urlencode(__('site.perfil.partilhar_texto') . ' ' . route('profile.public', $user->username)) }}" target="_blank" class="btn share-btn share-whatsapp" title="{{ __('site.perfil.partilhar_whatsapp') }}">
                         <i class="bi bi-whatsapp"></i>
                     </a>
                 </div>

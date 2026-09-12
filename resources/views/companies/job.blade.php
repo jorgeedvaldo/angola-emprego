@@ -130,12 +130,12 @@
 
             <div class="col-lg-4">
                 <aside class="company-panel">
-                    <h3 class="h6 fw-bold mb-3">Sobre a {{ $company->name }}</h3>
+                    <h3 class="h6 fw-bold mb-3">{{ __('site.empresas.sobre_a_empresa', ['empresa' => $company->name]) }}</h3>
                     @if($company->description)
                         <p class="text-muted small mb-3">{{ Str::limit(strip_tags($company->description), 240) }}</p>
                     @endif
                     <a href="{{ route('companies.show', $company->slug) }}" class="fw-semibold text-decoration-none">
-                        Ver todas as vagas <i class="bi bi-arrow-right ms-1"></i>
+                        {{ __('site.empresas.ver_todas_vagas') }} <i class="bi bi-arrow-right ms-1"></i>
                     </a>
                 </aside>
             </div>

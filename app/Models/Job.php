@@ -14,7 +14,7 @@ class Job extends Model
     use HasFactory, GeneratesCoverAndThumbnail;
 
     protected $fillable = [
-        'title', 'slug', 'company', 'location', 'description', 'email_or_link', 'image', 'company_id',
+        'title', 'slug', 'company', 'location', 'country_id', 'description', 'email_or_link', 'image', 'company_id',
         'description_vector', 'description_vector_model', 'description_vector_generated_at',
     ];
 
@@ -26,6 +26,14 @@ class Job extends Model
 	protected static function boot()
     {
         parent::boot();
+
+        // Uma vaga sem país é uma vaga de Angola. Fica aqui, e não só na API,
+        // para valer em todos os caminhos que criam vagas.
+        static::creating(function ($job) {
+            if (empty($job->country_id)) {
+                $job->country_id = Country::idPorOmissao();
+            }
+        });
 
         static::created(function ($job) {
             $job->slug = $job->generateSlug($job->title, $job->id);
@@ -77,6 +85,20 @@ class Job extends Model
         return $this->belongsTo(Company::class, 'company_id');
     }
 
+    public function country()
+    {
+        return $this->belongsTo(Country::class);
+    }
+
+    /**
+     * Código ISO do país, para o addressCountry do JobPosting. As vagas todas têm
+     * país, mas se uma linha antiga escapar continua a valer Angola.
+     */
+    public function countryCode(): string
+    {
+        return $this->country->code ?? Country::OMISSAO;
+    }
+
     public function applications()
     {
         return $this->hasMany(JobApplication::class);
@@ -104,7 +126,7 @@ class Job extends Model
     {
         // 1440 minutes = 24 hours
         return Cache::remember('latest_jobs_50', 1440, function () {
-            return self::publiclyVisible()->with('companyRecord')->orderByRaw('id DESC')->limit(50)->get();
+            return self::publiclyVisible()->with(['companyRecord', 'country'])->orderByRaw('id DESC')->limit(50)->get();
         });
     }
 }

@@ -270,6 +270,8 @@ return [
 
     'vaga_form' => [
         'titulo_vaga' => 'Título da vaga',
+        'pais' => 'País',
+        'pais_dica' => 'O país onde se trabalha. Fica Angola se não escolher outro.',
         'localizacao' => 'Localização',
         'descricao' => 'Descrição',
         'email_ou_link' => 'Email ou link de candidatura (opcional)',

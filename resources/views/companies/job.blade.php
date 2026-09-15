@@ -8,23 +8,23 @@
 {
   "@context": "https://schema.org/",
   "@type": "JobPosting",
-  "title": "{{ $job->title }}",
-  "description": "{{ Str::limit(strip_tags($job->description), 5000) }}",
-  "datePosted": "{{ $job->created_at->toIso8601String() }}",
-  "validThrough": "{{ $job->created_at->addMonths(2)->toIso8601String() }}",
+  "title": @json($job->title),
+  "description": @json(Str::limit(strip_tags($job->description), 5000)),
+  "datePosted": @json($job->created_at->toIso8601String()),
+  "validThrough": @json($job->created_at->addMonths(2)->toIso8601String()),
   "employmentType": ["FULL_TIME"],
   "hiringOrganization": {
     "@type": "Organization",
-    "name": "{{ $company->name }}",
-    "logo": "{{ $company->logo_url }}",
-    "sameAs": "{{ $company->website ?: route('companies.show', $company->slug) }}"
+    "name": @json($company->name),
+    "logo": @json($company->logo_url),
+    "sameAs": @json($company->website ?: route('companies.show', $company->slug))
   },
   "jobLocation": {
     "@type": "Place",
     "address": {
       "@type": "PostalAddress",
-      "addressLocality": "{{ $job->location ?: 'Luanda' }}",
-      "addressCountry": "AO"
+      "addressLocality": @json($job->location ?: $job->country->name),
+      "addressCountry": @json($job->countryCode())
     }
   }
 }

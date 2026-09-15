@@ -245,6 +245,82 @@ class JobCountryTest extends TestCase
             ->assertDontSee('Espanha');
     }
 
+    /**
+     * A capa de uma vaga é gerada no momento em que ela é criada. O que este
+     * teste guarda é a ligação: uma vaga do Brasil tem de sair com a capa verde
+     * e amarela, e uma de Angola com a azul de sempre.
+     */
+    public function test_a_brazilian_job_gets_the_green_and_yellow_cover()
+    {
+        // Sem Storage::fake: o gerador escreve com storage_path() em vez de
+        // passar pelo disco do Laravel, por isso um disco falso não o apanharia.
+        // As capas ficam mesmo em storage/app/public e apagam-se no fim.
+        $angolana = Job::factory()->create(['image' => null]);
+        $brasileira = Job::factory()->noPais('BR')->create(['image' => null, 'location' => 'São Paulo']);
+
+        try {
+            $verdeDoBrasil = $this->verdeMenosAzul($brasileira->fresh()->image);
+            $verdeDeAngola = $this->verdeMenosAzul($angolana->fresh()->image);
+
+            $this->assertGreaterThan(
+                0,
+                $verdeDoBrasil,
+                'A capa da vaga do Brasil devia ter mais verde do que azul.'
+            );
+
+            $this->assertLessThan(
+                0,
+                $verdeDeAngola,
+                'A capa da vaga de Angola devia continuar a ter mais azul do que verde.'
+            );
+        } finally {
+            foreach ([$angolana, $brasileira] as $vaga) {
+                $this->apagarCapa($vaga->fresh()->image);
+            }
+        }
+    }
+
+    /** Apaga uma capa gerada durante o teste, e a miniatura que saiu dela. */
+    private function apagarCapa(?string $caminho): void
+    {
+        if ($caminho === null) {
+            return;
+        }
+
+        @unlink(storage_path('app/public/' . $caminho));
+        @unlink(storage_path('app/public/thumb/' . $caminho));
+    }
+
+    /**
+     * Quanto é que o verde pesa mais do que o azul numa capa. Positivo é uma
+     * capa esverdeada, negativo é uma capa azulada.
+     */
+    private function verdeMenosAzul(?string $caminho): float
+    {
+        $this->assertNotNull($caminho, 'A vaga ficou sem capa.');
+
+        $ficheiro = storage_path('app/public/' . $caminho);
+        $this->assertFileExists($ficheiro);
+
+        $imagem = imagecreatefrompng($ficheiro);
+        $verde = 0;
+        $azul = 0;
+        $n = 0;
+
+        for ($y = 0; $y < imagesy($imagem); $y += 5) {
+            for ($x = 0; $x < imagesx($imagem); $x += 5) {
+                $cor = imagecolorat($imagem, $x, $y);
+                $verde += ($cor >> 8) & 255;
+                $azul += $cor & 255;
+                $n++;
+            }
+        }
+
+        imagedestroy($imagem);
+
+        return ($verde - $azul) / $n;
+    }
+
     public function test_the_flag_comes_from_the_country_code()
     {
         $this->assertSame('🇦🇴', Country::where('code', 'AO')->first()->bandeira);

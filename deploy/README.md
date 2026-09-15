@@ -15,6 +15,13 @@ O que corre no servidor é o `deploy/publicar.sh`, enviado pelo próprio canal d
 SSH: corre sempre a versão que está no commit publicado, nunca uma cópia
 esquecida no servidor.
 
+Há dois workflows, e os dois usam os mesmos segredos:
+
+| Workflow | Quando corre | O que faz |
+|---|---|---|
+| **Publicar na hospedagem** | a cada push na `main` | `git pull` |
+| **Migrar a base de dados** | só quando você mandar, no Actions | `artisan migrate` — ver [a secção mais abaixo](#migrar-a-base-de-dados-a-partir-do-actions-quando-você-mandar) |
+
 ## O que é preciso configurar uma vez
 
 ### 1. Autorizar a chave no cPanel
@@ -179,6 +186,45 @@ diz-lhe se este commit precisa de mais alguma coisa da sua parte:
 Quando não há nada a fazer, diz `nada que exija um passo adicional`. É só
 informação: o script não altera nada além do `git pull`.
 
+## Migrar a base de dados (a partir do Actions, quando você mandar)
+
+Quando um commit traz migrações, a publicação avisa mas não as corre. Para as
+correr sem abrir o Terminal do cPanel há um segundo workflow, **Migrar a base de
+dados**, que só arranca quando você o mandar arrancar.
+
+No GitHub: **Actions → Migrar a base de dados → Run workflow**. Aparece um
+formulário com quatro campos:
+
+| Campo | O que faz |
+|---|---|
+| **accao** | `estado` mostra o que está por aplicar · `simular` mostra o SQL que seria corrido · `migrar` corre mesmo |
+| **confirmacao** | Só para `migrar`: tem de escrever `MIGRAR`. Sem isso o workflow pára antes de se ligar ao servidor |
+| **copia_bd** | Guarda uma cópia da base de dados antes de migrar. Vem ligado |
+| **limpar_cache** | Corre `artisan optimize:clear` no fim |
+
+`estado` e `simular` **não alteram nada**. Vale a pena correr `estado` antes de
+`migrar`, para ver o que vai acontecer.
+
+Usa os mesmos segredos da publicação — não é preciso configurar mais nada.
+
+A ordem é sempre **publicar primeiro, migrar depois**: este workflow não faz
+`git pull`, corre as migrações que já estão no servidor. Os dois partilham o
+mesmo grupo de concorrência, por isso uma migração nunca apanha um `git pull` a
+meio.
+
+### A cópia da base de dados
+
+Fica em `storage/backups/bd-AAAAMMDD-HHMMSS.sql.gz`, no servidor. Se a cópia for
+pedida e falhar, **não se migra nada** — mais vale não migrar do que migrar sem
+rede. Para repor:
+
+```bash
+gunzip -c storage/backups/bd-20260915-143000.sql.gz | mysql -u UTILIZADOR -p NOME_DA_BD
+```
+
+Essas cópias ocupam espaço e ficam lá; convém apagar as antigas de vez em
+quando. A cópia só sabe copiar MySQL — noutro motor o workflow diz-lho e pára.
+
 ## Ligar passos adicionais (opcional)
 
 Se quiser que a publicação passe a fazer mais do que o `git pull`, crie o
@@ -191,7 +237,9 @@ segredo correspondente com o valor `1`:
 | `DEPLOY_CLEAR_CACHE` | `artisan optimize:clear` |
 
 Para apagar, basta remover o segredo. Recomendo começar sem nenhum, tal como
-faz hoje, e ligar as migrações só quando confiar no resto.
+faz hoje: para as migrações há o workflow manual acima, que lhe mostra o que vai
+correr e guarda uma cópia antes — coisa que o `DEPLOY_RUN_MIGRATIONS` não faz,
+porque corre calado em cada publicação.
 
 Uma nota técnica: **nunca se corre `route:cache`** neste projecto. O
 `routes/web.php` tem rotas definidas com closures, que o Laravel não consegue
@@ -201,6 +249,13 @@ serializar — o comando falha e deixa o site em baixo.
 
 ```bash
 cd ~/angolaemprego.com && bash deploy/publicar.sh
+```
+
+E para as migrações:
+
+```bash
+cd ~/angolaemprego.com && ACCAO=estado bash deploy/migrar.sh   # ver o que falta
+cd ~/angolaemprego.com && ACCAO=migrar COPIA_BD=1 bash deploy/migrar.sh
 ```
 
 ## Se correr mal

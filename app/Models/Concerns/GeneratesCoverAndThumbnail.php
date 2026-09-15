@@ -14,14 +14,23 @@ use Intervention\Image\ImageManager;
  */
 trait GeneratesCoverAndThumbnail
 {
-    protected function generateCoverIfMissing(string $directory, string $badge = ''): void
-    {
+    /**
+     * @param  string|null  $pais   código ISO do país, que escolhe as cores do cartão
+     * @param  string|null  $local  localização, mostrada nos cartões que a pedem
+     */
+    protected function generateCoverIfMissing(
+        string $directory,
+        string $badge = '',
+        ?string $pais = null,
+        ?string $local = null
+    ): void {
         if (!empty($this->image)) {
             return;
         }
 
         try {
-            $this->image = (new ArticleImageController())->generate($this->title, $directory, $badge);
+            $this->image = (new ArticleImageController())
+                ->generate($this->title, $directory, $badge, $pais, $local);
         } catch (\Throwable $e) {
             Log::error(static::class . ' cover image generation failed: ' . $e->getMessage());
         }

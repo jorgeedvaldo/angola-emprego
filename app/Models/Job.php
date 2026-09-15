@@ -37,7 +37,7 @@ class Job extends Model
 
         static::created(function ($job) {
             $job->slug = $job->generateSlug($job->title, $job->id);
-            $job->generateCoverIfMissing('images/jobs', 'VAGA');
+            $job->generateCoverIfMissing('images/jobs', 'VAGA', $job->countryCode(), $job->location);
             $job->save();
 
             $job->generateThumb($job->image);

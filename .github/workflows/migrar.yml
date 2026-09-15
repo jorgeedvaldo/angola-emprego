@@ -1,0 +1,182 @@
+name: Migrar a base de dados
+
+# Só arranca quando você o mandar arrancar, no separador Actions do GitHub.
+# Não há disparo por push: mexer na base de dados de produção é uma decisão sua,
+# não uma consequência de um commit.
+on:
+  workflow_dispatch:
+    inputs:
+      accao:
+        description: "O que fazer no servidor"
+        type: choice
+        required: true
+        default: estado
+        options:
+          - estado    # só mostra o que está por aplicar — não altera nada
+          - simular   # mostra o SQL que seria corrido — não altera nada
+          - migrar    # corre mesmo as migrações
+      confirmacao:
+        description: "Só para a acção 'migrar': escreva MIGRAR"
+        required: false
+        default: ""
+      copia_bd:
+        description: "Guardar uma cópia da base de dados antes de migrar"
+        type: boolean
+        required: false
+        default: true
+      limpar_cache:
+        description: "Limpar a cache de configuração e vistas no fim"
+        type: boolean
+        required: false
+        default: false
+
+# O mesmo grupo da publicação: uma migração nunca apanha um git pull a meio, nem
+# duas migrações se atropelam. A segunda espera pela primeira.
+concurrency:
+  group: publicar-producao
+  cancel-in-progress: false
+
+jobs:
+  migrar:
+    name: ${{ inputs.accao }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    # O que vem dos campos do formulário entra por aqui, e não colado dentro do
+    # shell: assim o que se escrever no campo é sempre tratado como texto, e não
+    # como mais uma linha do script.
+    env:
+      ACCAO: ${{ inputs.accao }}
+      CONFIRMACAO: ${{ inputs.confirmacao }}
+      COPIA_BD_PEDIDA: ${{ inputs.copia_bd }}
+      LIMPAR_CACHE_PEDIDA: ${{ inputs.limpar_cache }}
+
+    steps:
+      # A confirmação é a primeira coisa a ser verificada, antes de tocar em
+      # chaves ou no servidor: um clique errado em "migrar" não chega a ligar-se
+      # a lado nenhum.
+      - name: Confirmar a intenção
+        run: |
+          set -euo pipefail
+
+          if [ "$ACCAO" != "migrar" ]; then
+            echo "Acção '$ACCAO': não altera nada na base de dados."
+            exit 0
+          fi
+
+          if [ "$CONFIRMACAO" != "MIGRAR" ]; then
+            echo "::error::Para correr as migrações escreva MIGRAR no campo de confirmação."
+            exit 1
+          fi
+
+          echo "Confirmado. As migrações vão ser aplicadas em produção."
+
+      - name: Obter o código
+        uses: actions/checkout@v4
+
+      - name: Preparar o acesso SSH
+        env:
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "$SSH_KEY" ]; then
+            echo "::error::Falta o segredo DEPLOY_SSH_KEY."
+            exit 1
+          fi
+
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+
+          # Uma chave com palavra-passe não serve aqui: não há ninguém para a
+          # escrever. Sem esta verificação o sintoma seria o servidor a fechar a
+          # ligação sem explicação, porque o cliente nem chega a oferecer a chave.
+          if ! ssh-keygen -y -P "" -f ~/.ssh/id_deploy >/dev/null 2>&1; then
+            echo "::error::A chave em DEPLOY_SSH_KEY tem palavra-passe, ou está mal colada."
+            echo "::error::Gere uma chave sem palavra-passe: ssh-keygen -t ed25519 -N \"\" -f caminho/da/chave"
+            exit 1
+          fi
+
+          echo "Chave carregada: $(ssh-keygen -l -f ~/.ssh/id_deploy)"
+
+          if [ -n "$KNOWN_HOSTS" ]; then
+            printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+            chmod 644 ~/.ssh/known_hosts
+            echo "VERIFICAR_SERVIDOR=yes" >> "$GITHUB_ENV"
+          else
+            echo "::warning::Sem DEPLOY_KNOWN_HOSTS: a identidade do servidor não é verificada. Veja deploy/README.md."
+            echo "VERIFICAR_SERVIDOR=accept-new" >> "$GITHUB_ENV"
+          fi
+
+      - name: Correr no servidor
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          DEPLOY_PHP: ${{ secrets.DEPLOY_PHP }}
+        run: |
+          set -euo pipefail
+
+          for nome in DEPLOY_HOST DEPLOY_USER DEPLOY_PATH; do
+            if [ -z "${!nome}" ]; then
+              echo "::error::Falta o segredo $nome."
+              exit 1
+            fi
+          done
+
+          # As caixas de visto chegam como "true"/"false"; o script do servidor
+          # trabalha com 1/0.
+          COPIA_BD=0
+          if [ "$COPIA_BD_PEDIDA" = "true" ]; then COPIA_BD=1; fi
+
+          LIMPAR_CACHE=0
+          if [ "$LIMPAR_CACHE_PEDIDA" = "true" ]; then LIMPAR_CACHE=1; fi
+
+          # A acção é validada aqui também: é ela que vai dentro do comando
+          # remoto, e só estes três valores lá podem chegar.
+          case "$ACCAO" in
+            estado|simular|migrar) ;;
+            *) echo "::error::Acção desconhecida: $ACCAO"; exit 1 ;;
+          esac
+
+          # O script vai daqui pelo canal do SSH: corre sempre a versão que está
+          # neste commit, e não uma cópia esquecida no servidor.
+          ssh -i ~/.ssh/id_deploy \
+              -p "${DEPLOY_PORT:-22}" \
+              -o BatchMode=yes \
+              -o ConnectTimeout=20 \
+              -o "StrictHostKeyChecking=${VERIFICAR_SERVIDOR:-accept-new}" \
+              "$DEPLOY_USER@$DEPLOY_HOST" \
+              "APP_DIR='$DEPLOY_PATH' PHP_BIN='${DEPLOY_PHP:-php}' ACCAO='$ACCAO' COPIA_BD='$COPIA_BD' LIMPAR_CACHE='$LIMPAR_CACHE' bash -s" \
+              < deploy/migrar.sh
+
+      - name: Resumo
+        if: always()
+        env:
+          RESULTADO: ${{ job.status }}
+        run: |
+          set -euo pipefail
+
+          {
+            echo "### Migração — $ACCAO"
+            echo
+            case "$ACCAO" in
+              estado)  echo "Só se viu o que está por aplicar. **Nada foi alterado.**" ;;
+              simular) echo "Só se viu o SQL que as migrações iriam correr. **Nada foi alterado.**" ;;
+              migrar)  echo "As migrações foram aplicadas na base de dados de produção." ;;
+            esac
+            echo
+            echo "- Cópia da base de dados: \`$COPIA_BD_PEDIDA\`"
+            echo "- Limpar cache no fim: \`$LIMPAR_CACHE_PEDIDA\`"
+            echo "- Resultado: \`$RESULTADO\`"
+            echo
+            echo "O detalhe do que correu está no registo do passo **Correr no servidor**."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Apagar a chave
+        if: always()
+        run: rm -f ~/.ssh/id_deploy

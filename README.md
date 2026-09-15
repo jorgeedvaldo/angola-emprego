@@ -16,6 +16,13 @@ O Angola Emprego tem como missão:
 - **Publicação de Vagas**: Empresas podem adicionar vagas de forma simples.
 - **Design Responsivo**: Interface adaptável a desktops e dispositivos móveis.
 
+## Documentação
+
+- [Publicar vagas pela API](docs/api-vagas.md) — como outro sistema publica
+  vagas, incluindo as vagas do Brasil e dos restantes países.
+- [Publicação e migrações na hospedagem](deploy/README.md) — os workflows do
+  GitHub Actions e como os configurar.
+
 ## Tecnologias Utilizadas
 
 - **Backend**: PHP com Laravel

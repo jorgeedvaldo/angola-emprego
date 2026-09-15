@@ -3,6 +3,8 @@
 /public/hot
 /public/storage
 /storage/*.key
+# Cópias da base de dados feitas pelo deploy/migrar.sh — nunca no repositório.
+/storage/backups
 /vendor
 vendor.zip
 AGENT.md

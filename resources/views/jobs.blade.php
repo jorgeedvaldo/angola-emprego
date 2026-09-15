@@ -155,6 +155,7 @@
                                           <div class="text-muted small mb-2"><i class="bi bi-building me-1"></i> {{ $job->company }}</div>
                                           <div class="mb-2">
                                               <span class="badge bg-light text-dark border me-1"><i class="bi bi-geo-alt me-1"></i> {{ $job->location }}</span>
+                                              <span class="badge bg-light text-dark border me-1">{{ $job->country->bandeira }} {{ $job->country->nome }}</span>
                                               <span class="badge bg-light text-dark border"><i class="bi bi-clock me-1"></i> {{ __('site.vagas.integral') }}</span>
                                           </div>
                                            <div class="text-muted small description-truncate" style="max-height: 44px; overflow: hidden;">

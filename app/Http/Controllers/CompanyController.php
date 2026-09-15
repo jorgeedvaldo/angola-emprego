@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Company;
+use App\Models\Country;
 use App\Models\Job;
 use App\Models\JobApplication;
 use App\Models\JobApplicationAttachment;
@@ -129,8 +130,9 @@ class CompanyController extends Controller
     {
         $company = Auth::user()->company;
         $categories = Category::orderBy('name')->get();
+        $countries = Country::paraSelector();
 
-        return view('companies.jobs.create', compact('company', 'categories'));
+        return view('companies.jobs.create', compact('company', 'categories', 'countries'));
     }
 
     public function storeJob(Request $request)
@@ -140,6 +142,7 @@ class CompanyController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'location' => 'required|string|max:255',
+            'country_id' => 'nullable|exists:countries,id',
             'description' => 'required|string',
             'email_or_link' => 'nullable|string|max:255',
             'categories' => 'nullable|array',
@@ -149,6 +152,7 @@ class CompanyController extends Controller
         $job = Job::create([
             'title' => $validated['title'],
             'location' => $validated['location'],
+            'country_id' => $validated['country_id'] ?? Country::idPorOmissao(),
             'description' => HtmlSanitizer::clean($validated['description']),
             'email_or_link' => $validated['email_or_link'] ?? $company->email ?? Auth::user()->email,
             'company' => $company->name,
@@ -169,8 +173,9 @@ class CompanyController extends Controller
         $company = Auth::user()->company;
         $categories = Category::orderBy('name')->get();
         $selectedCategories = $job->categories()->pluck('categories.id')->all();
+        $countries = Country::paraSelector();
 
-        return view('companies.jobs.edit', compact('company', 'job', 'categories', 'selectedCategories'));
+        return view('companies.jobs.edit', compact('company', 'job', 'categories', 'selectedCategories', 'countries'));
     }
 
     public function updateJob(Request $request, Job $job)
@@ -180,6 +185,7 @@ class CompanyController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'location' => 'required|string|max:255',
+            'country_id' => 'nullable|exists:countries,id',
             'description' => 'required|string',
             'email_or_link' => 'nullable|string|max:255',
             'categories' => 'nullable|array',
@@ -192,6 +198,7 @@ class CompanyController extends Controller
         $job->update([
             'title' => $validated['title'],
             'location' => $validated['location'],
+            'country_id' => $validated['country_id'] ?? $job->country_id,
             'description' => $cleanDescription,
             'email_or_link' => $validated['email_or_link'] ?? $job->email_or_link,
             'company' => Auth::user()->company->name,

@@ -12,30 +12,30 @@
   {
     "@context": "https://schema.org/",
     "@type": "JobPosting",
-    "title": "{{ $job->title }}",
-    "description": "{{ Str::limit(strip_tags($job->description), 5000) }}",
-    "datePosted": "{{ $job->created_at->toIso8601String() }}",
-    "validThrough": "{{ $job->created_at->addMonths(2)->toIso8601String() }}",
+    "title": @json($job->title),
+    "description": @json(Str::limit(strip_tags($job->description), 5000)),
+    "datePosted": @json($job->created_at->toIso8601String()),
+    "validThrough": @json($job->created_at->addMonths(2)->toIso8601String()),
     "employmentType": ["FULL_TIME"],
     "hiringOrganization": {
       "@type": "Organization",
-      "name": "{{ $job->company }}",
-      "logo": "{{ asset('storage/' . $job->image) }}",
-      "sameAs": "{{ $job->companyRecord ? url('/company/' . $job->companyRecord->slug) : url('/vagas?q=' . urlencode($job->company)) }}"
+      "name": @json($job->company),
+      "logo": @json(asset('storage/' . $job->image)),
+      "sameAs": @json($job->companyRecord ? url('/company/' . $job->companyRecord->slug) : url('/vagas?q=' . urlencode($job->company)))
     },
     "jobLocation": {
       "@type": "Place",
       "address": {
         "@type": "PostalAddress",
-        "addressLocality": "{{ $job->location ?? $job->province ?? 'Luanda' }}",
-        "addressRegion": "{{ $job->province ?? $job->location ?? 'Luanda' }}",
-        "addressCountry": "AO"
+        "addressLocality": @json($job->location ?: $job->country->name),
+        "addressRegion": @json($job->location ?: $job->country->name),
+        "addressCountry": @json($job->countryCode())
       }
     },
     "identifier": {
       "@type": "PropertyValue",
-      "name": "{{ $job->company }}",
-      "value": "{{ $job->slug }}"
+      "name": @json($job->company),
+      "value": @json($job->slug)
     }
   }
   </script>
@@ -89,7 +89,8 @@
               @else
                 <span><i class="bi bi-building me-1"></i> {{$job->company}}</span>
               @endif
-              <span><i class="bi bi-geo-alt me-1"></i> {{$job->location ?? 'Angola'}}</span>
+              <span><i class="bi bi-geo-alt me-1"></i> {{ $job->location }}</span>
+              <span>{{ $job->country->bandeira }} {{ $job->country->nome }}</span>
               <span><i class="bi bi-clock me-1"></i> {{ date_format(new DateTime($job['created_at']), 'd/m/Y') }}</span>
             </div>
           </div>

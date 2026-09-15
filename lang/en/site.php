@@ -259,6 +259,8 @@ return [
 
     'vaga_form' => [
         'titulo_vaga' => 'Job title',
+        'pais' => 'Country',
+        'pais_dica' => 'Where the job is based. Defaults to Angola if you pick nothing.',
         'localizacao' => 'Location',
         'descricao' => 'Description',
         'email_ou_link' => 'Application email or link (optional)',

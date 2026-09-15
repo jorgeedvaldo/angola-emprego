@@ -53,7 +53,7 @@ class JobController extends Controller
                 ['path' => $request->url(), 'query' => $request->query()]
             );
         } else {
-             $jobs = $query->with('companyRecord')->orderByRaw('id DESC')->paginate(15);
+             $jobs = $query->with(['companyRecord', 'country'])->orderByRaw('id DESC')->paginate(15);
         }
         
         $jobs->appends($request->all());
@@ -75,7 +75,7 @@ class JobController extends Controller
         try
         {
             $job = Cache::remember('job_' . $slug, 1440, function () use ($slug) {
-                return Job::publiclyVisible()->with(['categories', 'companyRecord'])->where('slug', $slug)->firstOrFail();
+                return Job::publiclyVisible()->with(['categories', 'companyRecord', 'country'])->where('slug', $slug)->firstOrFail();
             });
 
             $categories = Category::getCachedAll();

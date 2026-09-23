@@ -20,6 +20,8 @@ O Angola Emprego tem como missão:
 
 - [Publicar vagas pela API](docs/api-vagas.md) — como outro sistema publica
   vagas, incluindo as vagas do Brasil e dos restantes países.
+- [Analisador de CV: motor de pontuação](docs/analisador-cv-jev.md) — vectores
+  ou JEV, e como trocar entre os dois.
 - [Publicação e migrações na hospedagem](deploy/README.md) — os workflows do
   GitHub Actions e como os configurar.
 

@@ -374,10 +374,17 @@
 
                 const formData = new FormData();
                 formData.append('cv', entry.file, entry.file.name);
-                formData.append('vector', vector);
-                formData.append('model', job.model);
-                formData.append('keywords', keywords);
-                formData.append('requirements', requirements);
+
+                if (job.motor === 'jev') {
+                    // O JEV recebe a vaga escrita, não um vector dela: a
+                    // descrição viaja com cada CV e a pontuação vem de lá.
+                    formData.append('description', job.description || '');
+                } else {
+                    formData.append('vector', vector);
+                    formData.append('model', job.model);
+                    formData.append('keywords', keywords);
+                    formData.append('requirements', requirements);
+                }
 
                 try {
                     const result = await postFile(config.cvUrl, formData);

@@ -104,5 +104,5 @@
         strings: @json(__('site.js')),
     };
 </script>
-<script src="{{ asset('assets/js/cv-analyzer.js') }}"></script>
+<script src="@asset('assets/js/cv-analyzer.js')"></script>
 @endsection

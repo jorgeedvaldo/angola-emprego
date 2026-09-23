@@ -114,7 +114,7 @@
             applications: @json($applicationsForAnalysis),
         };
     </script>
-    <script src="{{ asset('assets/js/cv-analysis.js') }}"></script>
+    <script src="@asset('assets/js/cv-analysis.js')"></script>
 
     <div class="modal fade" id="cv-viewer-modal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-scrollable">
@@ -134,6 +134,6 @@
             pdfWorkerUrl: '{{ asset('assets/vendor/pdfjs/pdf.worker.min.js') }}',
         };
     </script>
-    <script src="{{ asset('assets/js/cv-viewer.js') }}"></script>
+    <script src="@asset('assets/js/cv-viewer.js')"></script>
 @endif
 @endsection

@@ -43,7 +43,21 @@
 
                         <div class="mb-3">
                             <label for="cv-analyzer-files" class="form-label fw-semibold">{{ __('site.analisador.ficheiros') }}</label>
-                            <input type="file" id="cv-analyzer-files" multiple accept="application/pdf,.pdf" class="form-control">
+
+                            {{-- A zona inteira é um alvo para largar ficheiros, mas continua a
+                                 ser um <label> do input: quem não arrasta — ou usa o teclado,
+                                 ou está no telemóvel — clica e escolhe como sempre. --}}
+                            <label id="cv-analyzer-drop" class="cv-drop">
+                                <i class="bi bi-cloud-arrow-up cv-drop-icon" aria-hidden="true"></i>
+                                <span class="cv-drop-titulo">{{ __('site.analisador.arrastar') }}</span>
+                                <span class="cv-drop-ou">{{ __('site.analisador.arrastar_ou') }}</span>
+
+                                {{-- O input vive dentro do label: assim o :focus-within desenha o
+                                     anel de foco quando se chega aqui pelo teclado, coisa que não
+                                     aconteceria com o input escondido lá fora. --}}
+                                <input type="file" id="cv-analyzer-files" multiple
+                                    accept="application/pdf,.pdf" class="visually-hidden">
+                            </label>
                             <div class="form-text">{{ __('site.analisador.ficheiros_ajuda', ['max' => \App\Http\Controllers\CvAnalyzerController::MAX_CVS]) }}</div>
                         </div>
 
@@ -93,6 +107,59 @@
         </div>
     </div>
 </section>
+
+<style>
+    .cv-drop {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: .25rem;
+        width: 100%;
+        padding: 1.75rem 1rem;
+        border: 2px dashed #c7d2e0;
+        border-radius: .75rem;
+        background-color: #f8fafc;
+        cursor: pointer;
+        text-align: center;
+        transition: border-color .15s ease, background-color .15s ease;
+    }
+
+    .cv-drop:hover,
+    .cv-drop:focus-within {
+        border-color: #2557a7;
+        background-color: #eef4ff;
+    }
+
+    /* Enquanto se arrasta por cima. A classe é posta pelo JavaScript. */
+    .cv-drop.esta-a-receber {
+        border-color: #2557a7;
+        border-style: solid;
+        background-color: #e3edff;
+    }
+
+    .cv-drop-icon {
+        font-size: 1.75rem;
+        line-height: 1;
+        color: #2557a7;
+        margin-bottom: .25rem;
+    }
+
+    .cv-drop-titulo {
+        font-weight: 600;
+        color: #1f2d3d;
+    }
+
+    .cv-drop-ou {
+        font-size: .875rem;
+        color: #6b7280;
+    }
+
+    /* Quem tiver pedido menos animação não leva transições. */
+    @media (prefers-reduced-motion: reduce) {
+        .cv-drop { transition: none; }
+    }
+</style>
 
 <script>
     window.CV_ANALYZER_CONFIG = {

@@ -46,7 +46,7 @@ Route::get('/empresas-e-recrutadores', [RecruiterController::class, 'index'])->n
 // levam limite de pedidos para não servirem de porta aberta a esse serviço.
 Route::get('/analisador-de-cv', [CvAnalyzerController::class, 'index'])->name('cv-analyzer.index');
 Route::post('/analisador-de-cv/vaga', [CvAnalyzerController::class, 'analyzeJob'])->name('cv-analyzer.job')->middleware('throttle:20,1');
-Route::post('/analisador-de-cv/cv', [CvAnalyzerController::class, 'analyzeCv'])->name('cv-analyzer.cv')->middleware('throttle:60,1');
+Route::post('/analisador-de-cv/cv', [CvAnalyzerController::class, 'analyzeCv'])->name('cv-analyzer.cv')->middleware('throttle:120,1');
 Route::get('/company/{slug}', [CompanyController::class, 'show'])->name('companies.show')->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*');
 Route::get('/company/{slug}/vagas/{jobSlug}', [CompanyController::class, 'showJob'])->name('companies.job')->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*');
 Route::post('/vagas/{slug}/candidatar', [JobApplicationController::class, 'store'])->name('jobs.apply')->middleware('throttle:10,1');

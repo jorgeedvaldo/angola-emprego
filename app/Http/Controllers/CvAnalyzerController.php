@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\Cv\CvEngine;
+use App\Services\Cv\JevClient;
 use App\Services\CvAnalysisService;
 use App\Support\JobRequirements;
 use App\Support\KeywordMatcher;
@@ -65,6 +67,21 @@ class CvAnalyzerController extends Controller
         ]);
 
         $description = $validated['description'];
+
+        // Com o JEV não há vector da vaga para calcular: a descrição volta para
+        // o browser tal como foi escrita e acompanha cada CV no passo seguinte.
+        if (CvEngine::jevActivo()) {
+            return response()->json([
+                'ok' => true,
+                'motor' => CvEngine::JEV,
+                'model' => CvEngine::JEV,
+                'vector' => [],
+                'requirements' => [],
+                'keywords' => [],
+                'description' => $description,
+            ]);
+        }
+
         // O título é a linha mais específica de um anúncio: há empregadores que
         // publicam vários cargos com o mesmo bloco de requisitos, e sem o título
         // esses cargos ficam indistinguíveis.
@@ -120,6 +137,10 @@ class CvAnalyzerController extends Controller
         // os vectores de cada bloco; o limite por omissão do alojamento partilhado
         // (30-60s) cortaria o pedido a meio.
         set_time_limit(180);
+
+        if (CvEngine::jevActivo()) {
+            return $this->analyzeCvComJev($request, $analysis);
+        }
 
         $request->validate([
             'cv' => ['required', 'file', 'max:' . self::MAX_CV_SIZE_KB, $this->pdfRule()],
@@ -182,6 +203,64 @@ class CvAnalyzerController extends Controller
             'ok' => true,
             'score' => KeywordMatcher::blend($semanticScore, $keywordResult['score'] ?? null),
             'matched' => array_slice($keywordResult['matched'] ?? [], 0, 12),
+            'requirements' => [],
+        ]);
+    }
+
+    /**
+     * O mesmo passo, mas com o JEV a dar a pontuação.
+     *
+     * A metodologia é a que foi pedida: descrição da vaga + texto do CV numa só
+     * pergunta, e a resposta do JEV é a percentagem. O OCR continua a vir do
+     * analisecv — o JEV não lê PDFs, recebe o texto já extraído.
+     */
+    private function analyzeCvComJev(Request $request, CvAnalysisService $analysis)
+    {
+        $request->validate([
+            'cv' => ['required', 'file', 'max:' . self::MAX_CV_SIZE_KB, $this->pdfRule()],
+            'description' => 'required|string|min:30|max:20000',
+        ], [
+            'cv.required' => 'Escolha um CV em PDF.',
+            'cv.max' => 'Cada CV não pode ultrapassar 5 MB.',
+            'description.required' => 'A análise da vaga expirou. Actualize a página e comece de novo.',
+        ]);
+
+        /** @var UploadedFile $file */
+        $file = $request->file('cv');
+        $contents = (string) file_get_contents($file->getRealPath());
+
+        if ($contents === '') {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Este ficheiro está vazio ou não pôde ser lido.',
+            ], 422);
+        }
+
+        $result = $analysis->analyzeCvContents($contents, $file->getClientOriginalName());
+
+        if (!$result || trim((string) $result['text']) === '') {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Não foi possível ler este CV. Tente novamente dentro de momentos.',
+            ], 502);
+        }
+
+        $score = (new JevClient())->compatibilidade($request->input('description'), (string) $result['text']);
+
+        if ($score === null) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Não foi possível analisar este CV. Tente novamente dentro de momentos.',
+            ], 502);
+        }
+
+        // Sem lista de requisitos nem palavras-chave: o JEV devolve um número, e
+        // dizer ao recrutador que requisitos foram cumpridos seria inventar.
+        return response()->json([
+            'ok' => true,
+            'motor' => CvEngine::JEV,
+            'score' => $score,
+            'matched' => [],
             'requirements' => [],
         ]);
     }

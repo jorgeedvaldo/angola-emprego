@@ -37,7 +37,7 @@ class CvAnalyzerJevTest extends TestCase
             'services.cv_analyzer_engine' => 'jev',
             'services.jev.api_key' => 'chave-jev',
             'services.jev.url' => 'https://api.jev.test',
-            'services.jev.endpoint' => '/v1/evaluate',
+            'services.jev.endpoint' => '/v1/systemone',
             'services.jev.model' => 'jev-latest',
         ]);
     }
@@ -91,7 +91,7 @@ class CvAnalyzerJevTest extends TestCase
 
         Http::fake([
             'analisecv.test/*' => Http::response(['ok' => true, 'text' => 'Currículo do candidato', 'vector' => [0.1], 'model' => 'LaBSE']),
-            'api.jev.test/*' => Http::response(['answers' => ['compatibilidade' => ['probability' => 0.87]]]),
+            'api.jev.test/*' => Http::response($this->respostaJev(0.87)),
         ]);
 
         $resposta = $this->post(route('cv-analyzer.cv'), [
@@ -115,7 +115,7 @@ class CvAnalyzerJevTest extends TestCase
 
         Http::fake([
             'analisecv.test/*' => Http::response(['ok' => true, 'text' => 'TEXTO-OCR-DO-CV', 'vector' => [0.1], 'model' => 'LaBSE']),
-            'api.jev.test/*' => Http::response(['answers' => ['compatibilidade' => ['probability' => 0.5]]]),
+            'api.jev.test/*' => Http::response($this->respostaJev(0.5)),
         ]);
 
         $this->post(route('cv-analyzer.cv'), [
@@ -130,9 +130,13 @@ class CvAnalyzerJevTest extends TestCase
 
             $corpo = $request->data();
 
+            $pergunta = $corpo['questions']['compatibilidade'] ?? [];
+
             return str_contains($corpo['state']['vaga'] ?? '', 'DESCRICAO-DA-VAGA')
                 && str_contains($corpo['state']['curriculo'] ?? '', 'TEXTO-OCR-DO-CV')
-                && ($corpo['questions'][0]['type'] ?? null) === 'noul';
+                && ($pergunta['type'] ?? null) === 'noul'
+                && isset($pergunta['instructions'])
+                && ($corpo['model'] ?? null) === 'jev-latest';
         });
     }
 
@@ -154,19 +158,17 @@ class CvAnalyzerJevTest extends TestCase
     }
 
     /**
-     * A resposta do JEV vem numa forma que não foi possível confirmar na
-     * documentação, por isso o cliente procura a probabilidade em vários
-     * sítios. Estes são os que ele conhece.
+     * O noul é o valor tal e qual: 0 a 1, e é essa a percentagem que se mostra.
      *
-     * @dataProvider formasDaResposta
+     * @dataProvider valoresDoNoul
      */
-    public function test_it_reads_the_probability_from_the_shapes_it_knows(array $corpo, float $esperado)
+    public function test_the_noul_value_becomes_the_score(float $noul, float $esperado)
     {
         $this->ligarJev();
 
         Http::fake([
             'analisecv.test/*' => Http::response(['ok' => true, 'text' => 'Currículo', 'vector' => [0.1], 'model' => 'LaBSE']),
-            'api.jev.test/*' => Http::response($corpo),
+            'api.jev.test/*' => Http::response($this->respostaJev($noul)),
         ]);
 
         $resposta = $this->post(route('cv-analyzer.cv'), [
@@ -179,15 +181,59 @@ class CvAnalyzerJevTest extends TestCase
         $this->assertSame($esperado, (float) $resposta->json('score'));
     }
 
-    public static function formasDaResposta(): array
+    public static function valoresDoNoul(): array
     {
         return [
-            'answers por id' => [['answers' => ['compatibilidade' => ['probability' => 0.42]]], 0.42],
-            'answers por índice' => [['answers' => [['probability' => 0.33]]], 0.33],
-            'results' => [['results' => [['value' => 0.71]]], 0.71],
-            'probabilidade à cabeça' => [['probability' => 0.9], 0.9],
-            'numa escala de 0 a 100' => [['probability' => 87], 0.87],
-            'acima do limite' => [['probability' => 1.4], 1.0],
+            'forte sim' => [0.99, 0.99],
+            'meio' => [0.42, 0.42],
+            'forte não' => [0.03, 0.03],
+            'zero' => [0.0, 0.0],
+            'um' => [1.0, 1.0],
+            'fora do intervalo corta-se' => [1.4, 1.0],
+        ];
+    }
+
+    /**
+     * O limite do modelo é de 32k tokens para o state. Um CV digitalizado de
+     * muitas páginas não pode fazer o pedido ser recusado.
+     */
+    public function test_a_very_long_cv_is_cut_before_being_sent()
+    {
+        $this->ligarJev();
+
+        Http::fake([
+            'analisecv.test/*' => Http::response([
+                'ok' => true,
+                'text' => str_repeat('palavra ', 50000),
+                'vector' => [0.1],
+                'model' => 'LaBSE',
+            ]),
+            'api.jev.test/*' => Http::response($this->respostaJev(0.5)),
+        ]);
+
+        $this->post(route('cv-analyzer.cv'), [
+            'cv' => $this->pdf(),
+            'description' => 'Procuramos um técnico de recursos humanos com experiência em recrutamento.',
+        ])->assertOk();
+
+        Http::assertSent(function ($request) {
+            if (!str_contains($request->url(), 'api.jev.test')) {
+                return false;
+            }
+
+            return mb_strlen($request->data()['state']['curriculo']) <= 30000;
+        });
+    }
+
+    /** A resposta do JEV, na forma que a documentação define. */
+    private function respostaJev(float $noul): array
+    {
+        return [
+            'model' => 'jev-1.13.0',
+            'answers' => [
+                'compatibilidade' => ['type' => 'noul', 'noul' => $noul],
+            ],
+            'usage' => ['input_tokens' => 296, 'output_tokens' => 20],
         ];
     }
 

@@ -50,24 +50,25 @@ return [
     ],
 
     /*
-     * JEV, da TypeSafe — o motor alternativo de pontuação do analisador público.
-     *
-     * Os valores de wire (url, endpoint, cabeçalho, modelo) estão aqui em vez de
-     * no código de propósito: assim corrigem-se pelo .env, sem tocar na
-     * aplicação, se a API mudar ou se algum destes valores estiver errado.
-     */
-    /*
      * Qual o motor de pontuação do analisador público: 'vectores' ou 'jev'.
      * Ver App\Services\Cv\CvEngine.
      */
     'cv_analyzer_engine' => env('CV_ANALYZER_ENGINE', 'vectores'),
 
+    /*
+     * JEV, da TypeSafe — o motor alternativo de pontuação do analisador público.
+     *
+     * O modelo fica configurável para se poder fixar uma versão: o alias
+     * jev-latest muda quando sai uma versão nova, e com ele mudam as
+     * pontuações. Para fixar: JEV_MODEL=jev-1.13.0.
+     */
     'jev' => [
         'api_key' => env('JEV_API_KEY'),
         'url' => env('JEV_URL', 'https://api.typesafe.ai'),
-        'endpoint' => env('JEV_ENDPOINT', '/v1/evaluate'),
+        'endpoint' => env('JEV_ENDPOINT', '/v1/systemone'),
         'model' => env('JEV_MODEL', 'jev-latest'),
         'timeout' => (int) env('JEV_TIMEOUT', 60),
+        'tentativas' => (int) env('JEV_TENTATIVAS', 3),
     ],
 
 ];

@@ -64,31 +64,85 @@ sabe nada.
 Se pedir `CV_ANALYZER_ENGINE=jev` sem a `JEV_API_KEY` configurada, o analisador
 cai no motor antigo em vez de ficar em baixo.
 
-## ⚠️ Por confirmar
+## O pedido e a resposta
 
-O `docs.typesafe.ai` está bloqueado pela política de saída da rede do ambiente
-onde isto foi escrito, em todos os caminhos e por todas as ferramentas. Por
-isso **o endereço, o cabeçalho de autenticação e os nomes dos campos do pedido
-e da resposta não foram confirmados contra a documentação.**
+`POST https://api.typesafe.ai/v1/systemone`, com `Authorization: Bearer <chave>`.
 
-O que se sabe é o modelo (state + perguntas tipadas, Noul devolve 0–1); o que
-falta é a forma exacta do HTTP.
+```json
+{
+  "model": "jev-latest",
+  "state": {
+    "vaga": "Técnico de Recursos Humanos. Requisitos: licenciatura em RH...",
+    "curriculo": "João Silva. Licenciado em Gestão de Recursos Humanos..."
+  },
+  "questions": {
+    "compatibilidade": {
+      "type": "noul",
+      "instructions": "O candidato descrito em `curriculo` cumpre os requisitos da vaga descrita em `vaga`.",
+      "criteria": { "true": "...", "false": "..." }
+    }
+  }
+}
+```
 
-Para reduzir o custo de estar errado:
+```json
+{
+  "model": "jev-1.13.0",
+  "answers": { "compatibilidade": { "type": "noul", "noul": 0.81 } },
+  "usage": { "input_tokens": 296, "output_tokens": 20 }
+}
+```
 
-- tudo o que é "wire" está em `config/services.php` e sai do `.env`, por isso
-  corrige-se sem tocar no código:
+`0.81` → **81%**. É esse o número que o recrutador vê, e é por ele que a lista
+se ordena.
 
-  ```dotenv
-  JEV_URL=https://api.typesafe.ai
-  JEV_ENDPOINT=/v1/evaluate
-  JEV_MODEL=jev-latest
-  ```
+A pergunta tem **uma condição só**, como a documentação insiste: juntar "cumpre
+os requisitos **e** deve ser entrevistado" seriam duas perguntas disfarçadas de
+uma, e o valor significaria menos. Está escrita de maneira a que um valor alto
+signifique sim — ao contrário, quem lesse a pontuação mais tarde entendia-a ao
+contrário.
 
-- a leitura da resposta procura a probabilidade em vários sítios plausíveis e,
-  quando não a encontra, **regista o corpo inteiro no log**. Na primeira
-  chamada real vê-se lá exactamente o que o JEV devolveu, e corrige-se num sítio
-  só — `JevClient::probabilidade()`.
+## Limites e custos
 
-Confirmar contra `docs.typesafe.ai/api`, `docs.typesafe.ai/primitives/noul` e
-`docs.typesafe.ai/models`.
+| | |
+|---|---|
+| Contexto | 64k tokens por pedido; 32k para o `state` mais a pergunta mais longa |
+| Limite de pedidos | 1200 por minuto — folgado para os 30 CVs do analisador |
+| Preço | $0,042 por milhão de tokens de entrada; a saída não se paga |
+
+A vaga é cortada aos 20 mil caracteres e o CV aos 30 mil, com folga larga sobre
+o limite do `state`. Serve para o caso extremo — um CV digitalizado de vinte
+páginas — e não para o normal, em que um CV não chega a seis mil caracteres.
+
+Um `429` (limite de pedidos) ou um `529` (sobrecarga) são repetidos até três
+vezes, respeitando o `retry-after` quando ele vem. Um `401` ou um `422` não são
+repetidos: não passam por muito que se insista.
+
+## ⚠️ O aviso que mais pesa aqui: a língua
+
+A documentação do modelo é explícita:
+
+> English is the primary training language and where accuracy is currently
+> best. Other languages, including CJK scripts, are handled but not equally
+> well; **test on your own content before relying on Jev for a non-English
+> workload.**
+
+As vagas e os CVs deste portal são em português. O JEV aceita-os, mas a
+precisão em português não é a mesma que em inglês, e isso não se sabe sem medir.
+
+**Por isso não ligue o JEV em produção sem comparar primeiro.** Pegue numa vaga
+real e num punhado de CVs que já conheça — os bons e os maus — e corra as duas
+vezes, com `CV_ANALYZER_ENGINE=vectores` e com `=jev`. Se o JEV não separar os
+bons dos maus melhor do que os vectores, apague a linha e fica tudo como estava.
+
+O alias `jev-latest` muda quando sai uma versão nova do modelo, e com ele mudam
+as pontuações. Se afinar limiares contra uma versão, fixe-a: `JEV_MODEL=jev-1.13.0`.
+
+## Se os resultados não chegarem
+
+Antes de desistir, há um passo intermédio que a documentação recomenda
+("composite scoring"): em vez de uma pergunta vaga, várias perguntas atómicas
+no **mesmo pedido** — tem a experiência? tem a formação? tem os certificados? —
+combinadas em código com pesos seus. As perguntas correm em paralelo, por isso
+três perguntas custam quase o mesmo que uma. Isso também devolveria ao
+recrutador a explicação que hoje se perde.

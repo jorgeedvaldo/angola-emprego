@@ -33,6 +33,7 @@
         title: document.getElementById('cv-analyzer-title'),
         description: document.getElementById('cv-analyzer-description'),
         input: document.getElementById('cv-analyzer-files'),
+        drop: document.getElementById('cv-analyzer-drop'),
         button: document.getElementById('cv-analyzer-start'),
         results: document.getElementById('cv-analyzer-results'),
         empty: document.getElementById('cv-analyzer-empty'),
@@ -419,6 +420,55 @@
         // Permite voltar a escolher o mesmo ficheiro depois de o remover da lista.
         event.target.value = '';
     });
+
+    // Arrastar e soltar.
+    //
+    // O browser, por omissão, abre o ficheiro que se larga em cima da página e
+    // manda o recrutador para fora do analisador com a lista toda perdida. Por
+    // isso o largar é travado na página inteira, e só a zona própria o aceita.
+    if (elements.drop) {
+        const travar = (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+        };
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach((nome) => {
+            document.addEventListener(nome, travar, false);
+        });
+
+        // dragenter e dragleave disparam também ao passar por cima dos filhos da
+        // zona; contar as entradas e saídas evita a moldura a piscar.
+        let dentro = 0;
+
+        const realcar = (ligado) => elements.drop.classList.toggle('esta-a-receber', ligado);
+
+        elements.drop.addEventListener('dragenter', () => {
+            dentro += 1;
+            realcar(true);
+        });
+
+        elements.drop.addEventListener('dragleave', () => {
+            dentro = Math.max(0, dentro - 1);
+
+            if (dentro === 0) {
+                realcar(false);
+            }
+        });
+
+        elements.drop.addEventListener('drop', (event) => {
+            dentro = 0;
+            realcar(false);
+            showAlert('');
+
+            const largados = event.dataTransfer && event.dataTransfer.files;
+
+            if (largados && largados.length) {
+                // O addFiles já trata do resto: recusa o que não for PDF, ignora
+                // repetidos e pára no limite.
+                addFiles(largados);
+            }
+        });
+    }
 
     elements.form.addEventListener('submit', (event) => {
         event.preventDefault();

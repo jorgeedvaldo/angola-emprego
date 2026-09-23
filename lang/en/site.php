@@ -671,6 +671,8 @@ return [
         'descricao' => 'Job description',
         'descricao_exemplo' => 'Describe the duties, the requirements, and the training and experience you are looking for. The more detail, the better the ranking.',
         'ficheiros' => 'CVs (PDF)',
+        'arrastar' => 'Drag the CVs here',
+        'arrastar_ou' => 'or click to pick them from your computer',
         'ficheiros_ajuda' => 'Up to :max files, 5 MB each at most. PDF only — it is the format we can read the text from.',
         'analisar' => 'Analyse CVs',
         'como_funciona' => 'How it works',

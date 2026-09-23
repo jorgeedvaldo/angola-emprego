@@ -692,6 +692,8 @@ return [
         'descricao' => 'Descrição da vaga',
         'descricao_exemplo' => 'Descreva as funções, os requisitos, a formação e a experiência pretendida. Quanto mais detalhada a descrição, melhor a ordenação.',
         'ficheiros' => 'CVs (PDF)',
+        'arrastar' => 'Arraste os CVs para aqui',
+        'arrastar_ou' => 'ou clique para escolher no computador',
         'ficheiros_ajuda' => 'Até :max ficheiros, no máximo 5 MB cada. Só PDF — é o formato de que conseguimos ler o texto.',
         'analisar' => 'Analisar CVs',
         'como_funciona' => 'Como funciona',

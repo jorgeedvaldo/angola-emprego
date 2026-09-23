@@ -34,7 +34,7 @@ class CvAnalyzerController extends Controller
     public const MAX_CV_SIZE_KB = 5120;
 
     /** Máximo de CVs por análise — limite aplicado no browser. */
-    public const MAX_CVS = 30;
+    public const MAX_CVS = 50;
 
     /** Tecto defensivo para a lista de palavras-chave devolvida pelo browser. */
     private const MAX_KEYWORDS = 300;

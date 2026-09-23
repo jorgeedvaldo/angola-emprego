@@ -225,6 +225,55 @@ class CvAnalyzerJevTest extends TestCase
         });
     }
 
+    /**
+     * O browser guarda o JavaScript em cache. Quando o analisador passou a usar
+     * o JEV, o servidor passou a esperar a descrição da vaga em cada pedido e o
+     * JavaScript novo passou a enviá-la — mas os browsers continuaram com o
+     * antigo, que não a envia, e todos os CVs falhavam.
+     *
+     * A versão colada ao endereço é o que impede isso: muda quando o ficheiro
+     * muda, e o browser vai buscar o novo.
+     */
+    public function test_the_analyser_javascript_carries_a_version()
+    {
+        $resposta = $this->get(route('cv-analyzer.index'))->assertOk();
+
+        $this->assertMatchesRegularExpression(
+            '#assets/js/cv-analyzer\.js\?v=\d+#',
+            $resposta->getContent(),
+            'O JavaScript do analisador tem de sair com versão, senão o browser fica com o antigo.'
+        );
+    }
+
+    /**
+     * Este é o erro que se viu em produção: o JavaScript antigo, em cache, a
+     * falar com um servidor já com o JEV ligado. Fica aqui para ser reconhecido
+     * de imediato se voltar a acontecer.
+     */
+    public function test_a_stale_browser_gets_told_to_refresh_instead_of_a_wrong_score()
+    {
+        $this->ligarJev();
+        Http::fake();
+
+        // O que o JavaScript antigo envia: vector e model, nenhuma descrição.
+        // Os cabeçalhos são os mesmos que o browser manda, senão a falha de
+        // validação sairia como um redireccionamento em vez de JSON.
+        $resposta = $this->post(route('cv-analyzer.cv'), [
+            'cv' => $this->pdf(),
+            'vector' => '[]',
+            'model' => 'jev',
+            'keywords' => '[]',
+            'requirements' => '[]',
+        ], ['Accept' => 'application/json', 'X-Requested-With' => 'XMLHttpRequest']);
+
+        $resposta->assertStatus(422);
+        $this->assertStringContainsString('Actualize a página', $resposta->json('message') ?? '');
+
+        // E sobretudo: não se gastou uma chamada ao JEV nem ao OCR com um pedido
+        // que nunca poderia dar uma pontuação.
+        Http::assertNothingSent();
+    }
+
     /** A resposta do JEV, na forma que a documentação define. */
     private function respostaJev(float $noul): array
     {

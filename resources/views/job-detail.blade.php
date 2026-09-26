@@ -242,6 +242,63 @@
 
         <div class="col-lg-4">
           <div class="sticky-top" style="top: 100px;">
+
+            {{-- Só aparece com o JEV ligado. Sem ele não há uma percentagem
+                 única para mostrar ao candidato, e meia funcionalidade era pior
+                 do que nenhuma. --}}
+            @if(\App\Services\Cv\CvEngine::jevActivo())
+            {{-- Os textos que o JavaScript usa vêm daqui já traduzidos: ele não
+                 tem acesso aos ficheiros de tradução. --}}
+            <div class="card shadow-sm border-0 mb-4 rounded-3" id="verificar-cv"
+                 data-url="{{ route('cv-check', $job->slug) }}"
+                 data-so-pdf="{{ __('site.verificar.so_pdf') }}"
+                 data-a-verificar="{{ __('site.verificar.a_verificar') }}"
+                 data-falhou="{{ __('site.verificar.falhou') }}">
+              <div class="card-header bg-white py-3 border-bottom-0">
+                <h5 class="fw-bold m-0 text-dark">
+                  <i class="bi bi-patch-check text-primary me-1"></i> {{ __('site.verificar.titulo') }}
+                </h5>
+              </div>
+              <div class="card-body">
+                <p class="text-muted small">{{ __('site.verificar.intro') }}</p>
+
+                <form data-form>
+                  <label class="vcv-drop" data-drop>
+                    <i class="bi bi-file-earmark-arrow-up vcv-drop-icon" aria-hidden="true"></i>
+                    <span class="fw-semibold small" data-nome>{{ __('site.verificar.arrastar') }}</span>
+                    <span class="text-muted" style="font-size:.8rem;">{{ __('site.verificar.arrastar_ou') }}</span>
+                    <input type="file" accept="application/pdf,.pdf" class="visually-hidden" data-input>
+                  </label>
+
+                  <button type="submit" class="btn btn-primary w-100 mt-3 fw-bold" data-submit disabled>
+                    <i class="bi bi-stars me-1"></i> {{ __('site.verificar.verificar') }}
+                  </button>
+                </form>
+
+                <div class="alert alert-danger small mt-3 d-none" data-erro role="alert"></div>
+
+                <div class="mt-3 d-none" data-resultado>
+                  <div class="text-center">
+                    <div class="text-muted small">{{ __('site.verificar.resultado') }}</div>
+                    <div class="display-5 fw-bold" data-percentagem>—</div>
+                    <div class="progress mt-2" style="height:8px;">
+                      <div class="progress-bar" data-barra style="width:0%"></div>
+                    </div>
+                  </div>
+                  <p class="small mt-3 mb-2" data-leitura></p>
+                  <p class="text-muted mb-3" style="font-size:.78rem;">{{ __('site.verificar.aviso') }}</p>
+                  <button type="button" class="btn btn-outline-secondary btn-sm w-100" data-recomecar>
+                    {{ __('site.verificar.outro') }}
+                  </button>
+                </div>
+
+                <p class="text-muted mt-3 mb-0" style="font-size:.75rem;">
+                  <i class="bi bi-shield-check me-1"></i>{{ __('site.verificar.privacidade') }}
+                </p>
+              </div>
+            </div>
+            @endif
+
             <div class="card shadow-sm border-0 mb-4 rounded-3">
               <div class="card-header bg-white py-3 border-bottom-0">
                 <h5 class="fw-bold m-0 text-dark">{{ __('site.vaga.categorias') }}</h5>
@@ -303,5 +360,43 @@
       padding-left: 1.5rem;
       margin-bottom: 1.5rem;
     }
+
+    /* Zona de largar do cartão de verificação do CV. */
+    .vcv-drop {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .15rem;
+      width: 100%;
+      padding: 1.25rem .75rem;
+      border: 2px dashed #c7d2e0;
+      border-radius: .75rem;
+      background-color: #f8fafc;
+      cursor: pointer;
+      text-align: center;
+      transition: border-color .15s ease, background-color .15s ease;
+    }
+
+    .vcv-drop:hover,
+    .vcv-drop:focus-within,
+    .vcv-drop.esta-a-receber {
+      border-color: #2557a7;
+      background-color: #eef4ff;
+    }
+
+    .vcv-drop.esta-a-receber { border-style: solid; }
+
+    .vcv-drop-icon {
+      font-size: 1.4rem;
+      color: #2557a7;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .vcv-drop { transition: none; }
+    }
   </style>
+
+  @if(\App\Services\Cv\CvEngine::jevActivo())
+    <script src="@asset('assets/js/verificar-cv.js')"></script>
+  @endif
 @endsection('content')

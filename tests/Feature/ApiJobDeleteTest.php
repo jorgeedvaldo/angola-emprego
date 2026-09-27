@@ -12,32 +12,18 @@ use Tests\TestCase;
 /**
  * DELETE /api/jobs/{id}.
  *
- * É a única rota desta API que não se desfaz, e a única que pede chave: o
- * /api/job/create está aberto ao mundo, e publicar uma vaga a mais é chato mas
- * desfaz-se — apagar não.
+ * A rota é aberta, como o resto desta API. O que estes testes guardam é o que
+ * ela faz quando corre: uma vaga não sai sozinha da base de dados — traz atrás
+ * o pivot das categorias, que não tem cascata, e os ficheiros no disco, que a
+ * base de dados não sabe apagar.
  */
 class ApiJobDeleteTest extends TestCase
 {
     use RefreshDatabase;
 
-    private const CHAVE = 'chave-de-teste-comprida-o-suficiente';
-
-    protected function setUp(): void
+    private function apagar(int $id, array $corpo = [])
     {
-        parent::setUp();
-
-        config(['services.api.key' => self::CHAVE]);
-    }
-
-    private function apagar(int $id, array $corpo = [], ?string $chave = self::CHAVE)
-    {
-        $cabecalhos = ['Accept' => 'application/json'];
-
-        if ($chave !== null) {
-            $cabecalhos['X-API-Key'] = $chave;
-        }
-
-        return $this->json('DELETE', "/api/jobs/$id", $corpo, $cabecalhos);
+        return $this->json('DELETE', "/api/jobs/$id", $corpo, ['Accept' => 'application/json']);
     }
 
     public function test_it_deletes_a_job()
@@ -50,41 +36,6 @@ class ApiJobDeleteTest extends TestCase
             ->assertJsonPath('deleted.title', 'Vaga a apagar');
 
         $this->assertDatabaseMissing('jobs', ['id' => $vaga->id]);
-    }
-
-    // ---------------------------------------------------------------- chave
-
-    public function test_without_a_key_nothing_is_deleted()
-    {
-        $vaga = Job::factory()->create();
-
-        $this->apagar($vaga->id, [], null)->assertStatus(401);
-
-        $this->assertDatabaseHas('jobs', ['id' => $vaga->id]);
-    }
-
-    public function test_with_the_wrong_key_nothing_is_deleted()
-    {
-        $vaga = Job::factory()->create();
-
-        $this->apagar($vaga->id, [], 'chave-errada')->assertStatus(401);
-
-        $this->assertDatabaseHas('jobs', ['id' => $vaga->id]);
-    }
-
-    /**
-     * Sem chave configurada no servidor a rota fecha-se a toda a gente. Ficar
-     * aberta por esquecimento seria o pior dos dois mundos.
-     */
-    public function test_with_no_key_configured_the_route_is_closed_to_everyone()
-    {
-        config(['services.api.key' => null]);
-        $vaga = Job::factory()->create();
-
-        $this->apagar($vaga->id)->assertStatus(503);
-        $this->apagar($vaga->id, [], null)->assertStatus(503);
-
-        $this->assertDatabaseHas('jobs', ['id' => $vaga->id]);
     }
 
     // ------------------------------------------------ o que está agarrado
@@ -196,8 +147,8 @@ class ApiJobDeleteTest extends TestCase
         $this->apagar($vaga->id)->assertStatus(404);
     }
 
-    /** As outras rotas da API não passam a pedir chave por causa desta. */
-    public function test_creating_a_job_still_works_without_a_key()
+    /** A rota de criar vagas continua a funcionar como sempre. */
+    public function test_creating_a_job_still_works()
     {
         $this->postJson('/api/job/create', [
             'title' => 'Motorista',

@@ -22,10 +22,7 @@ Route::post('/post/create', [PostController::class, 'store']);
 
 Route::get('/jobs/{id}', [JobController::class, 'getById']);
 
-// Apagar uma vaga é a única coisa desta API que não se desfaz, e por isso é a
-// única que pede chave. Ver App\Http\Middleware\ApiKey e docs/api-vagas.md.
-Route::delete('/jobs/{id}', [JobController::class, 'destroy'])
-    ->middleware(['api.key', 'throttle:30,1']);
+Route::delete('/jobs/{id}', [JobController::class, 'destroy']);
 Route::get('/users', [App\Http\Controllers\Api\UserController::class, 'index']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

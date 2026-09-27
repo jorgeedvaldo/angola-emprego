@@ -152,25 +152,12 @@ campos obrigatórios do seu lado antes de enviar.
 
 ```
 DELETE https://angolaemprego.com/api/jobs/{id}
-X-API-Key: <a sua chave>
 ```
 
-É a **única rota desta API que pede chave**, e a única que não se desfaz.
-Publicar uma vaga a mais é chato mas corrige-se; apagar não. Sem a chave, ou
-com a chave errada, responde `401` e não apaga nada.
-
-A chave vive no `.env` do servidor, em `API_KEY`. Gere uma comprida e ao acaso:
-
-```bash
-php -r "echo bin2hex(random_bytes(32));"
-```
-
-Se o servidor não tiver `API_KEY` configurada, a rota responde `503` a toda a
-gente — fechada é melhor do que aberta por esquecimento.
+Sem autenticação, como o resto desta API.
 
 ```bash
 curl -X DELETE https://angolaemprego.com/api/jobs/1841 \
-  -H "X-API-Key: $API_KEY" \
   -H "Accept: application/json"
 ```
 
@@ -190,8 +177,8 @@ curl -X DELETE https://angolaemprego.com/api/jobs/1841 \
 ### Vagas com candidaturas
 
 Uma vaga com candidaturas **não se apaga à primeira**. São CVs que pessoas
-enviaram e que desaparecem com ela, e um script não deve poder destruí-los sem
-o pedir de propósito. A resposta é `409`:
+enviaram e que desaparecem com ela, por isso é preciso confirmar. A resposta é
+`409`:
 
 ```json
 {
@@ -205,7 +192,6 @@ Para confirmar:
 
 ```bash
 curl -X DELETE https://angolaemprego.com/api/jobs/1841 \
-  -H "X-API-Key: $API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"force": true}'
 ```
@@ -227,12 +213,17 @@ resposta diz quantos saíram.
 
 | Estado | Quando |
 |---|---|
-| `401` | chave em falta ou errada |
 | `404` | não existe vaga com esse id — apagar duas vezes dá `404` à segunda |
 | `409` | a vaga tem candidaturas e não veio `force` |
-| `503` | o servidor não tem `API_KEY` configurada |
 
-Limite: 30 pedidos por minuto.
+### ⚠️ A rota é aberta
+
+Qualquer pessoa que descubra o endereço pode apagar qualquer vaga, e com ela as
+candidaturas que lhe chegaram. É a mesma porta do `POST /api/job/create`, mas o
+que sai por ela não se desfaz.
+
+Se um dia quiser fechá-la, o caminho mais curto é um cabeçalho com uma chave
+comparada com uma variável do `.env`.
 
 ---
 
@@ -242,8 +233,7 @@ Limite: 30 pedidos por minuto.
   ficam sem categoria e têm de ser categorizadas no site.
 - **Actualizar.** Só se cria e se apaga. Cada `POST` cria uma vaga nova, mesmo
   que o título seja igual ao de outra.
-- **Autenticação para criar.** O `POST /api/job/create` continua aberto; só o
-  apagar pede chave.
+- **Autenticação.** Todas as rotas são abertas, incluindo a de apagar.
 
 Para ler uma vaga já criada: `GET /api/jobs/{id}`, que devolve também as
 categorias e o país.

@@ -47,6 +47,13 @@ Route::get('/empresas-e-recrutadores', [RecruiterController::class, 'index'])->n
 Route::get('/analisador-de-cv', [CvAnalyzerController::class, 'index'])->name('cv-analyzer.index');
 Route::post('/analisador-de-cv/vaga', [CvAnalyzerController::class, 'analyzeJob'])->name('cv-analyzer.job')->middleware('throttle:20,1');
 Route::post('/analisador-de-cv/cv', [CvAnalyzerController::class, 'analyzeCv'])->name('cv-analyzer.cv')->middleware('throttle:120,1');
+
+// "Verifique o seu CV" na página de cada vaga. Cada verificação custa um OCR
+// e uma chamada ao JEV, e a rota é pública: dez por minuto chegam de sobra a
+// quem está a testar o seu currículo, e travam quem quisesse abusar.
+Route::post('/vagas/{slug}/verificar-cv', [\App\Http\Controllers\CvCheckController::class, 'check'])
+    ->name('cv-check')
+    ->middleware('throttle:10,1');
 Route::get('/company/{slug}', [CompanyController::class, 'show'])->name('companies.show')->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*');
 Route::get('/company/{slug}/vagas/{jobSlug}', [CompanyController::class, 'showJob'])->name('companies.job')->where('slug', '[a-z0-9]+(?:-[a-z0-9]+)*');
 Route::post('/vagas/{slug}/candidatar', [JobApplicationController::class, 'store'])->name('jobs.apply')->middleware('throttle:10,1');

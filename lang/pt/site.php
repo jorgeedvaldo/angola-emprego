@@ -268,6 +268,36 @@ return [
         'publicar_primeira' => 'Publicar a primeira',
     ],
 
+    'verificar' => [
+        'titulo' => 'Verifique o seu CV',
+        'intro' => 'Carregue o seu CV e veja como ele se compara com esta vaga. É gratuito, não precisa de conta e o ficheiro não é guardado.',
+        'escolher' => 'Escolher o meu CV (PDF)',
+        'arrastar' => 'Arraste o seu CV para aqui',
+        'arrastar_ou' => 'ou clique para escolher no computador',
+        'verificar' => 'Verificar compatibilidade',
+        'a_verificar' => 'A ler o seu CV...',
+        'resultado' => 'Compatibilidade com esta vaga',
+        'outro' => 'Verificar outro CV',
+        'privacidade' => 'O ficheiro é usado só para esta verificação e não fica guardado em lado nenhum.',
+
+        // A leitura de cada faixa. Nenhuma delas diz a ninguém para não se
+        // candidatar: quem decide é a empresa, e uma percentagem baixa pode ser
+        // só um CV mal escrito para uma pessoa que serve para o lugar.
+        'leitura_alta' => 'O seu CV mostra boa parte do que esta vaga pede. Vale a pena candidatar-se.',
+        'leitura_media' => 'Há pontos em comum, mas faltam outros. Veja os requisitos da vaga e, se os cumprir, torne-os visíveis no seu CV antes de se candidatar.',
+        'leitura_baixa' => 'O seu CV tem pouco em comum com o que esta vaga pede. Pode candidatar-se na mesma — isto é só uma orientação —, mas talvez encontre vagas mais próximas do seu perfil.',
+
+        'aviso' => 'Isto é uma orientação automática, não uma decisão. Quem escolhe os candidatos é a empresa.',
+
+        'indisponivel' => 'A verificação de CV não está disponível de momento.',
+        'escolha_cv' => 'Escolha o seu CV em PDF.',
+        'cv_grande' => 'O CV não pode ultrapassar 5 MB.',
+        'so_pdf' => 'O CV deve estar em formato PDF.',
+        'ficheiro_vazio' => 'Este ficheiro está vazio ou não pôde ser lido.',
+        'nao_leu' => 'Não foi possível ler este CV. Se for digitalizado, experimente um PDF com texto.',
+        'falhou' => 'Não foi possível fazer a verificação. Tente novamente dentro de momentos.',
+    ],
+
     'vaga_form' => [
         'titulo_vaga' => 'Título da vaga',
         'pais' => 'País',

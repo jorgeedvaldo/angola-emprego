@@ -257,6 +257,33 @@ return [
         'publicar_primeira' => 'Post your first one',
     ],
 
+    'verificar' => [
+        'titulo' => 'Check your CV',
+        'intro' => 'Upload your CV and see how it compares with this job. Free, no account needed, and the file is not stored.',
+        'escolher' => 'Choose my CV (PDF)',
+        'arrastar' => 'Drag your CV here',
+        'arrastar_ou' => 'or click to pick it from your computer',
+        'verificar' => 'Check the match',
+        'a_verificar' => 'Reading your CV…',
+        'resultado' => 'Match with this job',
+        'outro' => 'Check another CV',
+        'privacidade' => 'The file is used for this check only and is not stored anywhere.',
+
+        'leitura_alta' => 'Your CV shows much of what this job asks for. It is worth applying.',
+        'leitura_media' => 'There is common ground, but some things are missing. Read the requirements and, if you meet them, make them visible on your CV before applying.',
+        'leitura_baixa' => 'Your CV has little in common with what this job asks for. You can still apply — this is only a guide — but you may find jobs closer to your profile.',
+
+        'aviso' => 'This is an automatic guide, not a decision. The company chooses the candidates.',
+
+        'indisponivel' => 'CV checking is not available right now.',
+        'escolha_cv' => 'Choose your CV as a PDF.',
+        'cv_grande' => 'The CV cannot be larger than 5 MB.',
+        'so_pdf' => 'The CV must be a PDF.',
+        'ficheiro_vazio' => 'This file is empty or could not be read.',
+        'nao_leu' => 'We could not read this CV. If it is scanned, try a PDF with real text.',
+        'falhou' => 'The check could not be completed. Please try again in a moment.',
+    ],
+
     'vaga_form' => [
         'titulo_vaga' => 'Job title',
         'pais' => 'Country',

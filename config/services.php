@@ -44,6 +44,14 @@ return [
         'from_name' => env('MAILEROO_FROM_NAME', env('MAIL_FROM_NAME', 'Angola Emprego')),
     ],
 
+    /*
+     * Chave das rotas da API que alteram ou destroem dados. Ver
+     * App\Http\Middleware\ApiKey.
+     */
+    'api' => [
+        'key' => env('API_KEY'),
+    ],
+
     'analisecv' => [
         'url' => env('ANALISECV_URL'),
         'api_key' => env('ANALISECV_API_KEY'),

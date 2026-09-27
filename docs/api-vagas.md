@@ -148,13 +148,102 @@ campos obrigatórios do seu lado antes de enviar.
 
 ---
 
+## Apagar uma vaga
+
+```
+DELETE https://angolaemprego.com/api/jobs/{id}
+X-API-Key: <a sua chave>
+```
+
+É a **única rota desta API que pede chave**, e a única que não se desfaz.
+Publicar uma vaga a mais é chato mas corrige-se; apagar não. Sem a chave, ou
+com a chave errada, responde `401` e não apaga nada.
+
+A chave vive no `.env` do servidor, em `API_KEY`. Gere uma comprida e ao acaso:
+
+```bash
+php -r "echo bin2hex(random_bytes(32));"
+```
+
+Se o servidor não tiver `API_KEY` configurada, a rota responde `503` a toda a
+gente — fechada é melhor do que aberta por esquecimento.
+
+```bash
+curl -X DELETE https://angolaemprego.com/api/jobs/1841 \
+  -H "X-API-Key: $API_KEY" \
+  -H "Accept: application/json"
+```
+
+```json
+{
+  "message": "Vaga apagada.",
+  "deleted": {
+    "id": 1841,
+    "title": "Analista de Suporte Técnico",
+    "slug": "analista-de-suporte-tecnico",
+    "applications": 0,
+    "files_removed": 2
+  }
+}
+```
+
+### Vagas com candidaturas
+
+Uma vaga com candidaturas **não se apaga à primeira**. São CVs que pessoas
+enviaram e que desaparecem com ela, e um script não deve poder destruí-los sem
+o pedir de propósito. A resposta é `409`:
+
+```json
+{
+  "message": "Esta vaga tem 7 candidatura(s), que são apagadas com ela. Repita com 'force': true para confirmar.",
+  "job_id": 1841,
+  "applications": 7
+}
+```
+
+Para confirmar:
+
+```bash
+curl -X DELETE https://angolaemprego.com/api/jobs/1841 \
+  -H "X-API-Key: $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"force": true}'
+```
+
+### O que desaparece com a vaga
+
+| | |
+|---|---|
+| Candidaturas e os seus anexos | as linhas descem em cascata na base de dados |
+| CVs enviados pelos candidatos | a pasta `job-applications/{id}` sai do disco |
+| Capa da vaga e a miniatura | saem do disco |
+| Ligação às categorias | a ligação sai; **as categorias em si ficam** |
+
+As candidaturas descem em cascata, mas os ficheiros no disco não: ninguém mais
+iria lá buscá-los, por isso é o endpoint que os remove. O `files_removed` da
+resposta diz quantos saíram.
+
+### Erros
+
+| Estado | Quando |
+|---|---|
+| `401` | chave em falta ou errada |
+| `404` | não existe vaga com esse id — apagar duas vezes dá `404` à segunda |
+| `409` | a vaga tem candidaturas e não veio `force` |
+| `503` | o servidor não tem `API_KEY` configurada |
+
+Limite: 30 pedidos por minuto.
+
+---
+
 ## O que esta rota ainda não faz
 
 - **Categorias.** O campo `categories` é ignorado; as vagas publicadas por aqui
   ficam sem categoria e têm de ser categorizadas no site.
-- **Actualizar ou apagar.** Só se cria. Cada pedido cria uma vaga nova, mesmo
+- **Actualizar.** Só se cria e se apaga. Cada `POST` cria uma vaga nova, mesmo
   que o título seja igual ao de outra.
-- **Autenticação.** A rota é aberta.
+- **Autenticação para criar.** O `POST /api/job/create` continua aberto; só o
+  apagar pede chave.
 
 Para ler uma vaga já criada: `GET /api/jobs/{id}`, que devolve também as
 categorias e o país.

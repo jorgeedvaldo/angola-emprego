@@ -148,13 +148,92 @@ campos obrigatórios do seu lado antes de enviar.
 
 ---
 
+## Apagar uma vaga
+
+```
+DELETE https://angolaemprego.com/api/jobs/{id}
+```
+
+Sem autenticação, como o resto desta API.
+
+```bash
+curl -X DELETE https://angolaemprego.com/api/jobs/1841 \
+  -H "Accept: application/json"
+```
+
+```json
+{
+  "message": "Vaga apagada.",
+  "deleted": {
+    "id": 1841,
+    "title": "Analista de Suporte Técnico",
+    "slug": "analista-de-suporte-tecnico",
+    "applications": 0,
+    "files_removed": 2
+  }
+}
+```
+
+### Vagas com candidaturas
+
+Uma vaga com candidaturas **não se apaga à primeira**. São CVs que pessoas
+enviaram e que desaparecem com ela, por isso é preciso confirmar. A resposta é
+`409`:
+
+```json
+{
+  "message": "Esta vaga tem 7 candidatura(s), que são apagadas com ela. Repita com 'force': true para confirmar.",
+  "job_id": 1841,
+  "applications": 7
+}
+```
+
+Para confirmar:
+
+```bash
+curl -X DELETE https://angolaemprego.com/api/jobs/1841 \
+  -H "Content-Type: application/json" \
+  -d '{"force": true}'
+```
+
+### O que desaparece com a vaga
+
+| | |
+|---|---|
+| Candidaturas e os seus anexos | as linhas descem em cascata na base de dados |
+| CVs enviados pelos candidatos | a pasta `job-applications/{id}` sai do disco |
+| Capa da vaga e a miniatura | saem do disco |
+| Ligação às categorias | a ligação sai; **as categorias em si ficam** |
+
+As candidaturas descem em cascata, mas os ficheiros no disco não: ninguém mais
+iria lá buscá-los, por isso é o endpoint que os remove. O `files_removed` da
+resposta diz quantos saíram.
+
+### Erros
+
+| Estado | Quando |
+|---|---|
+| `404` | não existe vaga com esse id — apagar duas vezes dá `404` à segunda |
+| `409` | a vaga tem candidaturas e não veio `force` |
+
+### ⚠️ A rota é aberta
+
+Qualquer pessoa que descubra o endereço pode apagar qualquer vaga, e com ela as
+candidaturas que lhe chegaram. É a mesma porta do `POST /api/job/create`, mas o
+que sai por ela não se desfaz.
+
+Se um dia quiser fechá-la, o caminho mais curto é um cabeçalho com uma chave
+comparada com uma variável do `.env`.
+
+---
+
 ## O que esta rota ainda não faz
 
 - **Categorias.** O campo `categories` é ignorado; as vagas publicadas por aqui
   ficam sem categoria e têm de ser categorizadas no site.
-- **Actualizar ou apagar.** Só se cria. Cada pedido cria uma vaga nova, mesmo
+- **Actualizar.** Só se cria e se apaga. Cada `POST` cria uma vaga nova, mesmo
   que o título seja igual ao de outra.
-- **Autenticação.** A rota é aberta.
+- **Autenticação.** Todas as rotas são abertas, incluindo a de apagar.
 
 Para ler uma vaga já criada: `GET /api/jobs/{id}`, que devolve também as
 categorias e o país.

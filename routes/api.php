@@ -22,7 +22,6 @@ Route::post('/post/create', [PostController::class, 'store']);
 
 Route::get('/jobs/{id}', [JobController::class, 'getById']);
 
-Route::delete('/jobs/{id}', [JobController::class, 'destroy']);
 Route::get('/users', [App\Http\Controllers\Api\UserController::class, 'index']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

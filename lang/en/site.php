@@ -257,6 +257,24 @@ return [
         'publicar_primeira' => 'Post your first one',
     ],
 
+    'promo_empresas' => [
+        'etiqueta' => 'New',
+        'sobretitulo' => 'Free for companies',
+        'titulo' => 'Candidate screening by artificial intelligence',
+        'texto' => 'Register your company, post the job, and let our system read the CVs for you. In seconds, see which candidates best match what you are looking for — without opening one PDF at a time.',
+
+        'ponto1' => 'Free to join',
+        'ponto1_nota' => 'No monthly fee',
+        'ponto2' => 'Automatic reading',
+        'ponto2_nota' => 'of every CV',
+        'ponto3' => 'Ranking',
+        'ponto3_nota' => 'by how well they match',
+
+        'criar' => 'Create a company',
+        'criar_nota' => 'Register your company for free, set up an official page with your logo and contacts, and start posting jobs.',
+        'como_funciona' => 'See how it works',
+    ],
+
     'verificar' => [
         'titulo' => 'Check your CV',
         'intro' => 'Upload your CV and see how it compares with this job. Free, no account needed, and the file is not stored.',

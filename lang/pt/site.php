@@ -268,6 +268,24 @@ return [
         'publicar_primeira' => 'Publicar a primeira',
     ],
 
+    'promo_empresas' => [
+        'etiqueta' => 'Novo',
+        'sobretitulo' => 'Serviço gratuito para empresas',
+        'titulo' => 'Análise de candidatos por inteligência artificial',
+        'texto' => 'Cadastre a sua empresa, publique a vaga e deixe o nosso sistema ler os currículos por si. Em poucos segundos, veja quais candidatos mais combinam com o que procura — sem abrir um PDF de cada vez.',
+
+        'ponto1' => 'Cadastro grátis',
+        'ponto1_nota' => 'Sem mensalidade',
+        'ponto2' => 'Leitura automática',
+        'ponto2_nota' => 'de cada currículo',
+        'ponto3' => 'Ranking',
+        'ponto3_nota' => 'por compatibilidade',
+
+        'criar' => 'Criar empresa',
+        'criar_nota' => 'Registe a sua empresa gratuitamente, monte a página oficial com logótipo e contactos e comece a publicar vagas.',
+        'como_funciona' => 'Ver como funciona',
+    ],
+
     'verificar' => [
         'titulo' => 'Verifique o seu CV',
         'intro' => 'Carregue o seu CV e veja como ele se compara com esta vaga. É gratuito, não precisa de conta e o ficheiro não é guardado.',

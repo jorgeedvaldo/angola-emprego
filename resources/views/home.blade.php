@@ -404,6 +404,8 @@
         </div>
     </section><!-- /Recent Articles Section -->
 
+    @include('partials.google-news')
+
     <!-- Social Media CTA Section -->
     @include('partials.social-cta')
 

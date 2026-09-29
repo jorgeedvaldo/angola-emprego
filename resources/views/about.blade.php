@@ -152,6 +152,8 @@
         </div>
     </section>
 
+    @include('partials.google-news')
+
     <!-- Contact Section -->
     <section id="contact" class="contact section py-5">
         <div class="container">

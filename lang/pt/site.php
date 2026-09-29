@@ -268,6 +268,14 @@ return [
         'publicar_primeira' => 'Publicar a primeira',
     ],
 
+    'google_news' => [
+        'siga' => 'Siga o Angola Emprego no',
+        'nota' => 'Receba as vagas e as notícias mais recentes directamente no seu feed.',
+        'marca' => 'Notícias',
+        'botao' => 'Seguir',
+        'aria' => 'Seguir o Angola Emprego no Google Notícias',
+    ],
+
     'promo_empresas' => [
         'etiqueta' => 'Novo',
         'sobretitulo' => 'Serviço gratuito para empresas',

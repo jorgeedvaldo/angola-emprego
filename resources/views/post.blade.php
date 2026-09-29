@@ -124,6 +124,8 @@
     </div>
 
     <!-- Article Section -->
+    @include('partials.google-news')
+
     <section class="section py-5">
 
       <div class="container">
@@ -186,6 +188,8 @@
 
     </section>
     
+    @include('partials.google-news')
+
     @include('partials.promo-empresas')
 
     @include('partials.social-cta')

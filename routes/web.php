@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\BlogController;
+use App\Http\Controllers\FeedController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\JobController;
 use App\Http\Controllers\JobApplicationController;
@@ -68,6 +69,7 @@ Route::get('/feed', [HomeController::class, 'feedGenerator'])->name('feed');
 Route::get('/@{username}', [App\Http\Controllers\ProfileController::class, 'publicProfile'])->name('profile.public');
 
 Route::get('/vagas/{slug}', [JobController::class, 'getBySlug']);
+Route::get('/vagas/{slug}/feed', [FeedController::class, 'job'])->name('feed.job');
 
 Route::middleware(['guest'])->group(function () {
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -161,4 +163,5 @@ Route::get('/noticias/resultados-concurso-csmj-2026', function () {
 })->name('post.resultado.csmj');
 
 Route::get('/noticias/{slug}', [BlogController::class, 'getBySlug']);
+Route::get('/noticias/{slug}/feed', [FeedController::class, 'post'])->name('feed.post');
 Route::get('/{slug}', [BlogController::class, 'getBySlug']);

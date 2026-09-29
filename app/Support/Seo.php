@@ -100,7 +100,8 @@ class Seo
     {
         $site = rtrim(url('/'), '/') . '/';
         $idioma = self::idioma();
-        $nome = config('app.name');
+        $nome = self::nomeDoSite();
+        $alternativo = trim((string) config('seo.nome_alternativo'));
 
         $imagem = [
             '@type' => 'ImageObject',
@@ -122,6 +123,10 @@ class Seo
                     '@id' => $site . '#website',
                     'url' => $site,
                     'name' => $nome,
+                    // O Google lê o nome do site aqui, e só na página inicial.
+                    // O alternateName é onde a forma comprida cabe sem ser
+                    // confundida com o nome.
+                    'alternateName' => $alternativo ?: $nome,
                     'description' => __('site.seo.site_descricao'),
                     'inLanguage' => $idioma,
                     'publisher' => ['@id' => $site . '#organizacao'],
@@ -186,6 +191,17 @@ class Seo
                 $imagem,
             ],
         ];
+    }
+
+    /**
+     * O nome curto do site, para o Google e para as redes sociais.
+     *
+     * Separado do APP_NAME porque esse assina também os emails e costuma
+     * acabar com o slogan colado — e um nome com slogan o Google recusa.
+     */
+    public static function nomeDoSite(): string
+    {
+        return config('seo.nome') ?: config('app.name');
     }
 
     /** pt-AO para o português; o código do idioma para o resto. */

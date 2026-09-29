@@ -217,10 +217,67 @@ class SeoTest extends TestCase
      */
     public function test_the_title_carries_the_site_name_from_the_configuration()
     {
-        config(['app.name' => 'Nome Da Configuração']);
+        config(['seo.nome' => 'Nome Da Configuração']);
 
         $this->get('/sobre')
             ->assertOk()
             ->assertSee('<title>Sobre Nós - Nome Da Configuração</title>', false);
+    }
+
+    // --------------------------------------------------- o nome do site
+
+    /**
+     * O Google mostra o nome do site por cima do resultado, no lugar do
+     * domínio — e lê-o do WebSite da página inicial. Um nome com slogan colado
+     * ("Angola Emprego - Notícias e Empregos") é recusado, e ele volta a
+     * escrever "angolaemprego.com".
+     */
+    public function test_the_site_name_is_a_name_and_not_a_title_with_a_tagline()
+    {
+        $nos = collect($this->fichas('/'));
+        $website = $nos->firstWhere('@type', 'WebSite');
+
+        $this->assertSame('Angola Emprego', $website['name']);
+        $this->assertStringNotContainsString(' - ', $website['name']);
+    }
+
+    /** A forma comprida cabe no alternateName, que é onde o Google a aceita. */
+    public function test_the_long_form_of_the_name_goes_in_the_alternate_name()
+    {
+        $website = collect($this->fichas('/'))->firstWhere('@type', 'WebSite');
+
+        $this->assertSame(config('seo.nome_alternativo'), $website['alternateName']);
+    }
+
+    /**
+     * O nome não pode vir do APP_NAME: esse assina também os emails e em
+     * produção acaba com o slogan colado.
+     */
+    public function test_the_site_name_does_not_follow_the_app_name()
+    {
+        config(['app.name' => 'Angola Emprego - Notícias e Empregos']);
+
+        $html = $this->get('/')->assertOk()->getContent();
+
+        $this->assertStringContainsString(
+            '<meta property="og:site_name" content="Angola Emprego" />',
+            $html
+        );
+        $this->assertStringContainsString('<title>Início - Angola Emprego</title>', $html);
+    }
+
+    /** O nome e o og:site_name têm de dizer o mesmo, ou o Google ignora os dois. */
+    public function test_the_three_places_that_name_the_site_agree_with_each_other()
+    {
+        $html = $this->get('/')->assertOk()->getContent();
+        $website = collect($this->fichas('/'))->firstWhere('@type', 'WebSite');
+        $organizacao = collect($this->fichas('/'))->firstWhere('@type', 'Organization');
+
+        $this->assertStringContainsString(
+            '<meta property="og:site_name" content="' . $website['name'] . '" />',
+            $html
+        );
+        $this->assertSame($website['name'], $organizacao['name']);
+        $this->assertStringContainsString('- ' . $website['name'] . '</title>', $html);
     }
 }

@@ -8,7 +8,7 @@
       // Tudo o que o cabeçalho precisa de saber, recolhido de uma vez: o que a
       // página declarou por @section e o que a classe Seo deduz sozinha.
       $seoTitulo = trim($__env->yieldContent('title'));
-      $seoNomeDoSite = config('app.name');
+      $seoNomeDoSite = \App\Support\Seo::nomeDoSite();
       $seoTituloCompleto = $seoTitulo === '' ? $seoNomeDoSite : $seoTitulo . ' - ' . $seoNomeDoSite;
       $seoDescricao = trim($__env->yieldContent('description'));
       $seoCanonica = \App\Support\Seo::canonica($__env->yieldContent('canonical_link'));

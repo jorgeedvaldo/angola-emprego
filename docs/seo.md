@@ -56,6 +56,29 @@ O `noindex` é automático quando o endereço traz parâmetros — uma pesquisa
 Nas páginas privadas (entrar, registar, painel da empresa, perfil, planos,
 pagamento, erros) está declarado à mão com `@section('robots', ...)`.
 
+### O nome do site
+
+O que o Google escreve por cima do resultado, em vez do domínio.
+
+Vem de `config/seo.php` (`SEO_SITE_NAME` no `.env`), **não** do `APP_NAME`. O
+`APP_NAME` assina também os emails e acaba quase sempre com o slogan colado —
+e um nome com slogan o Google recusa, voltando a escrever `angolaemprego.com`.
+
+Três sítios têm de dizer o mesmo, ou o Google ignora os três:
+
+| | |
+|---|---|
+| `WebSite.name` no JSON-LD | o principal, e **só é lido da página inicial** |
+| `og:site_name` | o que as redes sociais mostram |
+| o fim do `<title>` | o sinal de reserva |
+
+A forma comprida vai para o `alternateName` (`SEO_SITE_ALT_NAME`), que é onde o
+Google a aceita sem a confundir com o nome.
+
+Depois de mudar, o nome só aparece quando o Google voltar a ler a **página
+inicial** — pode levar semanas. Pedir a indexação da página inicial no Search
+Console acelera.
+
 ### Open Graph e Twitter
 
 O que o Facebook, o LinkedIn e o WhatsApp lêem quando alguém partilha a ligação.

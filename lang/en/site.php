@@ -260,6 +260,7 @@ return [
     'google_news' => [
         'siga' => 'Follow Angola Emprego on',
         'nota' => 'Get the latest jobs and news straight to your feed.',
+        'marca' => 'News',
         'botao' => 'Follow',
         'aria' => 'Follow Angola Emprego on Google News',
     ],

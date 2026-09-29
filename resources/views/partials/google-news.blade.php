@@ -26,7 +26,7 @@
                             class="gnews-amarelo">o</span><span
                             class="gnews-azul">g</span><span
                             class="gnews-verde">l</span><span
-                            class="gnews-vermelho">e</span> <span class="gnews-news">News</span></span>
+                            class="gnews-vermelho">e</span> <span class="gnews-news">{{ __('site.google_news.marca') }}</span></span>
                 </span>
                 <span class="gnews-nota">{{ __('site.google_news.nota') }}</span>
             </span>
@@ -91,10 +91,17 @@
         font-size: .85rem;
     }
 
-    /* O logótipo do Google News, escrito com as cores da marca. */
+    /*
+        O logótipo do Google Notícias, escrito com as cores da marca. O tipo de
+        letra do logótipo verdadeiro (Product Sans) não é público; o Montserrat
+        é o mais parecido de entre os que a página já carrega — geométrico e com
+        o mesmo "g" de uma só volta.
+    */
     .gnews-marca {
-        font-family: Arial, Helvetica, sans-serif;
-        font-weight: 700;
+        font-family: 'Montserrat', Arial, Helvetica, sans-serif;
+        font-weight: 500;
+        font-size: 1.05em;
+        letter-spacing: -.01em;
         white-space: nowrap;
     }
 
@@ -102,7 +109,7 @@
     .gnews-vermelho { color: #ea4335; }
     .gnews-amarelo { color: #fbbc05; }
     .gnews-verde { color: #34a853; }
-    .gnews-news { color: #5f6368; font-weight: 400; }
+    .gnews-news { color: #202124; }
 
     .gnews-botao {
         flex: 0 0 auto;

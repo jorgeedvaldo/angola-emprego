@@ -78,7 +78,8 @@ class GoogleNewsTest extends TestCase
             ->assertOk()
             ->assertSee('Siga o Angola Emprego no')
             ->assertSee('Seguir')
-            ->assertSee('Seguir o Angola Emprego no Google News');
+            ->assertSee('Seguir o Angola Emprego no Google Notícias')
+            ->assertSee('class="gnews-news">Notícias<', false);
     }
 
     public function test_it_follows_the_language_of_the_page()
@@ -88,6 +89,7 @@ class GoogleNewsTest extends TestCase
         $this->get('/sobre')
             ->assertOk()
             ->assertSee('Follow Angola Emprego on')
+            ->assertSee('class="gnews-news">News<', false)
             ->assertDontSee('Siga o Angola Emprego no');
     }
 

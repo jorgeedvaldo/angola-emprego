@@ -1,4 +1,5 @@
 @extends('templates.app')
+@section('robots', \App\Support\Seo::ROBOTS_ESCONDIDO)
 
 @section('title', __('site.auth.registar'))
 @section('description', __('site.auth.criar_conta_descricao'))

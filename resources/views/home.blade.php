@@ -7,21 +7,6 @@
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "WebPage",
-      "name": "Angola Emprego — Vagas de Emprego, Notícias e Cursos",
-      "description": "Angola Emprego é o maior portal de emprego em Angola. Encontre vagas de trabalho, cursos gratuitos e notícias de carreira.",
-      "url": "{{ url('/') }}",
-      "inLanguage": "{{ app()->getLocale() === 'pt' ? 'pt-AO' : app()->getLocale() }}",
-      "isPartOf": {
-        "@type": "WebSite",
-        "name": "Angola Emprego",
-        "url": "{{ url('/') }}"
-      }
-    }
-    </script>
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
       "@type": "ItemList",
       "name": "Vagas de Emprego em Destaque",
       "itemListOrder": "https://schema.org/ItemListOrderDescending",

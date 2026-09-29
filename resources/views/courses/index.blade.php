@@ -1,4 +1,5 @@
 @extends('templates.app')
+@section('schema_tipo', 'CollectionPage')
 
 @section('title', __('site.cursos.meta_titulo'))
 @section('description', __('site.cursos.meta_descricao'))
@@ -9,6 +10,7 @@
 {
   "@context": "https://schema.org",
   "@type": "CollectionPage",
+  "@id": "{{ url('/cursos') }}",
   "name": "Cursos Gratuitos Online — Angola Emprego",
   "description": "Cursos online gratuitos para desenvolver as suas competências profissionais em Angola.",
   "url": "{{ url('/cursos') }}",

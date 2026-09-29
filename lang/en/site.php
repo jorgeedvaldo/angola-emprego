@@ -257,6 +257,13 @@ return [
         'publicar_primeira' => 'Post your first one',
     ],
 
+    'seo' => [
+        'site_descricao' => 'Jobs, internships and scholarships in Angola.',
+        'organizacao_descricao' => 'Recruitment and job board in Angola, connecting companies and candidates across the country.',
+        'tempo_de_leitura' => 'Est. reading time',
+        'minutos' => ':contagem minute|:contagem minutes',
+    ],
+
     'google_news' => [
         'siga' => 'Follow Angola Emprego on',
         'nota' => 'Get the latest jobs and news straight to your feed.',

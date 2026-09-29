@@ -1,4 +1,5 @@
 @extends('templates.app')
+@section('robots', \App\Support\Seo::ROBOTS_ESCONDIDO)
 @section('title', __('site.candidaturas.meta_titulo', ['vaga' => $job->title]))
 @section('description', __('site.candidaturas.descricao'))
 

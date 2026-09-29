@@ -4,15 +4,36 @@
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>@yield('title') - {{env('APP_NAME')}}</title>
-  <meta name="description" content="@yield('description')" />
+  @php
+      // Tudo o que o cabeçalho precisa de saber, recolhido de uma vez: o que a
+      // página declarou por @section e o que a classe Seo deduz sozinha.
+      $seoTitulo = trim($__env->yieldContent('title'));
+      $seoNomeDoSite = config('app.name');
+      $seoTituloCompleto = $seoTitulo === '' ? $seoNomeDoSite : $seoTitulo . ' - ' . $seoNomeDoSite;
+      $seoDescricao = trim($__env->yieldContent('description'));
+      $seoCanonica = \App\Support\Seo::canonica($__env->yieldContent('canonical_link'));
+      $seoRobots = \App\Support\Seo::robots($__env->yieldContent('robots'));
+      $seoImagem = \App\Support\Seo::imagem($__env->yieldContent('og_image'));
+      $seoTipoDePagina = trim($__env->yieldContent('schema_tipo')) ?: 'WebPage';
+
+      $seoGrafo = \App\Support\Seo::grafo([
+          'titulo' => $seoTituloCompleto,
+          'descricao' => $seoDescricao,
+          'canonica' => $seoCanonica,
+          'imagem' => $seoImagem,
+          'tipo' => $seoTipoDePagina,
+      ]);
+  @endphp
+
+  <title>{{ $seoTituloCompleto }}</title>
+  <meta name="description" content="{{ $seoDescricao }}" />
   <meta name="csrf-token" content="{{ csrf_token() }}">
 
-  @hasSection('canonical_link')
-    <link rel="canonical" href="@yield('canonical_link')" />
-  @endif
+  {{-- Sem canónico, a mesma página com ?fbclid= ou ?gclid= conta como um
+       duplicado e divide a força que devia ter junta. --}}
+  <link rel="canonical" href="{{ $seoCanonica }}" />
 
-  <meta name="robots" content="follow, index, max-snippet:-1, max-video-preview:-1, max-image-preview:large" />
+  <meta name="robots" content="{{ $seoRobots }}" />
 
   <!-- Favicons -->
   <link rel="icon" href="{{ asset('assets/img/favicon.png') }}">
@@ -58,61 +79,42 @@
 
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="@yield('og_type', 'website')" />
-  <meta property="og:title" content="@yield('title') - {{env('APP_NAME')}}" />
-  <meta property="og:url"
-    content="@hasSection('canonical_link')@yield('canonical_link')@else{{ url()->current() }}@endif" />
-  <meta property="og:description" content="@yield('description')" />
+  <meta property="og:title" content="{{ $seoTituloCompleto }}" />
+  <meta property="og:url" content="{{ $seoCanonica }}" />
+  <meta property="og:description" content="{{ $seoDescricao }}" />
   @hasSection('created_at')
     <meta property="article:published_time" content="@yield('created_at')" />
   @endif
   @hasSection('updated_at')
     <meta property="article:modified_time" content="@yield('updated_at')" />
   @endif
-  <meta property="og:site_name" content="Angola Emprego" />
-  <meta property="og:image"
-    content="@hasSection('og_image')@yield('og_image')@else{{ asset('assets/img/og-default.png') }}@endif" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="@yield('title') - Angola Emprego" />
-  <meta property="og:locale" content="pt_AO" />
-  <meta name="author" content="Angola Emprego" />
+  <meta property="og:site_name" content="{{ $seoNomeDoSite }}" />
+  <meta property="og:image" content="{{ $seoImagem['url'] }}" />
+  {{-- O Facebook acredita na medida que lhe dermos; a errada corta a imagem. --}}
+  @if($seoImagem['largura'])
+    <meta property="og:image:width" content="{{ $seoImagem['largura'] }}" />
+    <meta property="og:image:height" content="{{ $seoImagem['altura'] }}" />
+    <meta property="og:image:type" content="{{ $seoImagem['tipo'] }}" />
+  @endif
+  <meta property="og:image:alt" content="{{ $seoTituloCompleto }}" />
+  <meta property="og:locale" content="{{ \App\Support\Seo::idiomaOpenGraph() }}" />
+  <meta name="author" content="{{ $seoNomeDoSite }}" />
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="@yield('title') - {{env('APP_NAME')}}" />
-  <meta name="twitter:description" content="@yield('description')" />
-  <meta name="twitter:image"
-    content="@hasSection('og_image')@yield('og_image')@else{{ asset('assets/img/og-default.png') }}@endif" />
-  <meta name="twitter:image:alt" content="@yield('title') - Angola Emprego" />
+  <meta name="twitter:title" content="{{ $seoTituloCompleto }}" />
+  <meta name="twitter:description" content="{{ $seoDescricao }}" />
+  <meta name="twitter:image" content="{{ $seoImagem['url'] }}" />
+  <meta name="twitter:image:alt" content="{{ $seoTituloCompleto }}" />
+  @hasSection('tempo_de_leitura')
+    <meta name="twitter:label1" content="{{ __('site.seo.tempo_de_leitura') }}" />
+    <meta name="twitter:data1" content="@yield('tempo_de_leitura')" />
+  @endif
 
-  <script type="application/ld+json">
-      {
-      "@context": "https://schema.org",
-      "@type": "Website",
-      "name": "Angola Emprego - Notícias e Emprego",
-      "url": "https://angolaemprego.com/"
-    }
-  </script>
-  <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "url": "https://www.angolaemprego.com",
-  "sameAs": [
-    "https://www.facebook.com/aoemprego"
-  ],
-  "logo": "https://angolaemprego.com/assets/img/logo.svg",
-  "name": "Angola Emprego - Notícias e Emprego",
-  "description": "Portal líder em recrutamento e ofertas de emprego em Angola, facilitando a conexão entre empresas e talentos em todo o país.",
-  "email": "geral@angolaemprego.com",
-  "telephone": "+244-951-014-936",
-  "address": {
-    "@type": "PostalAddress",
-    "addressLocality": "Luanda",
-    "addressCountry": "AO"
-  }
-}
-</script>
+  {{-- Um grafo só, com as peças ligadas por @id: esta página faz parte deste
+       site, que é publicado por esta organização. Soltas, como estavam, são
+       três fichas sem relação nenhuma entre si. --}}
+  <script type="application/ld+json">@json($seoGrafo, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)</script>
 
   @yield('head-scripts')
   <style>

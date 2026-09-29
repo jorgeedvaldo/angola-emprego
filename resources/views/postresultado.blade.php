@@ -14,7 +14,7 @@
           "headline": "Veja Os Resultados da Prova do Concurso do CSMJ (Conselho Superior da Magistratura Judicial)",
           "description": "Consulte a lista provisória de classificação final do concurso público do CSMJ 2026. Pesquise pelo seu nome e veja o resultado da sua candidatura.",
           "url": "{{ url('/noticias/resultados-concurso-csmj-2026') }}",
-          "image": ["https://angolaemprego.com/assets/img/logo.svg"],
+          "image": ["{{ asset('assets/img/og-default.png') }}"],
           "mainEntityOfPage": {
             "@type": "WebPage",
             "@id": "{{ url('/noticias/resultados-concurso-csmj-2026') }}"
@@ -25,26 +25,8 @@
           "publisher": {
             "@type": "Organization",
             "name": "Angola Emprego",
-            "logo": {"@type": "ImageObject", "url": "https://angolaemprego.com/assets/img/logo.svg"}
+            "logo": {"@type": "ImageObject", "url": "{{ asset('assets/img/logo-schema.png') }}", "width": 1138, "height": 406}
           }
-        }
-    </script>
-    <script type="application/ld+json">
-        {
-          "@context": "https://schema.org",
-          "@type": "BlogPosting",
-          "headline": "Veja Os Resultados da Prova do Concurso do CSMJ (Conselho Superior da Magistratura Judicial)",
-          "description": "Lista provisória de classificação final do concurso público do CSMJ Angola 2026.",
-          "image": {"@type": "ImageObject", "url": "https://angolaemprego.com/assets/img/logo.svg", "width": 1200, "height": 675},
-          "author": {"@type": "Person", "name": "Angola Emprego", "url": "{{ url('/') }}"},
-          "publisher": {
-            "@type": "Organization",
-            "name": "Angola Emprego",
-            "logo": {"@type": "ImageObject", "url": "https://angolaemprego.com/assets/img/logo.svg"}
-          },
-          "datePublished": "2026-04-13T00:00:00+01:00",
-          "dateModified": "2026-04-13T00:00:00+01:00",
-          "mainEntityOfPage": {"@type": "WebPage", "@id": "{{ url('/noticias/resultados-concurso-csmj-2026') }}"}
         }
     </script>
     <script type="application/ld+json">

@@ -8,6 +8,10 @@
 @section('og_image', asset('storage/' . $post->image))
 
 @section('head-scripts')
+<link rel="alternate" type="application/rss+xml"
+      title="{{ $post->title }}"
+      href="{{ url('/noticias/' . $post->slug . '/feed') }}">
+
 <script type="application/ld+json">
     {
       "@context": "https://schema.org",

@@ -8,6 +8,10 @@
 @section('og_image', asset('storage/' . $job->image))
 
 @section('head-scripts')
+  <link rel="alternate" type="application/rss+xml"
+        title="{{ $job->title }}"
+        href="{{ url('/vagas/' . $job->slug . '/feed') }}">
+
   <script type="application/ld+json">
   {
     "@context": "https://schema.org/",

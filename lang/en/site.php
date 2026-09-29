@@ -257,6 +257,13 @@ return [
         'publicar_primeira' => 'Post your first one',
     ],
 
+    'google_news' => [
+        'siga' => 'Follow Angola Emprego on',
+        'nota' => 'Get the latest jobs and news straight to your feed.',
+        'botao' => 'Follow',
+        'aria' => 'Follow Angola Emprego on Google News',
+    ],
+
     'promo_empresas' => [
         'etiqueta' => 'New',
         'sobretitulo' => 'Free for companies',

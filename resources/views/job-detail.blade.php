@@ -116,6 +116,8 @@
   </div>
   </div>
 
+  @include('partials.google-news')
+
   <!-- Job Details Section -->
   <section class="section py-5">
 
@@ -338,6 +340,8 @@
     </div>
 
   </section>
+
+  @include('partials.google-news')
 
   @include('partials.promo-empresas')
 

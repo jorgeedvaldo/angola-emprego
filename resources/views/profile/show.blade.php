@@ -1,4 +1,5 @@
 @extends('templates.app')
+@section('robots', \App\Support\Seo::ROBOTS_ESCONDIDO)
 
 @section('title', __('site.perfil.meta_titulo'))
 @section('description', __('site.perfil.meta_descricao'))

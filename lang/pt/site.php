@@ -268,6 +268,13 @@ return [
         'publicar_primeira' => 'Publicar a primeira',
     ],
 
+    'seo' => [
+        'site_descricao' => 'Vagas de emprego, estágios e bolsas de estudo em Angola.',
+        'organizacao_descricao' => 'Portal de recrutamento e ofertas de emprego em Angola, a ligar empresas e candidatos em todo o país.',
+        'tempo_de_leitura' => 'Tempo estimado de leitura',
+        'minutos' => ':contagem minuto|:contagem minutos',
+    ],
+
     'google_news' => [
         'siga' => 'Siga o Angola Emprego no',
         'nota' => 'Receba as vagas e as notícias mais recentes directamente no seu feed.',

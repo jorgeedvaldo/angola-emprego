@@ -1,4 +1,5 @@
 @extends('templates.app')
+@section('schema_tipo', 'FAQPage')
 @section('title', __('site.sobre.meta_titulo'))
 @section('description', __('site.sobre.meta_descricao'))
 @section('canonical_link', url('/sobre'))
@@ -8,6 +9,7 @@
 {
   "@context": "https://schema.org",
   "@type": "FAQPage",
+  "@id": "{{ url('/sobre') }}",
   "mainEntity": [{
     "@type": "Question",
     "name": @json(__('site.sobre.faq1_pergunta')),

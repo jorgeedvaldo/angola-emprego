@@ -1,4 +1,5 @@
 @extends('templates.app')
+@section('schema_tipo', 'CollectionPage')
 @section('title', __('site.noticias.meta_titulo'))
 @section('description', __('site.noticias.meta_descricao'))
 @section('canonical_link', url('/noticias'))
@@ -8,6 +9,7 @@
 {
   "@context": "https://schema.org",
   "@type": "CollectionPage",
+  "@id": "{{ url('/noticias') }}",
   "name": "Notícias de Angola — Emprego, Carreira e Actualidades",
   "description": "Fique atualizado com as últimas notícias de Angola sobre emprego, carreira, concursos públicos e oportunidades.",
   "url": "{{ url('/noticias') }}",

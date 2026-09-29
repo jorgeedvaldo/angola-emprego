@@ -1,4 +1,5 @@
 @extends('templates.app')
+@section('robots', \App\Support\Seo::ROBOTS_ESCONDIDO)
 
 @section('title', __('site.auth.redefinir'))
 @section('description', __('site.auth.redefinir_descricao'))

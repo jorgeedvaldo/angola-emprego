@@ -1,4 +1,5 @@
 @extends('templates.app')
+@section('schema_tipo', 'CollectionPage')
 @section('title', __('site.vagas.meta_titulo'))
 @section('description', __('site.vagas.meta_descricao'))
 @section('canonical_link', url('/vagas'))
@@ -8,6 +9,7 @@
 {
   "@context": "https://schema.org",
   "@type": "CollectionPage",
+  "@id": "{{ url('/vagas') }}",
   "name": "Vagas de Emprego em Angola",
   "description": "Listagem completa de vagas de emprego em Angola.",
   "url": "{{ url('/vagas') }}",

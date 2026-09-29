@@ -7,6 +7,9 @@
 @section('updated_at', $post->updated_at->toIso8601String())
 @section('og_image', asset('storage/' . $post->image))
 
+@php($minutosDeLeitura = \App\Support\Seo::tempoDeLeitura($post->description))
+@section('tempo_de_leitura', trans_choice('site.seo.minutos', $minutosDeLeitura, ['contagem' => $minutosDeLeitura]))
+
 @section('head-scripts')
 <link rel="alternate" type="application/rss+xml"
       title="{{ $post->title }}"
@@ -19,9 +22,15 @@
       "headline": "{{ $post->title }}",
       "description": "{{ Str::limit(strip_tags($post->description), 160) }}", 
       "url": "{{ url('/noticias/'. $post->slug) }}",
-      "image": [
-        "{{ asset('storage/' . $post->image) }}"
-       ],
+      "image": {
+        "@type": "ImageObject",
+        "url": "{{ asset('storage/' . $post->image) }}",
+        "width": 1200,
+        "height": 630
+      },
+      "inLanguage": "{{ \App\Support\Seo::idioma() }}",
+      "wordCount": {{ str_word_count(strip_tags($post->description)) }},
+      "timeRequired": "PT{{ $minutosDeLeitura }}M",
       "mainEntityOfPage": {
         "@type": "WebPage",
         "@id": "{{ url('/noticias/'. $post->slug) }}"
@@ -38,45 +47,13 @@
         "name": "Angola Emprego",
         "logo": {
           "@type": "ImageObject",
-          "url": "https://angolaemprego.com/assets/img/logo.svg"
+          "url": "{{ asset('assets/img/logo-schema.png') }}",
+          "width": 1138,
+          "height": 406
         }
       }
     }
 </script>
-<script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "BlogPosting",
-      "headline": "{{ $post->title }}",
-      "description": "{{ Str::limit(strip_tags($post->description), 160) }}",
-      "image": {
-        "@type": "ImageObject",
-        "url": "{{ asset('storage/' . $post->image) }}",
-        "width": 1200,
-        "height": 675
-      },
-      "author": {
-        "@type": "Person",
-        "name": "Yuri Kiluanji",
-        "url": "{{ url('/#YuriKiluanji') }}"
-      },
-      "publisher": {
-        "@type": "Organization",
-        "name": "Angola Emprego",
-        "logo": {
-          "@type": "ImageObject",
-          "url": "https://angolaemprego.com/assets/img/logo.svg"
-        }
-      },
-      "datePublished": "{{ $post->created_at->toIso8601String() }}",
-      "dateModified": "{{ $post->updated_at->toIso8601String() }}",
-      "mainEntityOfPage": {
-        "@type": "WebPage",
-        "@id": "{{ url('/noticias/'. $post->slug) }}"
-      }
-    }
-</script>
-
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",

@@ -39,8 +39,8 @@
       "dateModified": "{{ $post->updated_at->toIso8601String() }}",
       "author": [{
           "@type": "Person",
-          "name": "Yuri Kiluanji",
-          "url": "{{ url('/#YuriKiluanji') }}"
+          "name": "Ango Admin",
+          "url": "{{ url('/#AngoAdmin') }}"
       }],
       "publisher": {
         "@type": "Organization",
@@ -96,7 +96,7 @@
             <div class="col-lg-10 text-center">
                 <h1 class="display-5 fw-bold text-dark mb-4">{{$post->title}}</h1>
                 <div class="d-flex justify-content-center align-items-center gap-3 text-muted">
-                     <span><i class="bi bi-person-fill me-1"></i> Yuri Kiluanji</span>
+                     <span><i class="bi bi-person-fill me-1"></i> Ango Admin</span>
                      <span><i class="bi bi-calendar-event me-1"></i> {{ date_format(new DateTime($post->created_at), 'd/m/Y') }}</span>
                 </div>
             </div>

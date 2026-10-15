@@ -1,0 +1,59 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+
+/**
+ * Índice na coluna `company` das vagas.
+ *
+ * A barra lateral de /vagas agrupa as vagas por empresa para mostrar as 15 que
+ * mais contratam. Sem índice, esse GROUP BY varre a tabela toda — era a
+ * consulta mais cara do site, e corria em cada visita. Agora está em cache,
+ * mas quando a cache expira ainda tem de correr uma vez.
+ */
+return new class extends Migration
+{
+    private const INDICE = 'jobs_company_index';
+
+    public function up(): void
+    {
+        if (!Schema::hasTable('jobs') || !Schema::hasColumn('jobs', 'company') || $this->jaExiste()) {
+            return;
+        }
+
+        Schema::table('jobs', function ($tabela) {
+            $tabela->index('company');
+        });
+    }
+
+    public function down(): void
+    {
+        if (Schema::hasTable('jobs') && $this->jaExiste()) {
+            Schema::table('jobs', fn ($tabela) => $tabela->dropIndex(self::INDICE));
+        }
+    }
+
+    /**
+     * O Laravel 9 não sabe perguntar se um índice existe, e correr a migração
+     * duas vezes num servidor onde ela já passou não pode rebentar.
+     */
+    private function jaExiste(): bool
+    {
+        $ligacao = Schema::getConnection();
+
+        try {
+            if ($ligacao->getDriverName() === 'sqlite') {
+                return DB::table('sqlite_master')
+                    ->where('type', 'index')
+                    ->where('name', self::INDICE)
+                    ->exists();
+            }
+
+            return collect($ligacao->select('SHOW INDEX FROM `jobs`'))
+                ->contains(fn ($linha) => ($linha->Key_name ?? null) === self::INDICE);
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+};

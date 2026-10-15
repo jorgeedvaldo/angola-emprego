@@ -7,6 +7,7 @@ use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
+use App\Support\Resiliente;
 
 class BlogController extends Controller
 {
@@ -17,7 +18,7 @@ class BlogController extends Controller
             $perPage = 30;
             $currentPage = 1;
             $currentItems = $cachedPosts->slice(0, $perPage);
-            $total = Post::count(); 
+            $total = Resiliente::lembrar('total_posts', config('resiliencia.normal'), fn () => Post::count());
             
             $posts = new LengthAwarePaginator(
                 $currentItems, 
@@ -27,7 +28,13 @@ class BlogController extends Controller
                 ['path' => request()->url(), 'query' => request()->query()]
             );
         } else {
-            $posts = Post::orderByRaw('id DESC')->paginate(30);
+            $pagina = (int) request()->get('page', 1);
+
+            $posts = Resiliente::lembrar(
+                'posts_pagina_' . $pagina,
+                config('resiliencia.normal'),
+                fn () => Post::orderByRaw('id DESC')->paginate(30)
+            );
         }
         $categories = Category::getCachedAll();
         return view('blog', compact('posts', 'categories'));
@@ -37,7 +44,7 @@ class BlogController extends Controller
     {
         try
         {
-            $post = Cache::remember('post_' . $slug, 1440, function () use ($slug) {
+            $post = Resiliente::lembrar('post_' . $slug, config('resiliencia.normal'), function () use ($slug) {
                 return Post::where('slug', $slug)->firstOrFail();
             });
 

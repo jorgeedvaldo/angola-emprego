@@ -37,6 +37,10 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\SetLocale::class,
+
+            // Depois do SetLocale, para a chave da cache saber o idioma, e depois
+            // do StartSession, para o token CSRF poder ser reposto na cópia.
+            \App\Http\Middleware\CacheDePaginasPublicas::class,
         ],
 
         'api' => [

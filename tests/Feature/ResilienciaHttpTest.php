@@ -204,6 +204,35 @@ class ResilienciaHttpTest extends TestCase
     }
 
     /**
+     * Um HEAD — o que os monitores de uptime mandam, e o que o `curl -I` faz —
+     * também é servido da cópia. Deixá-lo de fora era deixar de fora quem mais
+     * bate à porta.
+     */
+    public function test_a_head_request_is_served_from_the_cache_too()
+    {
+        $this->ligarACacheDeHtml();
+
+        $this->get('/sobre')->assertOk();
+
+        $this->head('/sobre')
+            ->assertOk()
+            ->assertHeader('X-Cache-Angola', 'hit');
+    }
+
+    /** Mas um HEAD não enche a cache: a resposta a um HEAD vai sem corpo. */
+    public function test_a_head_request_never_fills_the_cache_with_an_empty_page()
+    {
+        $this->ligarACacheDeHtml();
+
+        $this->head('/sobre')->assertOk();
+
+        $this->get('/sobre')
+            ->assertOk()
+            ->assertHeaderMissing('X-Cache-Angola')
+            ->assertSee('Sobre');
+    }
+
+    /**
      * O token CSRF do primeiro visitante não pode ficar na cópia: ou os
      * formulários dos outros rebentavam com 419, ou — pior — passavam todos a
      * partilhar o mesmo token.

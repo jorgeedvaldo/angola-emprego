@@ -209,6 +209,7 @@ php artisan resiliencia --fechar   # fecha o disjuntor à força
 Pela linha de comandos, numa página pública:
 
 ```bash
+curl -s https://angolaemprego.com/vagas -o /dev/null     # aquece
 curl -sI https://angolaemprego.com/vagas | grep -i x-cache-angola
 ```
 
@@ -218,6 +219,10 @@ Na primeira visita não aparece nada; na segunda:
 X-Cache-Angola: hit
 X-Cache-Angola-Em: 2026-10-15T18:35:06+00:00
 ```
+
+O `-I` manda um **HEAD**, que é servido da cópia mas nunca a cria — por isso é
+preciso aquecer com um GET antes. É de propósito: a resposta a um HEAD vai sem
+corpo, e guardá-la enchia a cache de páginas vazias.
 
 No `storage/logs/laravel.log`, tudo o que isto faz fica marcado com
 `[resiliencia]`:

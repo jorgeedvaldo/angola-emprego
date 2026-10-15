@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Job;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use App\Support\Resiliente;
 
 class HomeController extends Controller
 {
@@ -25,11 +26,20 @@ class HomeController extends Controller
             '/noticias/resultados-concurso-csmj-2026'
         ];
 
-        $jobs = Job::publiclyVisible()->orderByRaw('id DESC')->paginate(12500);
-		$posts = Post::orderByRaw('id DESC')->paginate(12500);
+        // O sitemap é a página mais cara do site: varre as vagas e os artigos
+        // todos. Quem a pede são os robôs, que não precisam dela ao minuto.
+        [$jobs, $posts, $courses, $companies] = Resiliente::lembrar(
+            'sitemap',
+            config('resiliencia.sitemap'),
+            fn () => [
+                Job::publiclyVisible()->orderByRaw('id DESC')->paginate(12500),
+                Post::orderByRaw('id DESC')->paginate(12500),
+                \App\Models\Course::orderBy('id', 'desc')->get(),
+                \App\Models\Company::orderBy('name')->get(),
+            ]
+        );
+
         $categories = Category::getCachedAll();
-        $courses = \App\Models\Course::orderBy('id', 'desc')->get();
-        $companies = \App\Models\Company::orderBy('name')->get();
 
         return response()->view('xml.sitemap', compact('jobs', 'posts', 'categories', 'staticPages', 'courses', 'companies'))
             ->header('Content-Type', 'text/xml');
@@ -38,7 +48,11 @@ class HomeController extends Controller
 	public function feedGenerator()
     {
         //$jobs = Job::orderByRaw('id DESC')->paginate(10);
-        $posts = Post::orderBy('id', 'desc')->paginate(10);
+        $posts = Resiliente::lembrar(
+            'feed_geral',
+            config('resiliencia.normal'),
+            fn () => Post::orderBy('id', 'desc')->paginate(10)
+        );
         return response()->view('xml.feed', compact('posts'))->header('Content-Type', 'text/xml');
     }
 }

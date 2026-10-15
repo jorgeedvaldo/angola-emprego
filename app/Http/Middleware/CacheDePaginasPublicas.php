@@ -70,7 +70,10 @@ class CacheDePaginasPublicas
 
     private function podeGuardar(Request $request): bool
     {
-        if (!config('resiliencia.html.activa') || !$request->isMethod('GET')) {
+        // GET e HEAD. Um HEAD é o que os monitores de uptime e os robôs mandam,
+        // e é o que o `curl -I` faz — deixá-lo de fora era deixar de fora
+        // exactamente quem mais bate à porta.
+        if (!config('resiliencia.html.activa') || !$request->isMethodCacheable()) {
             return false;
         }
 
@@ -114,6 +117,13 @@ class CacheDePaginasPublicas
     private function respostaServe(Request $request, RespostaBase $resposta): bool
     {
         if ($resposta->getStatusCode() !== 200 || !$resposta instanceof Response) {
+            return false;
+        }
+
+        // Serve-se a um HEAD, mas não se guarda a partir de um: o corpo de uma
+        // resposta a HEAD é deitado fora antes de sair, e guardá-lo era encher
+        // a cache de páginas vazias.
+        if (!$request->isMethod('GET')) {
             return false;
         }
 

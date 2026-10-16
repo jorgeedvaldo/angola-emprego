@@ -22,14 +22,6 @@
         <env name="APP_KEY" value="base64:HnqpB+C84LvUPppubs6wMVlD9K+uhbDzBUngLJUmeDo="/>
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="CACHE_DRIVER" value="array"/>
-
-        <!--
-            A cache de HTML fica desligada nos testes: há testes que mudam a
-            configuração entre dois pedidos ao mesmo endereço e esperam HTML
-            diferente — coisa que em produção não acontece sem uma publicação,
-            que limpa a cache. Os testes da própria cache ligam-na à mão.
-        -->
-        <env name="RESILIENCIA_HTML" value="false"/>
         <env name="DB_CONNECTION" value="sqlite"/>
         <env name="DB_DATABASE" value=":memory:"/>
         <env name="MAIL_MAILER" value="array"/>

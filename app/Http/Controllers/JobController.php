@@ -7,7 +7,6 @@ use App\Models\Job;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
-use App\Support\Resiliente;
 
 class JobController extends Controller
 {
@@ -44,7 +43,7 @@ class JobController extends Controller
             $currentItems = $cachedJobs->slice(0, $perPage);
             // We use a simple count query for total, or just a large number if we want to avoid it.
             // For accurate pagination links, we need real count.
-            $total = Resiliente::lembrar('total_vagas', config('resiliencia.normal'), fn () => Job::publiclyVisible()->count());
+            $total = Job::publiclyVisible()->count();
             
             $jobs = new LengthAwarePaginator(
                 $currentItems, 
@@ -62,16 +61,11 @@ class JobController extends Controller
         // Sidebar Data
         $categories = Category::getCachedWithJobs();
         // Top 15 companies by job count
-        // Um GROUP BY sobre a tabela das vagas inteira, que antes corria em
-        // cada visita a /vagas — filtrada ou não. Era a consulta mais cara
-        // desta página.
-        $topCompanies = Resiliente::lembrar('top_empresas', config('resiliencia.normal'), function () {
-            return Job::publiclyVisible()->select('company', \DB::raw('count(*) as total'))
-                        ->groupBy('company')
-                        ->orderByDesc('total')
-                        ->limit(15)
-                        ->get();
-        });
+        $topCompanies = Job::publiclyVisible()->select('company', \DB::raw('count(*) as total'))
+                            ->groupBy('company')
+                            ->orderByDesc('total')
+                            ->limit(15)
+                            ->get();
 
         return view('jobs', compact('jobs', 'categories', 'topCompanies'));
     }
@@ -80,7 +74,7 @@ class JobController extends Controller
     {
         try
         {
-            $job = Resiliente::lembrar('job_' . $slug, config('resiliencia.normal'), function () use ($slug) {
+            $job = Cache::remember('job_' . $slug, 1440, function () use ($slug) {
                 return Job::publiclyVisible()->with(['categories', 'companyRecord', 'country'])->where('slug', $slug)->firstOrFail();
             });
 

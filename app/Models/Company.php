@@ -4,8 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Http\Middleware\CacheDePaginasPublicas;
-use App\Support\Resiliente;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
@@ -47,8 +45,8 @@ class Company extends Model
     {
         static::saving(function (Company $company) {
             if ($company->isDirty('approval_status')) {
-                Resiliente::esquecer('latest_jobs_50', 'categories_with_jobs');
-                CacheDePaginasPublicas::invalidar();
+                Cache::forget('latest_jobs_50');
+                Cache::forget('categories_with_jobs');
 
                 if ($company->approval_status === 'approved') {
                     $company->approved_at = $company->approved_at ?: now();

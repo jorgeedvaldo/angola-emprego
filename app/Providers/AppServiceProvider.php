@@ -2,12 +2,10 @@
 
 namespace App\Providers;
 
-use App\Services\CircuitoBaseDeDados;
-use App\Services\DatabaseFallbackCache;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade;
-use Illuminate\Database\Schema\Builder as SchemaBuilder;
+use Illuminate\Support\Facades\Schema;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -18,14 +16,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        // Um por requisição: o disjuntor tem de ser o mesmo para toda a gente
-        // que o consulte dentro do mesmo pedido.
-        $this->app->singleton(CircuitoBaseDeDados::class, fn () => new CircuitoBaseDeDados());
-
-        $this->app->singleton(
-            DatabaseFallbackCache::class,
-            fn ($app) => new DatabaseFallbackCache($app->make(CircuitoBaseDeDados::class))
-        );
+        //
     }
 
     /**
@@ -35,12 +26,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        // Directamente na classe, e não pela fachada Schema::. A fachada
-        // resolve o construtor de esquema, e isso **estabelece uma ligação ao
-        // MySQL em cada requisição** — mesmo numa página sem consulta nenhuma,
-        // mesmo num 404. Num alojamento com 30 ligações, era uma ligação
-        // gasta por visita para pôr um número numa propriedade estática.
-        SchemaBuilder::defaultStringLength(191);
+        Schema::defaultStringLength(191);
         Paginator::useBootstrap();
 
         // @asset('assets/js/x.js') em vez de asset(): junta a versão do ficheiro

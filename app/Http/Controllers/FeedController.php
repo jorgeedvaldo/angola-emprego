@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Job;
 use App\Models\Post;
 use Illuminate\Database\Eloquent\Collection;
-use App\Support\Resiliente;
 use Illuminate\Support\Str;
 
 /**
@@ -24,18 +23,12 @@ class FeedController extends Controller
 
     public function post(string $slug)
     {
-        [$post, $outros] = Resiliente::lembrar(
-            'feed_artigo_' . $slug,
-            config('resiliencia.normal'),
-            function () use ($slug) {
-                $post = Post::where('slug', $slug)->firstOrFail();
+        $post = Post::where('slug', $slug)->firstOrFail();
 
-                return [$post, Post::where('id', '!=', $post->id)
-                    ->orderByDesc('id')
-                    ->limit(self::VIZINHOS)
-                    ->get()];
-            }
-        );
+        $outros = Post::where('id', '!=', $post->id)
+            ->orderByDesc('id')
+            ->limit(self::VIZINHOS)
+            ->get();
 
         return $this->canal(
             $post->title,
@@ -48,15 +41,18 @@ class FeedController extends Controller
 
     public function job(string $slug)
     {
-        [$job, $outras] = Resiliente::lembrar(
-            'feed_vaga_' . $slug,
-            config('resiliencia.normal'),
-            function () use ($slug) {
-                $job = Job::publiclyVisible()->with('country')->where('slug', $slug)->firstOrFail();
+        $job = Job::publiclyVisible()->with('country')->where('slug', $slug)->firstOrFail();
 
-                return [$job, $this->vizinhasDe($job)];
-            }
-        );
+        // De uma vaga de empresa seguem-se as outras vagas dessa empresa: é o
+        // que torna este feed útil a quem quer acompanhar quem contrata. Das
+        // vagas sem empresa registada seguem-se as mais recentes do site.
+        $outras = Job::publiclyVisible()
+            ->with('country')
+            ->where('id', '!=', $job->id)
+            ->when($job->company_id, fn ($consulta) => $consulta->where('company_id', $job->company_id))
+            ->orderByDesc('id')
+            ->limit(self::VIZINHOS)
+            ->get();
 
         return $this->canal(
             $job->title,
@@ -67,22 +63,6 @@ class FeedController extends Controller
                 : 'Vagas do Angola Emprego, a começar em "' . $job->title . '".',
             $this->vagas($outras->prepend($job))
         );
-    }
-
-    /**
-     * De uma vaga de empresa seguem-se as outras vagas dessa empresa: é o que
-     * torna este feed útil a quem quer acompanhar quem contrata. Das vagas sem
-     * empresa registada seguem-se as mais recentes do site.
-     */
-    private function vizinhasDe(Job $job): Collection
-    {
-        return Job::publiclyVisible()
-            ->with('country')
-            ->where('id', '!=', $job->id)
-            ->when($job->company_id, fn ($consulta) => $consulta->where('company_id', $job->company_id))
-            ->orderByDesc('id')
-            ->limit(self::VIZINHOS)
-            ->get();
     }
 
     // ------------------------------------------------------------- o canal

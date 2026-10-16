@@ -6,8 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Cache;
-use App\Http\Middleware\CacheDePaginasPublicas;
-use App\Support\Resiliente;
 
 use App\Models\Concerns\GeneratesCoverAndThumbnail;
 
@@ -57,13 +55,15 @@ class Job extends Model
         });
 
         static::saved(function ($job) {
-            Resiliente::esquecer('latest_jobs_50', 'job_' . $job->slug, 'categories_with_jobs');
-            CacheDePaginasPublicas::invalidar();
+            Cache::forget('latest_jobs_50');
+            Cache::forget('job_' . $job->slug);
+            Cache::forget('categories_with_jobs');
         });
 
         static::deleted(function ($job) {
-            Resiliente::esquecer('latest_jobs_50', 'job_' . $job->slug, 'categories_with_jobs');
-            CacheDePaginasPublicas::invalidar();
+            Cache::forget('latest_jobs_50');
+            Cache::forget('job_' . $job->slug);
+            Cache::forget('categories_with_jobs');
         });
     }
 
@@ -124,7 +124,8 @@ class Job extends Model
 
     public static function getCachedLatest()
     {
-        return Resiliente::lembrar('latest_jobs_50', config('resiliencia.normal'), function () {
+        // 1440 minutes = 24 hours
+        return Cache::remember('latest_jobs_50', 1440, function () {
             return self::publiclyVisible()->with(['companyRecord', 'country'])->orderByRaw('id DESC')->limit(50)->get();
         });
     }

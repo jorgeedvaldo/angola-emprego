@@ -61,15 +61,20 @@ Route::post('/vagas/{slug}/candidatar', [JobApplicationController::class, 'store
 Route::get('/blog', [BlogController::class, 'index']);
 Route::get('/noticias', [BlogController::class, 'index']);
 Route::get('/atm-com-dinheiro', [ToolsController::class, 'index']);
-Route::get('/sitemap.xml', [HomeController::class, 'siteMapGenerator'])->name('sitemap');
-Route::get('/feed', [HomeController::class, 'feedGenerator'])->name('feed');
+// Sitemap e feeds: sem conta, sem limite nenhum até agora, e são as rotas que
+// os crawlers (Google, Bing, agregadores de vagas, leitores de RSS) mais
+// visitam. O sitemap em particular varre as vagas, os artigos, os cursos e as
+// empresas inteiros, sem cache nenhuma — o throttle não torna isso mais
+// barato, mas impede que um rastreador mal comportado o peça em rajada.
+Route::get('/sitemap.xml', [HomeController::class, 'siteMapGenerator'])->name('sitemap')->middleware('throttle:20,1');
+Route::get('/feed', [HomeController::class, 'feedGenerator'])->name('feed')->middleware('throttle:30,1');
 
 
 // Public profile by username (e.g. /@joao.silva)
 Route::get('/@{username}', [App\Http\Controllers\ProfileController::class, 'publicProfile'])->name('profile.public');
 
 Route::get('/vagas/{slug}', [JobController::class, 'getBySlug']);
-Route::get('/vagas/{slug}/feed', [FeedController::class, 'job'])->name('feed.job');
+Route::get('/vagas/{slug}/feed', [FeedController::class, 'job'])->name('feed.job')->middleware('throttle:30,1');
 
 Route::middleware(['guest'])->group(function () {
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -163,5 +168,5 @@ Route::get('/noticias/resultados-concurso-csmj-2026', function () {
 })->name('post.resultado.csmj');
 
 Route::get('/noticias/{slug}', [BlogController::class, 'getBySlug']);
-Route::get('/noticias/{slug}/feed', [FeedController::class, 'post'])->name('feed.post');
+Route::get('/noticias/{slug}/feed', [FeedController::class, 'post'])->name('feed.post')->middleware('throttle:30,1');
 Route::get('/{slug}', [BlogController::class, 'getBySlug']);

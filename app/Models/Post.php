@@ -29,6 +29,16 @@ class Post extends Model
             $post->generateThumb($post->image);
         });
 
+        static::updating(function ($post) {
+            // O cache de um artigo vive na chave do seu slug. Se o slug está a
+            // mudar, a cópia antiga fica presa até expirar sozinha (24h) a
+            // menos que seja esquecida aqui — o static::saved() de baixo só
+            // sabe esquecer a chave do slug novo.
+            if ($post->isDirty('slug')) {
+                Cache::forget('post_' . $post->getOriginal('slug'));
+            }
+        });
+
         static::updated(function ($post) {
             $post->generateThumb($post->image);
         });

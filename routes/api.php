@@ -20,6 +20,10 @@ Route::get('/subscribers', [SubscriberController::class, 'index']);
 Route::post('/job/create', [JobController::class, 'store']);
 Route::post('/post/create', [PostController::class, 'store']);
 
+// Editar um artigo já publicado. O {identificador} aceita o id ou o slug —
+// é a mesma rota para os dois. Ver docs/api-noticias.md.
+Route::match(['put', 'patch'], '/posts/{identificador}', [PostController::class, 'update']);
+
 Route::get('/jobs/{id}', [JobController::class, 'getById']);
 
 Route::get('/users', [App\Http\Controllers\Api\UserController::class, 'index']);
